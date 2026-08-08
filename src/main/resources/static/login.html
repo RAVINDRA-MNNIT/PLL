@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Learner's Digital Library - Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+}
+
+.login-container{
+    width:380px;
+    background:#fff;
+    padding:35px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+h1{
+    font-size:24px;
+    color:#1e3c72;
+    text-align:center;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin:8px 0 25px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:bold;
+}
+
+input, select{
+    width:100%;
+    padding:12px;
+    margin-bottom:18px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+}
+
+input:focus, select:focus{
+    outline:none;
+    border-color:#1e3c72;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#1e3c72;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.error{
+    color:red;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+button:disabled{
+    opacity:0.65;
+    cursor:not-allowed;
+}
+.footer{
+    text-align:center;
+    color:#777;
+    font-size:12px;
+    margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h1>📚 Pro Learner's Digital Library</h1>
+    <p class="subtitle">Library Login Portal</p>
+
+    <form onsubmit="return validateForm()">
+        <label>User Type</label>
+        <select id="userType" onchange="updatePersonList()" >
+            <option value="">-- Select Login Type --</option>
+            <option value="Manager">Manager</option>
+            <option value="Admin">Admin</option>
+        </select>
+
+        <label id="personLabel">Select Person</label>
+        <select id="personName"  disabled>
+            <option value="">-- Select User Type First --</option>
+        </select>
+
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter 8 Character Password" >
+
+        <div id="errorMsg" class="error"></div>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="footer">
+        © 2026 Pro Learner's Digital Library
+    </div>
+
+</div>
+
+<script>
+const userType = document.getElementById("userType");
+const personSelect = document.getElementById("personName");
+const personLabel = document.getElementById("personLabel");
+const passwordInput = document.getElementById("password");
+const error = document.getElementById("errorMsg");
+const form = document.querySelector("form");
+const loginButton = form.querySelector('button[type="submit"]');
+
+form.removeAttribute("onsubmit");
+userType.removeAttribute("onchange");
+userType.addEventListener("change", updatePersonList);
+form.addEventListener("submit", login);
+
+async function updatePersonList() {
+    const selectedType = userType.value;
+    error.innerText = "";
+    personSelect.disabled = true;
+
+    if (!selectedType) {
+        personLabel.innerText = "Select Person";
+        personSelect.innerHTML = '<option value="">-- Select User Type First --</option>';
+        return;
+    }
+
+    const role = selectedType === "Manager" ? "MANAGER" : "ADMIN";
+    personLabel.innerText = selectedType;
+    personSelect.innerHTML = `<option value="">-- Loading ${selectedType} --</option>`;
+
+    try {
+        const response = await fetch(`/api/users?role=${encodeURIComponent(role)}`, {
+            credentials: "include"
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const users = await response.json();
+        personSelect.innerHTML = `<option value="">-- Select ${selectedType} --</option>`;
+
+        users.forEach(user => {
+            const option = document.createElement("option");
+            option.value = user.id;
+            option.textContent = user.fullName;
+            personSelect.appendChild(option);
+        });
+
+        if (users.length === 0) {
+            personSelect.innerHTML = `<option value="">-- No active ${selectedType} found --</option>`;
+            return;
+        }
+
+        personSelect.disabled = false;
+    } catch (err) {
+        console.error(err);
+        personSelect.innerHTML = '<option value="">-- Unable to load users --</option>';
+        error.innerText = "Could not connect to the server. Make sure Spring Boot is running.";
+    }
+}
+
+async function login(event) {
+    event.preventDefault();
+
+    let selectedType = userType.value;
+    let userId = personSelect.value;
+    let password = passwordInput.value;
+
+    if (!selectedType) {
+        error.innerText = "Please select Admin or Manager.";
+        return;
+    }
+
+    if (!userId) {
+        error.innerText = `Please select a ${selectedType}.`;
+        return;
+    }
+
+    if (password.length < 8) {
+        error.innerText = "Password must be exactly 8 characters.";
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = "Logging in...";
+
+    try {
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            credentials: "include",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                userId: Number(userId),
+                password: password
+            })
+        });
+
+        if (response.status === 401) {
+            error.innerText = "Invalid user or password.";
+            return;
+        }
+
+        if (!response.ok) {
+            error.innerText = "Login failed. Please try again.";
+            return;
+        }
+
+        const user = await response.json();
+
+        if (user.role === "ADMIN") {
+            window.location.href = "/admin.html";
+        } else if (user.role === "MANAGER") {
+            window.location.href = "/manager.html";
+        } else {
+            error.innerText = "Unknown user role.";
+        }
+    } catch (err) {
+        console.error(err);
+        error.innerText = "Could not connect to the server. Make sure Spring Boot is running.";
+    } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Login";
+    }
+}
+</script>
+
+</body>
+</html>

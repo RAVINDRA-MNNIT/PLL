@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link
+    rel="stylesheet"
+    href="/css/pending-approvals.css">
+</head>
+<body>
+<div class="card">
+
+    <div class="pending-header">
+
+        <div class="pending-header-left">
+
+            <h2>Pending Approvals</h2>
+
+            <p class="pending-subtitle">
+                Review admission and fee update requests.
+            </p>
+
+        </div>
+
+<div class="collection-summary">
+
+    <span class="summary-title">
+        Total Collection
+    </span>
+
+    <div class="summary-item">
+
+        <span class="summary-label">
+            💵 Cash
+        </span>
+
+        <strong
+            id="cashCollection"
+            class="summary-value cash">
+
+            ₹0
+
+        </strong>
+
+    </div>
+
+    <div class="summary-divider"></div>
+
+    <div class="summary-item">
+
+        <span class="summary-label">
+            💳 Online
+        </span>
+
+        <strong
+            id="onlineCollection"
+            class="summary-value online">
+
+            ₹0
+
+        </strong>
+
+    </div>
+
+</div>
+
+    </div>
+
+    <div class="tabs-container">
+
+        <div class="tabs">
+            <button id="admissionTab" class="tab active">Admission</button>
+            <button id="feesTab" class="tab">Fees</button>
+            <button id="seatTab" class="tab">Seat</button>
+            <button id="detailsTab" class="tab">Details</button>
+            <button id="enrollmentTab" class="tab">Enrollment</button>
+            <button id="allTab" class="tab">All Request Status</button>
+        </div>
+
+        <button id="clearAllBtn" class="clear-btn">
+            🗑 Clear All
+        </button>
+
+    </div>
+
+    <div class="search">
+
+        <input
+            id="searchBox"
+            type="text"
+            placeholder="Search pending requests..."
+            aria-label="Search pending requests">
+
+    </div>
+
+    <table id="pendingTable">
+
+        <thead id="pendingTableHead"></thead>
+
+        <tbody id="pendingRows"></tbody>
+
+    </table>
+
+</div>
+<div
+    id="admissionModal"
+    class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Request</h2>
+            <button
+                id="closePendingModal"
+                type="button"
+                aria-label="Close">
+                ✕
+            </button>
+        </div>
+        <div id="admissionModalBody">
+            Loading...
+        </div>
+    </div>
+</div>
+</body>
+</html>

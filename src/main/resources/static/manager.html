@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Digital Library - Manager Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="/css/manager.css">
+
+</head>
+
+<body>
+
+<div id="pageLoading">
+
+    Loading Manager Dashboard...
+
+</div>
+
+<div id="dashboard">
+
+    <aside class="sidebar">
+
+        <h2>📚 Pro Learner's Digital Library</h2>
+
+        <div
+            class="nav-item active"
+            onclick="switchView('fees')">
+
+            Student Fees
+
+        </div>
+
+        <div
+            class="nav-item"
+            onclick="switchView('add')">
+
+            Add New Student
+
+        </div>
+
+        <div
+            class="nav-item"
+            onclick="switchView('pending')">
+
+            Pending Approvals
+
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+
+            <h1>Manager Dashboard</h1>
+
+            <div class="user-area">
+
+                <span class="welcome">
+
+                    Welcome,
+
+                    <strong id="managerName">
+
+                        Loading...
+
+                    </strong>
+
+                </span>
+
+                <button
+                    type="button"
+                    class="logout-btn"
+                    onclick="Session.logout()">
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Fees -->
+
+        <div id="feesView">
+
+            <div class="stats">
+
+                <div class="stat">
+                    <h4>Total Students</h4>
+                    <div class="value" id="total">0</div>
+                </div>
+
+                <div class="stat">
+                    <h4>Active Memberships</h4>
+                    <div class="value" id="activeCount">0</div>
+                </div>
+
+                <div class="stat">
+                    <h4>Expired Memberships</h4>
+                    <div class="value" id="expiredCount">0</div>
+                </div>
+
+                <div class="stat">
+                    <h4>Pending Admin Approval</h4>
+                    <div class="value" id="pendingCount">0</div>
+                </div>
+
+            </div>
+
+            <section class="card">
+
+                <h2>Student Fee Records</h2>
+
+                <div class="student-filters">
+
+                    <select id="searchType">
+                        <option value="all">All</option>
+                        <option value="id">Membership ID</option>
+                        <option value="name">Student Name</option>
+                        <option value="mobile">Mobile Number</option>
+                        <option value="seat">Seat Number</option>
+                    </select>
+
+                    <input
+                        id="search"
+                        type="text"
+                        placeholder="Search students...">
+
+                    <select id="batchFilter">
+                        <option value="">All Batches</option>
+                    </select>
+
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="EXPIRED">Expired</option>
+                        <option value="DISCONTINUED">Discontinued</option>
+                        <option value="TERMINATED">Terminated</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="resetFilters()">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+
+                        Reset
+
+                    </button>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Membership ID</th>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Batch</th>
+                                <th>Seat No.</th>
+                                <th>Fees</th>
+                                <th>From</th>
+                                <th>Till Date</th>
+                                <th>Status</th>
+                                <th>Pending Approval</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="studentRows"></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- Admission -->
+
+        <div
+            id="addView"
+            style="display:none">
+
+            <div id="newAdmissionContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+
+                        Loading New Admission...
+
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- Pending -->
+
+        <div
+            id="pendingView"
+            style="display:none">
+
+            <div id="pendingApprovalContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+
+                        Loading Pending Approvals...
+
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Fee Modal -->
+
+<div
+    id="feeModal"
+    class="modal">
+
+    <div
+        class="modal-content"
+        style="max-width:900px">
+
+        <div class="modal-header">
+
+            <h2>
+
+                Update Fees
+
+            </h2>
+
+            <button
+                type="button"
+                onclick="closeFeeModal()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <div id="feeModalBody">
+
+            Loading...
+
+        </div>
+
+    </div>
+
+    <div id="global-loader">
+    <div class="loader-spinner"></div>
+</div>
+
+</div>
+
+<!-- JavaScript -->
+
+<script src="/js/session.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/lookups.js"></script>
+
+<script src="/js/filters.js"></script>
+
+<script src="/js/student-details-modal.js"></script>
+<script src="/js/student-details.js"></script>
+<script src="/js/students.js"></script>   <!-- uses modal -->
+
+<script src="/js/views.js"></script>
+
+<script src="/js/fee.js"></script>
+
+<script src="/js/pending-templates.js"></script>
+
+<script src="/js/pending-approvals.js"></script>
+
+<script src="/js/admission.js"></script>
+<script src="/js/loader.js"></script>   <!-- ✅ FIRST -->
+
+<script src="/js/api.js"></script>   <!-- MUST be before manager.js -->
+
+<script src="/js/endpoints.js"></script>
+
+<script src="/js/manager.js"></script>
+
+</body>
+
+</html>

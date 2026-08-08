@@ -1,0 +1,317 @@
+/* ==========================================================
+   PAGE
+   ========================================================== */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f8fafc;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+
+/* ==========================================================
+   TABS
+   ========================================================== */
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tab {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+
+/* ==========================================================
+   SEARCH
+   ========================================================== */
+
+.search input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+
+/* ==========================================================
+   TABLE
+   ========================================================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* ==========================================================
+   MODAL
+   ========================================================== */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 9999;
+}
+
+.modal-content {
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    margin: 30px auto;
+    background: white;
+    border-radius: 10px;
+    overflow: auto;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.modal-header button {
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+
+/* ==========================================================
+   ACTION BUTTONS
+   ========================================================== */
+
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 8px;
+    color: white;
+    font-size: 15px;
+    transition: .25s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.08);
+}
+
+.view {
+    background: #2563eb;
+}
+
+.approve {
+    background: #16a34a;
+}
+
+.reject {
+    background: #dc2626;
+}
+
+.cancel {
+    background: #ea580c;
+}
+
+.pending-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    margin-bottom:24px;
+}
+
+.pending-header-left{
+    flex:1;
+}
+
+.pending-header-left h2{
+    margin:0;
+}
+
+.pending-subtitle{
+    margin-top:6px;
+    color:#64748b;
+    font-size:14px;
+}
+
+.collection-summary{
+    min-width:360px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:16px 20px;
+}
+
+.collection-summary h3{
+    margin:0 0 14px;
+    font-size:18px;
+    color:#0f172a;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+}
+
+.summary-row span{
+    color:#475569;
+    font-size:14px;
+}
+
+.summary-row strong{
+    font-size:18px;
+    font-weight:700;
+}
+
+.summary-row.cash strong{
+    color:#16a34a;
+}
+
+.summary-row.online strong{
+    color:#2563eb;
+}
+
+.collection-summary{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:24px;
+
+    padding:14px 20px;
+
+    background:#fff;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:10px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+
+}
+
+.summary-title{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+    white-space:nowrap;
+
+}
+
+.summary-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    white-space:nowrap;
+
+}
+
+.summary-label{
+
+    font-size:14px;
+
+    color:#64748b;
+
+}
+
+.summary-value{
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+.summary-value.cash{
+
+    color:#16a34a;
+
+}
+
+.summary-value.online{
+
+    color:#2563eb;
+
+}
+
+.summary-divider{
+
+    width:1px;
+
+    height:22px;
+
+    background:#e2e8f0;
+
+}
+
+.tabs-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.clear-btn {
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.clear-btn:hover {
+    background: #d9363e;
+}

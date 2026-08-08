@@ -1,0 +1,206 @@
+<form id="feeForm">
+<div class="form-grid">
+
+    <div class="section-title center-title">
+        Student Details
+    </div>
+
+    <div class="student-info">
+        <span class="info-item">
+            <span class="info-label">Membership ID:</span>
+            <span id="membershipId" class="info-value"></span>
+        </span>
+
+        <span class="info-item">
+            <span class="info-label">Name:</span>
+            <span id="studentName" class="info-value"></span>
+        </span>
+
+        <span class="info-item">
+            <span class="info-label">Status:</span>
+            <span id="enrollmentStatus" class="status-badge"></span>
+        </span>
+    </div>
+
+    <div class="section-title center-title">
+        Fee Details & Batch Detail
+    </div>
+
+    <div class="form-group">
+        <label>Batch</label>
+        <select id="batchId"></select>
+    </div>
+
+    <div class="form-group" id="seatContainer" style="display:none;">
+        <label>Seat Number <span style="color:red">*</span></label>
+        <select id="seatId"></select>
+    </div>
+
+    <div class="membership-duration-row">
+        <span class="duration-label">
+            Current Membership Duration:
+        </span>
+
+        <span
+            id="currentMembershipDuration"
+            class="duration-value">
+        </span>
+    </div>
+
+    <div class="duration-option-row">
+
+        <span class="duration-option-label">
+            Update Membership Duration:
+        </span>
+
+        <label class="radio-option">
+            <input
+                type="radio"
+                name="durationType"
+                value="EXTEND"
+                checked>
+
+            1 Month Extension
+        </label>
+
+        <label class="radio-option">
+            <input
+                type="radio"
+                name="durationType"
+                value="CUSTOM">
+
+            Custom Date
+        </label>
+
+    </div>
+
+    <!-- Next Membership Duration -->
+    <div
+        id="nextMembershipRow"
+        class="next-membership-row">
+
+        <span class="next-membership-label">
+            Next Membership Duration:
+        </span>
+
+        <span
+            id="nextMembershipDuration"
+            class="next-membership-value">
+        </span>
+
+    </div>
+
+    <!-- Custom Date -->
+    <div
+        id="customDateSection"
+        class="custom-date-section"
+        style="display:none;">
+
+        <div class="form-group">
+            <label>Membership From <span style="color:red">*</span></label>
+            <input
+                type="date"
+                id="membershipFrom">
+        </div>
+
+        <div class="form-group">
+            <label>Membership Till <span style="color:red">*</span></label>
+            <input
+                type="date"
+                id="membershipTill">
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <label>Submitted Amount *</label>
+        <input
+            type="number"
+            id="submittedAmount">
+    </div>
+
+    <div class="form-group">
+        <label>Discount</label>
+        <input
+            type="number"
+            id="discount"
+            value="0">
+    </div>
+
+    <div class="form-group">
+        <label>Pending Amount</label>
+        <input
+            type="number"
+            id="pendingAmount"
+            value="0">
+        </div>
+
+    <div class="form-group">
+        <label>Payment Mode</label>
+
+        <select id="paymentMode">
+
+            <option value="">Select</option>
+            <option value="CASH">Cash</option>
+            <option value="ONLINE">Online</option>
+
+        </select>
+
+    </div>
+
+    <div
+        class="form-group"
+        id="transactionIdContainer"
+        style="display:none;">
+
+        <label>
+            Transaction ID
+            <span style="color:red">*</span>
+        </label>
+
+        <input
+            id="transactionId"
+            placeholder="Enter Transaction ID">
+
+    </div>
+
+    <div class="form-group full">
+        <label>Remark</label>
+
+        <textarea
+            id="paymentRemarks"
+            rows="3"></textarea>
+
+    </div>
+
+       <div
+        id="feeMessage"
+        class="form-message"
+        style="display:none;">
+    </div>
+
+    <div class="form-actions">
+
+        <button
+            type="button"
+            class="secondary-btn"
+            onclick="closeFeeModal()">
+
+            Cancel
+
+        </button>
+
+        <button
+            type="button"
+            class="primary-btn"
+            onclick="FeeForm.save()">
+
+            Update Fees
+
+        </button>
+
+    </div>
+
+</div>
+
+</form>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Details</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="/css/manager.css">
+
+    <link rel="stylesheet"
+          href="/css/student-details.css">
+
+</head>
+
+<body>
+
+<div class="details-container">
+
+    <!-- Header -->
+
+<div class="details-header">
+
+    <div class="header-left">
+
+        <div class="library-brand">
+
+            <i class="fa-solid fa-book-open-reader library-icon"></i>
+
+            <div>
+
+                <h1 class="library-title">
+                    Pro Learner's Digital Library
+                </h1>
+
+                <p class="library-subtitle">
+                    Student Information Portal
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="page-heading">
+
+            <h2>
+
+                <i class="fa-solid fa-user-graduate"></i>
+
+                Student Details
+
+            </h2>
+
+            <p>
+
+                View complete student profile and current membership information.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <button
+        type="button"
+        class="secondary-btn"
+        onclick="history.back()">
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Back
+
+    </button>
+
+</div>
+
+    <!-- Membership -->
+
+    <section class="card">
+
+        <h3>
+
+            <i class="fa-solid fa-id-card"></i>
+
+            Membership Information
+
+        </h3>
+
+        <div class="details-grid">
+
+            <div>
+
+                <label>Membership ID</label>
+
+                <span id="studentId">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Admission Date</label>
+
+                <span id="admissionDate">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Enrollment Status</label>
+
+                <span
+                    id="enrollmentStatus"
+                    class="badge">
+
+                    -
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Personal -->
+
+    <section class="card">
+
+        <h3>
+
+            <i class="fa-solid fa-user"></i>
+
+            Personal Information
+
+        </h3>
+
+        <div class="details-grid">
+
+            <div>
+
+                <label>Full Name</label>
+
+                <span id="fullName">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Date of Birth</label>
+
+                <span id="dateOfBirth">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Mobile Number</label>
+
+                <span id="mobileNumber">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Guardian Number</label>
+
+                <span id="guardianNumber">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Father Name</label>
+
+                <span id="fatherName">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Aadhaar Number</label>
+
+                <span id="aadharNumber">-</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Address -->
+
+    <section class="card">
+
+        <h3>
+
+            <i class="fa-solid fa-location-dot"></i>
+
+            Address Information
+
+        </h3>
+
+        <div class="details-grid">
+
+            <div class="full">
+
+                <label>Local Address</label>
+
+                <span id="localAddress">-</span>
+
+            </div>
+
+            <div class="full">
+
+                <label>Permanent Address</label>
+
+                <span id="permanentAddress">-</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Academic -->
+
+    <section class="card">
+
+        <h3>
+
+            <i class="fa-solid fa-book-open"></i>
+
+            Academic Information
+
+        </h3>
+
+        <div class="details-grid">
+
+            <div>
+
+                <label>Qualification</label>
+
+                <span id="qualification">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Preparation For</label>
+
+                <span id="preparationFor">-</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Current Membership -->
+
+    <section class="card">
+
+        <h3>
+
+            <i class="fa-solid fa-calendar-days"></i>
+
+            Current Membership
+
+        </h3>
+
+        <div class="details-grid">
+
+            <div>
+
+                <label>Current Batch</label>
+
+                <span id="batchName">-</span>
+
+            </div>
+
+            <div
+                id="seatRow"
+                style="display:none;">
+
+                <label>Seat Number</label>
+
+                <span id="seatNumber">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Membership From</label>
+
+                <span id="membershipFrom">-</span>
+
+            </div>
+
+            <div>
+
+                <label>Membership Till</label>
+
+                <span id="membershipTill">-</span>
+
+            </div>
+
+        </div>
+
+    </section>
+    <section class="card">
+        <h3>
+            <i class="fa-solid fa-bolt"></i>
+            Quick Actions
+        </h3>
+
+        <div id="studentActions" class="action-buttons"></div>
+    </section>
+
+</div>
+
+<script src="/js/utils.js"></script>
+<script src="/js/lookups.js"></script>
+<script src="/js/loader.js"></script>   <!-- ✅ FIRST -->
+<script src="/js/api.js"></script>
+<script src="/js/endpoints.js"></script>
+
+<!-- ✅ Modal FIRST (dependency) -->
+<script src="/js/student-details-modal.js"></script>
+
+<!-- ✅ Actions (depends on modal) -->
+<script src="/js/student-actions.js"></script>
+
+<!-- ✅ Page logic -->
+<script src="/js/student-details.js"></script>
+
+</body>
+
+</html>

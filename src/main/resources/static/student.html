@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+.info {
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+.info strong {
+    color: #1e3c72;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #1e3c72;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+.status-paid {
+    color: green;
+    font-weight: bold;
+}
+
+.status-due {
+    color: red;
+    font-weight: bold;
+}
+
+.logout {
+    display: block;
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 8px 15px;
+    border: none;
+    background: #e74c3c;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="logout">
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <h2>Student Dashboard</h2>
+
+    <!-- Student Info -->
+    <div class="info">
+        <p><strong>Name:</strong> Rahul Sharma</p>
+        <p><strong>Mobile Number:</strong> 9876543210</p>
+        <p><strong>Batch:</strong> Evening Batch</p>
+    </div>
+
+    <!-- Fees History -->
+    <h3>Fees History</h3>
+    <table>
+        <tr>
+            <th>From</th>
+            <th>To</th>
+            <th>Fees Amount</th>
+            <th>Status</th>
+            <th>Due Date</th>
+        </tr>
+
+        <tr>
+            <td>Jan 2026</td>
+            <td>Mar 2026</td>
+            <td>₹3000</td>
+            <td class="status-paid">Submitted</td>
+            <td>31 Mar 2026</td>
+        </tr>
+
+        <tr>
+            <td>Apr 2026</td>
+            <td>Jun 2026</td>
+            <td>₹3000</td>
+            <td class="status-due">Pending</td>
+            <td>30 Jun 2026</td>
+        </tr>
+
+    </table>
+
+</div>
+
+<script>
+function logout() {
+    alert("Logged out successfully!");
+    window.location.href = "login.html"; // redirect to login page
+}
+</script>
+
+</body>
+</html>
