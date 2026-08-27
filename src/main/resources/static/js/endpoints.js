@@ -3,13 +3,13 @@ window.Endpoints = {
     // ================= AUTH =================
     auth: {
         currentUser: "/api/auth/me",
-        logout: "/api/auth/logout"
+        logout: "/api/auth/logout",
+        studentlogin: "/api/auth/student/login"
     },
 
     // ================= STUDENTS =================
     students: {
         list: "/api/students",
-
         details(studentId) {
             return `/api/students/${studentId}`;
         },
@@ -18,75 +18,73 @@ window.Endpoints = {
             return `/api/students/${studentId}/fees`;
         },
 
-        update(studentId) {
-            return `/api/students/${studentId}`;
-        },
-
         changeSeat(studentId) {
             return `/api/students/${studentId}/seat`;
         },
-
-        updateEnrollmentStatus(studentId) {
-            return `/api/students/${studentId}/enrollment-status`;
-        }
     },
 
     // ================= PENDING (UNIFIED SYSTEM) =================
      pending: {
+         collectionSummary: "/api/pending/collection-summary",
 
         listByType(type) {
             return `/api/pending?type=${type}`;
         },
 
-        all() {
-            return `/api/pending`;
-        },
-
-        // ✅ FIX NAME (important)
-        collectionSummary: "/api/pending/collection-summary",
-
-        get(requestId) {
-            return `/api/pending/${requestId}`;
-        },
-
-        approve(requestId) {
-            return `/api/pending/${requestId}/approve`;
-        },
-
-        reject(requestId) {
-            return `/api/pending/${requestId}/reject`;
-        },
-
-        cancel(requestId) {
-            return `/api/pending/${requestId}/cancel`;
+        nonPending() {
+            return `/api/nonpending`;
         },
 
         update(requestId) {
-            return `/api/pending/${requestId}`;
+            return `/api/manager/pending/${requestId}`;
         },
+    },
+
+    admin: {
+        admissionRequest: `/api/admin/admission`,
+        updateFeeRequest: `/api/admin/updatefee`,
+        updateStudent: `/api/admin/updatestudent/DETAILS`,
+        updateSeat: `/api/admin/updatestudent/SEAT`,
+        updateEnrollmentStatus: `/api/admin/updatestudent/ENROLLMENT`,
+        rejectRequest: `/api/admin/pending/reject`,
+        approveRequest: `/api/admin/pending/approve`,
+        saveExpense: `/api/admin/expense/save`,
+        getExpense: `/api/admin/expense/get`,
+        approveExpense: `/api/admin/expense/approve`,
+        rejectExpense: `/api/admin/expense/reject`,
+        expenseAnalytics: `/api/admin/transactions/expense/dashboard`,
+        getDailyIncome: `/api/admin/income/daily`,
+        getMonthlyIncome(month) {
+            return `/api/admin/income/monthly?month=${month}`
+        },
+        getProfit: `/api/admin/profit/summary`,
+
 
         clear() {
             return `/api/pending/clear`;
         },
-
-        // 🔹 Update student details
-        updateStudent(studentId) {
-            return `/api/pending/updatedetail/${studentId}/DETAILS`;
-        },
-
-        // 🔹 Update seat
-        updateSeat(studentId) {
-            return `/api/pending/updatedetail/${studentId}/SEAT`;
-        },
-
-        // 🔹 Update enrollment status
-        updateEnrollmentStatus(studentId) {
-            return `/api/pending/updatedetail/${studentId}/ENROLLMENT`;
-        }
     },
 
+    manager: {
+        createRequest(type) {
+            return `/api/manager/approvalrequest/create/${type}`;
+        },
+
+        updateRequest() {
+            return `/api/manager/approvalrequest/update`;
+        },
+
+        cancel() {
+            return `/api/manager/approvalrequest/cancel`;
+        },
+
+        saveExpense: `/api/manager/expense/save`,
+        getExpense: `/api/manager/expense/get`,
+        cancelExpense: `/api/manager/expense/cancel`,
+    },
+    
     // ================= LOOKUPS =================
-    lookup: {
+    lookups: {
         qualifications: "/api/lookups/qualifications",
         batches: "/api/lookups/batches",
         preparations: "/api/lookups/preparations",

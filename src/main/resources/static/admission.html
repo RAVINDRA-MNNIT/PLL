@@ -34,7 +34,7 @@
         <div class="form-group">
           <label for="fatherName">Father Name</label>
           <input id="fatherName" name="fatherName" type="text"
-                 placeholder="Enter Father Name">
+                 placeholder="Enter Father Name" required>
         </div>
 
         <div class="form-group full">
@@ -55,15 +55,15 @@
         </div>
 
         <div class="form-group">
-          <label for="aadharNumber">Aadhaar Card Number *</label>
-          <input id="aadharNumber" name="aadharNumber" type="text"
+          <label for="aadhaarNumber">Aadhaar Card Number *</label>
+          <input id="aadhaarNumber" name="aadhaarNumber" type="text"
                  inputmode="numeric" maxlength="12"
                  pattern="[0-9]{12}" placeholder="12 digit Aadhaar number" required>
         </div>
 
         <div class="form-group">
           <label for="qualification">Qualification</label>
-          <select id="qualification" name="qualification">
+          <select id="qualification" name="qualification" required>
             <option value="">-- Select Qualification --</option>
           </select>
         </div>
@@ -84,19 +84,19 @@
 
         <div class="form-group">
           <label for="preparationFor">Preparation For</label>
-          <select id="preparationFor" name="preparationFor">
+          <select id="preparationFor" name="preparationFor" required>
             <option value="">-- Select Preparation --</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="membershipFrom">Membership From *</label>
-          <input id="membershipFrom" name="membershipFrom" type="date" required>
+          <label for="fromDate">Membership From *</label>
+          <input id="fromDate" name="fromDate" type="date" required>
         </div>
 
         <div class="form-group">
-          <label for="membershipTill">Membership Till *</label>
-          <input id="membershipTill" name="membershipTill" type="date" required>
+          <label for="tillDate">Membership Till *</label>
+          <input id="tillDate" name="tillDate" type="date" required>
         </div>
 
         <div class="form-group">
@@ -144,6 +144,7 @@
       </div>
   </div>
 
+<!-- ✅ ONLY TRANSACTION ID SHOULD BE HERE -->
 <div id="onlinePaymentSection" class="form-group full" style="display:none;">
 
     <label for="transactionId">
@@ -155,6 +156,11 @@
         id="transactionId"
         placeholder="Enter UPI / Bank Transaction ID">
 
+</div>
+
+<!-- ✅ ALWAYS VISIBLE -->
+<div class="form-group full">
+
     <label for="paymentRemarks" style="margin-top:12px;">
         Payment Description
     </label>
@@ -164,7 +170,8 @@
         rows="2"
         placeholder="Example:
 Paid through Google Pay
-Transaction successful"></textarea>
+Transaction successful">
+    </textarea>
 
 </div>
 

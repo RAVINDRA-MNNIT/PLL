@@ -19,16 +19,13 @@ init() {
 },
 
 initialize() {
-    try {
 
+    try {
         // ✅ GET ID FROM URL (CORRECT FLOW)
         const params = new URLSearchParams(window.location.search);
         let studentId = params.get("id");
 
-        console.log("Resolved studentId:", studentId);
-
         if (!studentId) {
-            console.warn("⚠️ Student ID not found");
             return;
         }
 
@@ -42,6 +39,33 @@ initialize() {
     // ================= API =================
 
     async loadStudent(studentId) {
+        // debugger;
+        // await fetch(Endpoints.auth.studentlogin, {
+        //     method: "POST",
+        //     credentials: "same-origin",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         userId: 1,
+        //         password: "AK2531993"
+        //     })
+        // });
+        await Session.loadCurrentUser();
+        if (Session.getUser() == null) {
+            await Api.postWithoutResponse(Endpoints.auth.logout);
+            window.location.href = "/student-login.html";
+            return
+        }
+        else if (Session.isStudent()) {
+            const loggedInStudentId = Number(Session.getUserId());
+            const requestedStudentId = Number(studentId);
+            if (loggedInStudentId !== requestedStudentId) {
+                await Api.postWithoutResponse(Endpoints.auth.logout);
+                window.location.href = "/student-login.html";
+                return;
+            }
+        }
         try {
             this.currentStudent = await Api.get(
                 Endpoints.students.details(studentId)
@@ -58,10 +82,33 @@ initialize() {
     // ================= RENDER =================
 
     render() {
+        debugger;
+        const btn = document.getElementById("headerActionBtn");
+        const icon = document.getElementById("headerActionIcon");
+        const text = document.getElementById("headerActionText");
+
+        if (Session.isStudent()) {
+
+            icon.className = "fa-solid fa-right-from-bracket";
+            text.textContent = "Logout";
+
+            btn.onclick = async () => {
+                await Api.postWithoutResponse(Endpoints.auth.logout);
+                window.location.href = "/student-login.html";
+            };
+
+        } else {
+
+            icon.className = "fa-solid fa-arrow-left";
+            text.textContent = "Back";
+
+            btn.onclick = () => history.back();
+
+        }
+
         const student = this.currentStudent;
 
         if (!student) {
-            console.error("❌ student is null");
             return;
         }
 
@@ -72,21 +119,22 @@ initialize() {
         this.setValue("mobileNumber", student.mobileNumber);
         this.setValue("guardianNumber", student.guardianNumber);
         this.setValue("fatherName", student.fatherName);
-        this.setValue("aadharNumber", student.aadhaarNumber);
+        this.setValue("aadhaarNumber", student.aadhaarNumber);
         this.setValue("localAddress", student.localAddress);
         this.setValue("permanentAddress", student.permanentAddress);
         this.setValue("qualification", student.qualification);
         this.setValue("preparationFor", student.preparationFor);
 
-        const lastFee = student.feeRecords?.at(-1) || null;
+        const lastFee = student.feeRecords?.[0] || null;
 
-        this.setValue("membershipFrom", formatDate(lastFee?.membershipFrom));
-        this.setValue("membershipTill", formatDate(lastFee?.membershipTill));
+        this.setValue("fromDate", formatDate(lastFee?.fromDate));
+        this.setValue("tillDate", formatDate(lastFee?.tillDate));
         this.setValue("seatNumber", lastFee?.seatNumber ?? "-");
         this.setValue("batchName", lastFee?.batchName ?? "-");
-
         this.toggleSeatSection(this.isSeatApplicable(lastFee));
-        this.updateEnrollmentStatus(student.enrollmentStatus);
+        const enrollmentStatus = getUpdatedEnrollment(Date(), lastFee?.tillDate , student.enrollmentStatus)
+        this.setValue("membershipTitle", enrollmentStatus === "ACTIVE" ? "Current Membership" : "Last Membership (Outdated)");
+        this.updateEnrollmentStatus(enrollmentStatus);
         StudentActionsUI.init("studentActions", student);
     },
 
@@ -147,9 +195,8 @@ initialize() {
             `);
             return;
         }
-
         let html = `
-            <table>
+            <table class="fee-history-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -174,9 +221,9 @@ initialize() {
                     <td>${r.batchName ?? "-"}</td>
                     <td>${r.seatNumber ?? "-"}</td>
                     <td>
-                        ${formatDate(r.membershipFrom)}<br>
+                        ${formatDate(r.fromDate)}<br>
                         <small>to</small><br>
-                        ${formatDate(r.membershipTill)}
+                        ${formatDate(r.tillDate)}
                     </td>
                     <td>₹${Number(r.submittedAmount ?? 0).toLocaleString("en-IN")}</td>
                     <td>₹${Number(r.discountAmount ?? 0).toLocaleString("en-IN")}</td>
@@ -191,9 +238,6 @@ initialize() {
         html += `</tbody></table>`;
 
         StudentDetailsModal.feeHistory(html);
-
-        // ❌ OLD (KEPT)
-        // document.getElementById("feeHistoryModal").style.display = "flex";
     },
 
     updateStudentDetails() {
@@ -202,7 +246,7 @@ initialize() {
 
     async changeSeat() {
 
-        await loadLookups();
+    //    await loadLookups();
 
         const currentSeatId =
             this.currentStudent?.feeRecords?.at(-1)?.seatId;

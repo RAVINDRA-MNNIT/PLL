@@ -19,6 +19,10 @@
         rel="stylesheet"
         href="/css/manager.css">
 
+    <link
+            rel="stylesheet"
+            href="/css/transaction.css">
+
 </head>
 
 <body>
@@ -39,7 +43,7 @@
             class="nav-item active"
             onclick="switchView('fees')">
 
-            Student Fees
+            Students
 
         </div>
 
@@ -56,6 +60,14 @@
             onclick="switchView('pending')">
 
             Pending Approvals
+
+        </div>
+
+        <div
+                class="nav-item"
+                onclick="switchView('transactions')">
+
+            Transactions
 
         </div>
 
@@ -130,7 +142,7 @@
 
                     <select id="searchType">
                         <option value="all">All</option>
-                        <option value="id">Membership ID</option>
+                        <option value="id">Student ID</option>
                         <option value="name">Student Name</option>
                         <option value="mobile">Mobile Number</option>
                         <option value="seat">Seat Number</option>
@@ -173,7 +185,7 @@
                         <thead>
 
                             <tr>
-                                <th>Membership ID</th>
+                                <th>Student ID</th>
                                 <th>Name</th>
                                 <th>Mobile</th>
                                 <th>Batch</th>
@@ -242,6 +254,26 @@
 
         </div>
 
+        <!-- Transactions -->
+
+        <div
+                id="transactionsView"
+                style="display:none">
+
+            <div id="transactionContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+                        Loading Transactions...
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
     </main>
 
 </div>
@@ -289,36 +321,50 @@
 </div>
 
 <!-- JavaScript -->
-
+<!-- 🔹 CORE (must come first) -->
+<script src="/js/api.js"></script>
+<script src="/js/endpoints.js"></script>
+<!-- 🔹 UTILITIES -->
 <script src="/js/session.js"></script>
-
 <script src="/js/utils.js"></script>
-
 <script src="/js/lookups.js"></script>
-
 <script src="/js/filters.js"></script>
-
+<!-- 🔹 SHARED UI -->
+<script src="/js/loader.js"></script>
+<!-- 🔹 STUDENT MODULE -->
 <script src="/js/student-details-modal.js"></script>
 <script src="/js/student-details.js"></script>
-<script src="/js/students.js"></script>   <!-- uses modal -->
-
+<script src="/js/students.js"></script>
+<!-- 🔹 FEATURE MODULES -->
 <script src="/js/views.js"></script>
-
 <script src="/js/fee.js"></script>
-
-<script src="/js/pending-templates.js"></script>
-
-<script src="/js/pending-approvals.js"></script>
-
 <script src="/js/admission.js"></script>
-<script src="/js/loader.js"></script>   <!-- ✅ FIRST -->
+<!-- 🔹 PENDING (depends on API + endpoints) -->
+<script src="/js/pending-templates.js"></script>
+<script src="/js/pending-approvals.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/transaction.js"></script>
 
-<script src="/js/api.js"></script>   <!-- MUST be before manager.js -->
-
-<script src="/js/endpoints.js"></script>
-
+<!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/manager.js"></script>
+
+<!--<div id="addView" style="display:none">-->
+
+<!--    &lt;!&ndash; ✅ THIS IS YOUR CONTAINER &ndash;&gt;-->
+<!--    <div id="newAdmissionContainer">-->
+
+<!--        &lt;!&ndash; default placeholder &ndash;&gt;-->
+<!--        <section class="card">-->
+<!--            <p style="color:var(&#45;&#45;muted)">-->
+<!--                Loading New Admission...-->
+<!--            </p>-->
+<!--        </section>-->
+
+<!--    </div>-->
+
+<!--</div>-->
 
 </body>
 
 </html>
+

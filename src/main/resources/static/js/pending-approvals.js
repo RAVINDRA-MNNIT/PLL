@@ -7,10 +7,6 @@ window.PendingApprovals = {
     // ✅ unified data source
     pendingRowsData: [],
 
-    // ✅ old arrays (NOT REMOVED)
-    admission: [],
-    fees: [],
-
     modal: null,
     modalBody: null,
 
@@ -79,55 +75,90 @@ window.PendingApprovals = {
         return response.json();
     },
 
-    async loadData() {
-        let data = [];
+async loadData() {
+    let res;
 
-        if (this.current === this.TABS.ALL) {
-            data = await this.load(Endpoints.pending.all());
-        } else {
-            data = await this.load(Endpoints.pending.listByType(this.current));
-        }
+    if (this.current === this.TABS.ALL) {
+        res = await this.load(Endpoints.pending.nonPending());
+    } else {
+        res = await this.load(Endpoints.pending.listByType(this.current));
+    }
 
-        // ❌ OLD
-        // this.pendingRowsData = data;
+    // ✅ normalize to array
+    const list = Array.isArray(res)
+        ? res
+        : res?.pendingRowsData
+        || res?.data
+        || res?.content
+        || [];
 
-        // ✅ NEW (mapped safely)
-        this.pendingRowsData = (data || []).map(x => this.mapResponse(x));
-
-        // ✅ KEEP OLD STRUCTURE
-        // this.admission = this.pendingRowsData.filter(x => x.requestType === "ADMISSION");
-        // this.fees = this.pendingRowsData.filter(x => x.requestType === "FEES");
-    },
-
+    this.pendingRowsData = list//.map(x => this.mapResponse(x));
+},
     // ================= MAPPING =================
 
-    mapResponse(item) {
+mapResponse(item) {
+    // ✅ unified field resolver (snake_case + camelCase fallback)
+    const pick = (...keys) => {
+        for (const k of keys) {
+            if (k !== undefined && k !== null) return k;
+        }
+        return null;
+    };
+    
+    return {
+        // 🔑 identifiers
+        requestId: item.requestId,
+        requestType: item.requestType,
 
-        // ❌ OLD (breaks new API)
-        // const data = item.requestData || {};
+        // 👤 student
+        studentId: item.studentId,
+        fullName: item.fullName,
+        mobile: item.mobileNumber,
+        guardianNumber: item.guardianNumber,
+        dateOfBirth: item.dateOfBirth,
+        fatherName: item.fatherName,
+        localAddress: item.localAddress,
+        permanentAddress: item.permanentAddress,
+        aadhaarNumber: item.aadhaarNumber,
+        qualification: item.qualification,
+        preparationFor: item.preparationFor,
 
-        // ✅ NEW (supports both)
-        const data = item.requestData || item;
+        dateOfAdmission: item.dateOfAdmission,
+        enrollmentStatus: item.enrollmentStatus,
+        requestedStatus: item.newEnrollmentStatus,
 
-        return {
-            requestId: item.id || item.requestId,
-            requestType: item.requestType,
+        requestedFullName: item.newfullName,
+        requestedMobile: item.newMobileNumber,
+        requestedGuardian: item.newGuardianNumber,
 
-            studentId: data.studentId ?? item.studentId,
-            fullName: data.fullName ?? item.fullName,
-            mobile: data.mobile ?? item.mobile,
-            batchName: data.batchName ?? item.batchName,
-            membershipFrom: data.membershipFrom ?? item.membershipFrom,
-            membershipTill: data.membershipTill ?? item.membershipTill,
-            submittedAmount: data.submittedAmount ?? item.submittedAmount,
-            discount: data.discount ?? item.discount,
-            pendingAmount: data.pendingAmount ?? item.pendingAmount,
-            paymentMode: data.paymentMode ?? item.paymentMode,
+        // 🪑 batch / seat
+        batchId: item.batchId,
+        seatId: item.batchId,
+        batchName: item.batchName,
+        seatNumber: item.seatNumber,
+        requestSeatId: item.newSeatId,
+        requestSeatNumber: item.newSeatNumber,
 
-            requestedBy: item.requestedBy,
-            requestedAt: item.requestedAt
-        };
-    },
+        // 📅 membership
+        fromDate: item.fromDate,
+        tillDate: item.tillDate,
+        tillDate: item.tillDate,
+
+        // 💰 payment
+        submittedAmount: pick(item.submittedAmount, 0),
+        discount: pick(item.discount, 0),
+        pendingAmount: pick(item.pendingAmount, 0),
+        paymentMode: item.paymentMode,
+        remarks: item.remarks,
+        transactionId: item.transactionId,
+
+        // 🧾 metadata
+        requestedBy: item.requestedBy,
+        requestedAt: item.requestedAt,
+        remarks: item.remarks,
+        status: item.status,
+    };
+},
 
     async refresh() {
         await this.loadData();
@@ -136,21 +167,53 @@ window.PendingApprovals = {
     },
 
     // ================= SUMMARY =================
-
     async loadCollectionSummary() {
-        const cash = this.get("cashCollection");
-        const online = this.get("onlineCollection");
+
+        const cashCollection = this.get("cashCollection");
+        const onlineCollection = this.get("onlineCollection");
+
+        const cashExpense = this.get("cashExpense");
+        const onlineExpense = this.get("onlineExpense");
+
+        const cashProfit = this.get("cashProfit");
+        const onlineProfit = this.get("onlineProfit");
 
         try {
+
             const res = await this.load(Endpoints.pending.collectionSummary);
 
-            cash.textContent = formatCurrency(res.totalCash || 0);
-            online.textContent = formatCurrency(res.totalOnline || 0);
+            const cashCollectionAmount = Number(res.cashCollection || 0);
+            const onlineCollectionAmount = Number(res.onlineCollection || 0);
+
+            const cashExpenseAmount = Number(res.cashPendingExpenses || 0);
+            const onlineExpenseAmount = Number(res.onlinePendingExpenses || 0);
+
+            cashCollection.textContent = formatCurrency(cashCollectionAmount);
+            onlineCollection.textContent = formatCurrency(onlineCollectionAmount);
+
+            cashExpense.textContent = formatCurrency(cashExpenseAmount);
+            onlineExpense.textContent = formatCurrency(onlineExpenseAmount);
+
+            cashProfit.textContent = formatCurrency(
+                cashCollectionAmount - cashExpenseAmount
+            );
+
+            onlineProfit.textContent = formatCurrency(
+                onlineCollectionAmount - onlineExpenseAmount
+            );
 
         } catch (e) {
+
             console.error(e);
-            cash.textContent = formatCurrency(0);
-            online.textContent = formatCurrency(0);
+
+            cashCollection.textContent = formatCurrency(0);
+            onlineCollection.textContent = formatCurrency(0);
+
+            cashExpense.textContent = formatCurrency(0);
+            onlineExpense.textContent = formatCurrency(0);
+
+            cashProfit.textContent = formatCurrency(0);
+            onlineProfit.textContent = formatCurrency(0);
         }
     },
 
@@ -160,18 +223,7 @@ window.PendingApprovals = {
         this.renderTableHeader();
 
         const rows = this.get("pendingRows");
-        let data = [];
-
-        switch (this.current) {
-            case this.TABS.ADMISSION:
-                data = this.admission;
-                break;
-            case this.TABS.FEES:
-                data = this.fees;
-                break;
-            default:
-                data = this.pendingRowsData;
-        }
+        let data = this.pendingRowsData;
 
         if (!data.length) {
             rows.innerHTML = this.renderEmptyRow();
@@ -200,9 +252,8 @@ window.PendingApprovals = {
         return PendingTemplates.emptyRow(10);
     },
 
-    renderRow(item) {
+    renderRow(item) { 
         const requestedAt = this.renderRequestedAt(item.requestedAt);
-
         switch (this.current) {
             case this.TABS.ADMISSION:
                 return PendingTemplates.admissionRow(item, this.renderActions(item));
@@ -222,13 +273,28 @@ window.PendingApprovals = {
     },
 
     renderActions(item) {
+        const shouldShowEdit = ![
+            this.TABS.DETAILS,
+            this.TABS.SEAT,
+            this.TABS.ENROLLMENT
+        ].includes(this.current);
+
+
+debugger;
+        const comment =
+            item.status === "REJECTED" && item.remarks?.trim()
+                ? item.remarks
+                : "";
+
         return PendingTemplates.actions(
             item.requestId,
             Session.isAdmin(),
-            Session.isManager()
+            Session.isManager(),
+            comment,
+            shouldShowEdit
         );
     },
-
+    
     renderRequestedAt(value) {
         if (!value) return "-";
 
@@ -250,81 +316,105 @@ window.PendingApprovals = {
 
     getRequest(id) {
 
-        // ❌ NEW (not tab aware)
-        // return this.pendingRowsData.find(x => x.requestId === id);
-
-        // ✅ OLD LOGIC RESTORED
-        const source =
-            this.current === this.TABS.ADMISSION
-                ? this.admission
-                : this.current === this.TABS.FEES
-                    ? this.fees
-                    : this.pendingRowsData;
-
+        return this.pendingRowsData.find(x => x.requestId === id);
         return source.find(x => x.requestId === id);
     },
 
     // ✅ RESTORED OLD EDIT FLOW
-    async viewEdit(requestId) {
+async viewEdit(requestId) {
 
-        const data = this.getRequest(requestId);
+    const data = this.getRequest(requestId);
 
-        if (!data) {
-            alert("Record not found.");
-            return;
+    if (!data) {
+        alert("Record not found.");
+        return;
+    }
+    if (this.current === this.TABS.ADMISSION) {
+
+        if (window.AdmissionForm && typeof AdmissionForm.openForEdit === "function") {
+
+            await AdmissionForm.openForEdit(requestId, data);
         }
 
-        if (this.current === this.TABS.ADMISSION) {
-            if (window.AdmissionForm?.openForEdit) {
-                await AdmissionForm.openForEdit(requestId, data);
-            }
-        } else if (this.current === this.TABS.FEES) {
-            if (window.FeeForm?.openForEdit) {
-                await FeeForm.openForEdit(requestId, data);
-            }
-        } else {
-            // fallback modal
-            this.modalBody.innerHTML =
-                PendingTemplates.viewEditModal?.(data) || "<div>No template</div>";
+    } else if (this.current === this.TABS.FEES) {
 
-            this.modal.style.display = "block";
+        if (window.FeeForm && typeof FeeForm.openForEdit === "function") {
+
+            await FeeForm.openForEdit(requestId, data);
         }
-    },
+
+    } else {
+
+        this.modalBody.innerHTML =
+            PendingTemplates.viewEditModal?.(data) || "<div>No template</div>";
+
+        // ✅ FIXED
+        this.modal.style.display = "flex";
+    }
+},
 
     async approveRequest(id) {
+        const pendingRow = this.pendingRowsData.find(row => row.requestId === id);
+        if (!pendingRow) {
+            console.error("Pending row not found");
+        }
+        if (pendingRow.pendingAmount > 0) {
+            if (!confirm(`Current pending amount of this student is ₹${pendingRow.pendingAmount}.\n\n Make sure you have received the amount!`)) {
+                return
+            }
+        }
+
+        if (pendingRow.lastFeePendingAmount > 0) {
+            if (!confirm(`In Last fee record, pending amount of this student is ₹${pendingRow.lastFeePendingAmount}.\n\n Make sure you have received the amount!`)) {
+                return
+            }
+        }
+
+
         if (!confirm("Approve this request?")) return;
-
-        await fetch(Endpoints.pending.approve(id), {
-            method: "POST",
-            credentials: "same-origin"
-        });
-
-        await this.refresh();
+        debugger;
+        try {
+            await Api.post(Endpoints.admin.approveRequest, id);
+            await this.refresh();
+        } catch (e) {
+            alert(e);
+        }
     },
 
     async rejectRequest(id) {
-        const reason = prompt("Reason?");
-        if (!reason?.trim()) return;
-
-        await fetch(Endpoints.pending.reject(id), {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ reason })
-        });
-
-        await this.refresh();
+        const reason = prompt("Enter rejection reason:");
+        if (!reason || !reason.trim()) {
+            alert("Rejection reason is required");
+            return;
+        }
+        try {
+            await Api.patch(Endpoints.admin.rejectRequest, { id, reason });
+            alert("Request rejected successfully");
+            await this.refresh();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to reject request");
+        }
     },
 
     async cancelRequest(id) {
-        if (!confirm("Cancel request?")) return;
+        const reason = prompt("Enter cancellation reason:");
+        if (!reason || !reason.trim()) {
+            alert("Cancellation reason is required");
+            return;
+        }
+        try {
+            await Api.patch(Endpoints.manager.cancel(), { id, reason });
+            alert("Request cancelled successfully");
+            await this.refresh();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to cancel request");
+        }
+    },
 
-        await fetch(Endpoints.pending.cancel(id), {
-            method: "PATCH",
-            credentials: "same-origin"
-        });
-
-        await this.refresh();
+    viewComment(comment){
+        alert(comment);
     },
 
     closeModal() {

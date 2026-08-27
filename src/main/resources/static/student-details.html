@@ -70,13 +70,18 @@
     </div>
 
     <button
-        type="button"
-        class="secondary-btn"
-        onclick="history.back()">
+            id="headerActionBtn"
+            type="button"
+            class="secondary-btn">
 
-        <i class="fa-solid fa-arrow-left"></i>
+        <i
+                id="headerActionIcon"
+                class="fa-solid fa-arrow-left">
+        </i>
 
+        <span id="headerActionText">
         Back
+    </span>
 
     </button>
 
@@ -98,7 +103,7 @@
 
             <div>
 
-                <label>Membership ID</label>
+                <label>Student ID</label>
 
                 <span id="studentId">-</span>
 
@@ -188,7 +193,7 @@
 
                 <label>Aadhaar Number</label>
 
-                <span id="aadharNumber">-</span>
+                <span id="aadhaarNumber">-</span>
 
             </div>
 
@@ -272,7 +277,7 @@
 
             <i class="fa-solid fa-calendar-days"></i>
 
-            Current Membership
+            <span id="membershipTitle">Current Membership</span>
 
         </h3>
 
@@ -280,7 +285,7 @@
 
             <div>
 
-                <label>Current Batch</label>
+                <label>Batch</label>
 
                 <span id="batchName">-</span>
 
@@ -300,7 +305,7 @@
 
                 <label>Membership From</label>
 
-                <span id="membershipFrom">-</span>
+                <span id="fromDate">-</span>
 
             </div>
 
@@ -308,7 +313,7 @@
 
                 <label>Membership Till</label>
 
-                <span id="membershipTill">-</span>
+                <span id="tillDate">-</span>
 
             </div>
 
@@ -331,6 +336,7 @@
 <script src="/js/loader.js"></script>   <!-- ✅ FIRST -->
 <script src="/js/api.js"></script>
 <script src="/js/endpoints.js"></script>
+<script src="/js/session.js"></script> 
 
 <!-- ✅ Modal FIRST (dependency) -->
 <script src="/js/student-details-modal.js"></script>

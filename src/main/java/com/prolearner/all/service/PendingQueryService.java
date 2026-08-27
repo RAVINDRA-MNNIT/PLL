@@ -1,31 +1,45 @@
 package com.prolearner.all.service;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.prolearner.all.dto.PendingCollectionSummaryResponse;
+import com.prolearner.all.entity.Transaction;
+import com.prolearner.all.enums.PaymentMode;
+import com.prolearner.all.enums.TransactionType;
+import com.prolearner.all.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import com.prolearner.all.entity.ApprovalRequest;
 import com.prolearner.all.enums.RequestType;
-import com.prolearner.all.enums.Status;
+import com.prolearner.all.enums.PendingRequestStatus;
 import com.prolearner.all.repository.ApprovalRequestRepository;
 
 @Service
 public class PendingQueryService {
 
     private final ApprovalRequestRepository repo;
+    private final TransactionRepository transactionRepository ;
 
-    public PendingQueryService(ApprovalRequestRepository repo) {
+
+    public PendingQueryService(ApprovalRequestRepository repo, TransactionRepository transactionRepository) {
         this.repo = repo;
+        this.transactionRepository = transactionRepository;
     }
 
     // ====================================================
     // 🔹 LIST BY TYPE + STATUS
     // ====================================================
-    public List<Map<String, Object>> list(RequestType type, Status status) {
-        return repo.getPendingData(type.name(), status.name());
+    public List<Map<String, Object>> list(RequestType type, List<PendingRequestStatus> statuses) {
+
+        return repo.getPendingData(
+                type.name(),
+                statuses.stream()
+                        .map(Enum::name)
+                        .toList()
+        );
     }
 
     // ====================================================
@@ -39,30 +53,61 @@ public class PendingQueryService {
     // ====================================================
     // 🔹 GET ALL (LATEST FIRST)
     // ====================================================
-    public List<Map<String, Object>> getAll() {
-        return repo.getPendingData(null, "PENDING");
+//    public List<Map<String, Object>> getAll() {
+//        return repo.getPendingData(null, "PENDING");
+//    }
+
+    public List<Map<String, Object>> fetchNonPending() {
+        return repo.fetchNonPending();
     }
 
     // ====================================================
     // 🔹 DASHBOARD SUMMARY
     // ====================================================
 
-    public Map<String, Object> getCollectionSummary() {
+    public PendingCollectionSummaryResponse getCollectionSummary() {
 
         List<Object[]> list = repo.sumByPaymentMode();
-        Object[] result = list.get(0);
-        Double totalCash = 0.0;
-        Double totalOnline = 0.0;
+        Object[] result = list.getFirst();
+
+        BigDecimal cashCollection = BigDecimal.ZERO;
+        BigDecimal onlineCollection = BigDecimal.ZERO;
 
         if (result != null) {
-            totalCash = result[0] != null ? ((Number) result[0]).doubleValue() : 0.0;
-            totalOnline = result[1] != null ? ((Number) result[1]).doubleValue() : 0.0;
+            cashCollection = result[0] != null
+                    ? BigDecimal.valueOf(((Number) result[0]).doubleValue())
+                    : BigDecimal.ZERO;
+
+            onlineCollection = result[1] != null
+                    ? BigDecimal.valueOf(((Number) result[1]).doubleValue())
+                    : BigDecimal.ZERO;
         }
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("totalCash", totalCash);
-        res.put("totalOnline", totalOnline);
+        List<Transaction> pendingExpenses =
+                transactionRepository.findByTransactionTypeAndStatusOrderByTransactionDateDesc(
+                        TransactionType.EXPENSE,
+                        PendingRequestStatus.PENDING
+                );
 
-        return res;
+        BigDecimal cashPendingExpenses = BigDecimal.ZERO;
+        BigDecimal onlinePendingExpenses = BigDecimal.ZERO;
+
+        for (Transaction transaction : pendingExpenses) {
+
+            if (transaction.getPaymentMode() == PaymentMode.CASH) {
+                cashPendingExpenses =
+                        cashPendingExpenses.add(transaction.getAmount());
+            } else if (transaction.getPaymentMode() == PaymentMode.ONLINE) {
+                onlinePendingExpenses =
+                        onlinePendingExpenses.add(transaction.getAmount());
+            }
+        }
+
+        return new PendingCollectionSummaryResponse(
+                cashCollection,
+                onlineCollection,
+                cashPendingExpenses,
+                onlinePendingExpenses
+        );
     }
 }

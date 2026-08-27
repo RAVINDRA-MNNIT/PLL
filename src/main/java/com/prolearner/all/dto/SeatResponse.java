@@ -4,6 +4,7 @@ public record SeatResponse(
 
         Long id,
         String seatNumber,
-        boolean active
+        boolean active,
+        Long student_id
 
 ) {}

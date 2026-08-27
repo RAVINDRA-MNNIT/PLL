@@ -1,0 +1,582 @@
+<div class="transaction-page">
+
+    <!-- ===================================================== -->
+    <!-- Header -->
+    <!-- ===================================================== -->
+
+    <section class="card transaction-card">
+
+        <div class="transaction-header">
+
+            <h2>Transactions</h2>
+
+            <div class="transaction-tabs">
+
+                <button
+                        id="incomeTabBtn"
+                        class="transaction-tab"
+                        onclick="Transactions.showIncome()">
+
+                    Income
+
+                </button>
+
+                <button
+                        id="expenseTabBtn"
+                        class="transaction-tab"
+                        onclick="Transactions.showExpense()">
+
+                    Expenses
+
+                </button>
+
+                <button
+                        id="profitTabBtn"
+                        class="transaction-tab"
+                        onclick="Transactions.showProfit()">
+
+                    Profit
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- Income -->
+    <!-- ===================================================== -->
+
+    <div id="incomeView" style="display:none">
+
+        <section class="card">
+
+            <div class="transaction-toolbar">
+
+                <div class="transaction-sub-tabs">
+
+                    <button
+                            id="dailyIncomeBtn"
+                            class="transaction-tab active"
+                            onclick="Transactions.showDailyIncome()">
+
+                        Daily
+
+                    </button>
+
+                    <button
+                            id="monthlyIncomeBtn"
+                            class="transaction-tab"
+                            onclick="Transactions.showMonthlyIncome()">
+
+                        Monthly
+
+                    </button>
+
+                </div>
+
+                <div
+                        id="monthFilter"
+                        class="month-filter"
+                        style="display:none">
+
+                    <label>Month</label>
+
+                    <select
+                            id="incomeMonth"
+                            onchange="Transactions.loadMonthlyIncome()">
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- Daily -->
+
+            <div id="dailyIncomeView">
+
+                <div class="table-wrapper">
+
+                    <table class="transaction-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Receipt</th>
+                            <th>Student ID</th>
+                            <th>Source</th>
+                            <th>Amount</th>
+                            <th>Payment Mode</th>
+                            <th>Time</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="dailyIncomeRows">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <!-- Monthly -->
+
+            <div
+                    id="monthlyIncomeView"
+                    style="display:none">
+
+                <div class="table-wrapper">
+
+                    <table class="transaction-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Admission Cash</th>
+                            <th>Admission Online</th>
+                            <th>Fee Cash</th>
+                            <th>Fee Online</th>
+                            <th>Total Cash</th>
+                            <th>Total Online</th>
+                            <th>Grand Total</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="monthlyIncomeRows">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Profit -->
+    <!-- ===================================================== -->
+
+    <div
+            id="profitView"
+            style="display:none">
+
+        <section class="card">
+
+            <div class="transaction-stats">
+
+                <div class="stat">
+
+                    <h4>Total Income</h4>
+
+                    <div
+                            class="value"
+                            id="profitIncome">
+
+                        ₹0
+
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <h4>Total Expense</h4>
+
+                    <div
+                            class="value"
+                            id="profitExpense">
+
+                        ₹0
+
+                    </div>
+
+                </div>
+
+                <div class="stat">
+
+                    <h4>Net Profit</h4>
+
+                    <div
+                            class="value"
+                            id="netProfit">
+
+                        ₹0
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table class="transaction-table">
+
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Income Cash</th>
+                        <th>Income Online</th>
+                        <th>Expense Cash</th>
+                        <th>Expense Online</th>
+                        <th>Profit Cash</th>
+                        <th>Profit Online</th>
+                        <th>Total Profit</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="profitRows">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- Expense -->
+    <!-- ===================================================== -->
+
+    <div
+            id="expenseView"
+            style="display:none">
+
+        <section class="card">
+
+            <div class="transaction-toolbar">
+
+                <div class="transaction-sub-tabs">
+                    <button
+                            id="expenseDashboardBtn"
+                            class="transaction-tab active"
+                            onclick="Transactions.showExpenseDashboard()">
+
+                        Dashboard
+
+                    </button>
+                    <button
+                            id="newExpenseBtn"
+                            class="transaction-tab"
+                            onclick="Transactions.showNewExpense()">
+
+                        New Expense
+
+                    </button>
+
+                    <button
+                            id="pendingExpenseBtn"
+                            class="transaction-tab"
+                            onclick="Transactions.showExpenses()">
+                        All Expenses
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- New Expense -->
+            <!-- ================================================= -->
+            <div id="expenseDashboardView">
+
+                <!-- ================= KPI Cards ================= -->
+
+                <div class="expense-dashboard-cards">
+
+                    <div class="expense-card today">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-calendar-day"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">Today's Expense</div>
+                            <div id="todayExpense" class="card-value">₹0</div>
+                        </div>
+                    </div>
+
+                    <div class="expense-card month">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">Month Expense</div>
+                            <div id="monthExpense" class="card-value">₹0</div>
+                        </div>
+                    </div>
+
+                    <div class="expense-card pending">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">Pending Amount</div>
+                            <div id="pendingAmount" class="card-value">₹0</div>
+                        </div>
+                    </div>
+
+                    <div class="expense-card average">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">Average / Day</div>
+                            <div id="averagePerDay" class="card-value">₹0</div>
+                        </div>
+                    </div>
+
+                    <div class="expense-card today">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">Today's Transactions</div>
+                            <div id="todayTransactionCount" class="card-value">0</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="expense-size-grid">
+
+                    <div class="expense-size-card">
+
+                        <h4>Small (&lt; ₹500)</h4>
+
+                        <div class="size-count" id="smallExpenseCount">0</div>
+
+                        <div class="size-amount" id="smallExpenseAmount">₹0</div>
+
+                    </div>
+
+                    <div class="expense-size-card">
+
+                        <h4>Medium (₹5000 - ₹2000)</h4>
+
+                        <div class="size-count" id="mediumExpenseCount">0</div>
+
+                        <div class="size-amount" id="mediumExpenseAmount">₹0</div>
+
+                    </div>
+
+                    <div class="expense-size-card">
+
+                        <h4>Large (&gt; ₹2,000)</h4>
+
+                        <div class="size-count" id="largeExpenseCount">0</div>
+
+                        <div class="size-amount" id="largeExpenseAmount">₹0</div>
+
+                    </div>
+
+                </div>
+
+                <!-- ================= Charts ================= -->
+
+                <div class="expense-chart-grid">
+
+                    <div class="card">
+
+                        <h3>Expense by Category</h3>
+
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <h3>Payment Mode</h3>
+
+                        <div class="chart-container">
+                            <canvas id="paymentChart"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ================= Table ================= -->
+
+                <section class="card">
+
+                    <h3>Expense Category Summary</h3>
+
+                    <div class="table-wrapper">
+
+                        <table class="transaction-table">
+
+                            <thead>
+
+                            <tr>
+                                <th>Category</th>
+                                 <th>Total Expense</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody id="categorySummaryRows"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <div id="newExpenseView" style="display:none">
+                <div class="expense-form">
+
+                    <div class="form-group">
+
+                        <label>Date</label>
+
+                        <input
+                                type="date"
+                                id="expenseDate">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Category</label>
+
+                        <select id="expenseCategory">
+
+                            <option value="">Select Category</option>
+                            <option value="SWEEPER">SWEEPER</option>
+                            <option value="NEWSPAPER">NEWSPAPER</option>
+                            <option value="AC">AC</option>
+                            <option value="SALARY">SALARY</option>
+                            <option value="ELECTRICITY">ELECTRICITY</option>
+                            <option value="INTERNET">INTERNET</option>
+                            <option value="STATIONERY">STATIONERY</option>
+                            <option value="MAINTENANCE">MAINTENANCE</option>
+                            <option value="OTHER">OTHER</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Amount</label>
+
+                        <input
+                                type="number"
+                                id="expenseAmount"
+                                placeholder="Enter amount">
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Payment Mode</label>
+
+                        <select id="expensePaymentMode">
+
+                            <option value="">Select Payment Mode</option>
+                            <option value="CASH">Cash</option>
+                            <option value="ONLINE">UPI</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label>Description</label>
+
+                        <textarea
+                                id="expenseDescription"
+                                rows="3"
+                                placeholder="Enter description"></textarea>
+
+                    </div>
+
+                    <div class="full-width expense-actions">
+
+                        <button
+                                class="primary-btn"
+                                onclick="Transactions.saveExpense()">
+
+                            <i class="fa-solid fa-floppy-disk"></i>
+
+                            Save Expense
+
+                        </button>
+
+                        <button
+                                class="secondary-btn"
+                                type="button"
+                                onclick="Transactions.resetExpenseForm()">
+
+                            Reset
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- Pending Expenses -->
+            <!-- ================================================= -->
+
+            <div
+                    id="expenseListView"
+                    style="display:none">
+
+                <div class="table-wrapper">
+
+                    <table class="transaction-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Payment Mode</th>
+                            <th>Status</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="expenseRows"></tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>

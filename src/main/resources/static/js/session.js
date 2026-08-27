@@ -40,6 +40,10 @@ window.Session = {
         return this.currentUser?.role === "ADMIN";
     },
 
+    isStudent() {
+        return this.currentUser?.role === "STUDENT";
+    },
+
     isManager() {
         return this.currentUser?.role === "MANAGER";
     },
@@ -66,6 +70,14 @@ window.Session = {
 
 
     async logout(redirectUrl = "/login.html") {
+        window.libraryLookups = {
+            qualifications: [],
+            batches: [],
+            preparations: [],
+            seats: [],
+            loaded: false
+        };
+
         try {
             await Api.postWithoutResponse(Endpoints.auth.logout);
         } catch (error) {

@@ -39,17 +39,19 @@ public class LookupService {
         String sql = """
                 SELECT
                     id,
-                    batch_name
+                    batch_name,
+                    batch_alias
                 FROM library.batches
                 WHERE is_active = TRUE
-                ORDER BY batch_name
+                ORDER BY id;
                 """;
 
         return jdbcTemplate.query(
                 sql,
                 (rs, rowNum) -> Map.of(
                         "id", rs.getLong("id"),
-                        "name", rs.getString("batch_name")
+                        "name", rs.getString("batch_name"),
+                        "batchAlias", rs.getString("batch_alias")
                 )
         );
     }
@@ -60,13 +62,14 @@ public class LookupService {
     public List<SeatResponse> getSeats() {
 
         String sql = """
-                SELECT
-                    id,
-                    seat_number,
-                    is_active
-                FROM library.seats
-                WHERE is_active = TRUE
-                ORDER BY seat_number
+            SELECT
+                id,
+                seat_number,
+                is_active,
+                student_id
+            FROM library.seats
+            WHERE is_active = TRUE
+            ORDER BY id;
                 """;
 
         return jdbcTemplate.query(
@@ -74,7 +77,8 @@ public class LookupService {
                 (rs, rowNum) -> new SeatResponse(
                         rs.getLong("id"),
                         rs.getString("seat_number"),
-                        rs.getBoolean("is_active")
+                        rs.getBoolean("is_active"),
+                        rs.getLong("student_id")
                 )
         );
     }

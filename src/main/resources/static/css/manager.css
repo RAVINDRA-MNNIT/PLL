@@ -138,13 +138,92 @@ input,select,textarea{
     background:#fff}.search input{flex:1
 }
 
-.table-wrapper{
-    overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:14px;border-bottom:1px solid var(--border);text-align:left}th{background:#f1f5f9;color:var(--muted)}
-.badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600}.badge.active{background:var(--success-bg);color:var(--success)}.badge.expired{background:var(--danger-bg);color:var(--danger)}
-#pageLoading{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:var(--bg);z-index:9999;font-size:18px;font-weight:600}
-#dashboard{display:none;width:100%;min-height:100vh}
-@media(max-width:800px){body{display:block}.sidebar{width:100%}.main{padding:16px}.header{align-items:flex-start;flex-direction:column}.user-area{width:100%;justify-content:space-between}.search{flex-direction:column}}
+.table-wrapper {
+    overflow-x: auto;
+}
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th,
+td {
+    padding: 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+th {
+    background: #f1f5f9;
+    color: var(--muted);
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.active {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.badge.expired {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+#pageLoading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+    z-index: 9999;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#dashboard {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+}
+
+@media (max-width: 800px) {
+    body {
+        display: block;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .main {
+        padding: 16px;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-area {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .search {
+        flex-direction: column;
+    }
+}
 input[type="radio"]:disabled {
     cursor: not-allowed;
 }
@@ -492,4 +571,117 @@ input[type="radio"]:disabled {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ✅ ACTIVE (green like your image) */
+.status-active {
+    background: #d1f2e1;
+    color: #1e7e34;
+}
+
+/* ✅ APPROVED */
+.status-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* ✅ PENDING */
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* ❌ REJECTED */
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* ❌ CANCELLED */
+.status-cancelled {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* ⚠️ EXPIRED */
+.status-expired {
+    background: #f5c6cb;
+    color: #721c24;
+}
+
+/* others */
+.status-default {
+    background: #e0e0e0;
+    color: #333;
+}
+
+/* TERMINATED → strikethrough */
+.status-terminated {
+    background: #e2e3e5;
+    color: #6c757d;
+    text-decoration: line-through;
+}
+
+.update-fees-btn:disabled {
+    background: #9f9fa7;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.badge.active {
+    color: #166534;
+    background: #dcfce7;
+    border-color: #86efac;
+}
+
+.badge.expired {
+    color: #991b1b;
+    background: #fee2e2;
+    border-color: #fca5a5;
+}
+
+.badge.discontinued {
+    color: #92400e;
+    background: #fef3c7;
+    border-color: #fcd34d;
+}
+
+.badge.terminated {
+    color: #6b7280;
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    opacity: 0.8;
+}
+
+.badge:not(.active):not(.expired):not(.discontinued):not(.terminated) {
+    color: #475569;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }

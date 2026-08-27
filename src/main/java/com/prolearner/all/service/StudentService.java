@@ -39,8 +39,8 @@ public class StudentService {
 
     return jdbcTemplate.query(
             """
- SELECT
-    s.id,
+SELECT
+    s.student_id,
     s.full_name,
     s.date_of_birth,
     s.mobile_number,
@@ -57,20 +57,20 @@ public class StudentService {
     fr.from_date,
     fr.till_date,
     fr.seat_id,
-    fr.seat_number,
+    st.seat_number,
     fr.batch_id,
-    fr.batch_name,
+    b.batch_name,
     fr.discount_amount,
     fr.submitted_amount,
     fr.pending_amount,
     fr.payment_mode,
     fr.transaction_id,
-    fr.payment_remark,
+    fr.remarks,
 
     (
         SELECT COUNT(*)
         FROM library.approval_requests ar
-        WHERE ar.student_id = s.id
+        WHERE ar.student_id = s.student_id
           AND ar.status = 'PENDING'
     ) AS pending_approval_count,
 
@@ -79,68 +79,58 @@ public class StudentService {
 
 FROM library.students s
 
-LEFT JOIN library.fee_records fr
-    ON fr.student_id = s.id
+LEFT JOIN LATERAL (
+    SELECT *
+    FROM library.fee_records fr
+    WHERE fr.student_id = s.student_id
+    ORDER BY fr.id DESC
+    LIMIT 1
+) fr ON TRUE
 
-ORDER BY s.id DESC;
+LEFT JOIN library.batches b
+    ON b.id = fr.batch_id
+
+LEFT JOIN library.seats st
+    ON st.id = fr.seat_id
+
+ORDER BY s.student_id DESC;
             """,
             (rs, rowNum) -> new StudentResponse(
-
-                    rs.getLong("id"),
-
+                    rs.getLong("student_id"),
                     rs.getString("full_name"),
-
-                    rs.getDate("date_of_birth").toLocalDate(),
-
+                    rs.getDate("date_of_birth") != null
+                            ? rs.getDate("date_of_birth").toLocalDate()
+                            : null,
                     rs.getString("mobile_number"),
-
                     rs.getString("guardian_number"),
-
                     rs.getString("father_name"),
-
                     rs.getString("local_address"),
-
                     rs.getString("permanent_address"),
-
                     rs.getString("aadhaar_number"),
-
                     rs.getString("qualification"),
-
                     rs.getString("preparation_for"),
-
                     rs.getLong("batch_id"),
                     rs.getString("batch_name"),
-
-                    rs.getObject("seat_id") != null
-                            ? rs.getLong("seat_id")
-                            : null,
+                    rs.getLong("seat_id"),
                     rs.getString("seat_number"),
-                    rs.getDate("date_of_admission").toLocalDate(),
-                    rs.getDate("from_date").toLocalDate(),
-
-                    rs.getDate("till_date").toLocalDate(),
-
+                    rs.getDate("date_of_admission") != null
+                            ? rs.getDate("date_of_admission").toLocalDate()
+                            : null,
+                    rs.getDate("from_date") != null
+                            ? rs.getDate("from_date").toLocalDate()
+                            : null,
+                    rs.getDate("till_date") != null
+                            ? rs.getDate("till_date").toLocalDate()
+                            : null,
                     rs.getString("enrollment_status"),
-
                     rs.getBigDecimal("submitted_amount"),
-
                     rs.getBigDecimal("pending_amount"),
-
                     rs.getBigDecimal("discount_amount"),
-
                     rs.getString("payment_mode"),
-
                     rs.getString("transaction_id"),
-
-                    rs.getString("payment_remark"),
-
+                    rs.getString("remarks"),
                     rs.getLong("created_by"),
-
-                    rs.getObject(
-                            "created_at",
-                            OffsetDateTime.class
-                    ),
-
+                    rs.getObject("created_at", OffsetDateTime.class),
                     rs.getLong("pending_approval_count")
             )
     );
@@ -148,43 +138,63 @@ ORDER BY s.id DESC;
 
 public StudentFeeResponse getStudentFees(Long studentId) {
     String sql = """
-        SELECT
-            s.id,
-            s.full_name,
-            s.seat_id,
-            s.enrollment_status,
-
-            fr.from_date,
-            fr.till_date,
-            fr.batch_id,
-            fr.discount_amount,
-            fr.submitted_amount,
-            fr.pending_amount,
-            fr.payment_mode,
-            fr.transaction_id,
-            fr.payment_remark
-
-        FROM library.students s
-
-        LEFT JOIN library.fee_records fr
-            ON fr.student_id = s.id
-
-        WHERE s.id = ?
+            SELECT
+                s.student_id,
+                s.full_name,
+                s.enrollment_status,
+            
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'feeRecordId', fr.id,
+                            'batchId', fr.batch_id,
+                            'batchName', b.batch_name,
+                            'seatId', fr.seat_id,
+                            'seatNumber', st.seat_number,
+                            'fromDate', fr.from_date,
+                            'tillDate', fr.till_date,
+                            'submittedAmount', fr.submitted_amount,
+                            'pendingAmount', fr.pending_amount,
+                            'discountAmount', fr.discount_amount,
+                            'paymentMode', fr.payment_mode,
+                            'transactionId', fr.transaction_id,
+                            'paymentRemark', fr.remarks,
+                            'createdBy', fr.created_by,
+                            'createdAt', fr.created_at
+                        )
+                        ORDER BY fr.created_at DESC
+                    ) FILTER (WHERE fr.id IS NOT NULL),
+                    '[]'::json
+                ) AS fee_records
+            
+            FROM library.students s
+            
+            LEFT JOIN library.fee_records fr
+                ON fr.student_id = s.student_id
+            
+            LEFT JOIN library.batches b
+                ON b.id = fr.batch_id
+            
+            LEFT JOIN library.seats st
+                ON st.id = fr.seat_id
+            
+            WHERE s.student_id = ?
+            
+            GROUP BY
+                s.student_id,
+                s.full_name,
+                s.enrollment_status;
         """;
 
     return jdbcTemplate.queryForObject(
             sql,
             (rs, rowNum) -> new StudentFeeResponse(
 
-                    rs.getLong("id"),
+                    rs.getLong("student_id"),
 
                     rs.getString("full_name"),
 
                     rs.getLong("batch_id"),
-
-                    rs.getObject("seat_id") != null
-                            ? rs.getLong("seat_id")
-                            : null,
 
                     rs.getDate("from_date").toLocalDate(),
 
@@ -202,7 +212,7 @@ public StudentFeeResponse getStudentFees(Long studentId) {
 
                     rs.getString("transaction_id"),
 
-                    rs.getString("payment_remark")
+                    rs.getString("remarks")
             ),
             studentId
     );
@@ -215,13 +225,14 @@ public void submitFeeUpdateRequest(
         UpdateFeeRequest request
 ) {
 
+
     Map<String, Object> requestData = new LinkedHashMap<>();
 
     requestData.put("studentId", studentId);
     requestData.put("batchId", request.batchId());
     requestData.put("seatId", request.seatId());
-    requestData.put("membershipFrom", request.membershipFrom());
-    requestData.put("membershipTill", request.membershipTill());
+    requestData.put("fromDate", request.fromDate());
+    requestData.put("tillDate", request.tillDate());
     requestData.put("submittedAmount", request.submittedAmount());
     requestData.put("discount", request.discount());
     requestData.put("pendingAmount", request.pendingAmount());
@@ -275,8 +286,8 @@ public void updatePendingFeeRequest(
 
     requestData.put("batchId", request.batchId());
     requestData.put("seatId", request.seatId());
-    requestData.put("membershipFrom", request.membershipFrom());
-    requestData.put("membershipTill", request.membershipTill());
+    requestData.put("fromDate", request.fromDate());
+    requestData.put("tillDate", request.tillDate());
     requestData.put("submittedAmount", request.submittedAmount());
     requestData.put("discount", request.discount());
     requestData.put("pendingAmount", request.pendingAmount());
@@ -310,41 +321,41 @@ public void updatePendingFeeRequest(
 public StudentDetailsResponse getStudentDetails(Long studentId) {
 
     StudentDetailsResponse student = jdbcTemplate.queryForObject(
-        """
-        SELECT
-            s.id,
-            s.full_name,
-            s.date_of_birth,
-            s.mobile_number,
-            s.guardian_number,
-            s.father_name,
-            s.local_address,
-            s.permanent_address,
-            s.aadhaar_number,
-            s.qualification,
-            s.preparation_for,
-            s.date_of_admission,
-            s.enrollment_status
-        FROM library.students s
-        WHERE s.id = ?
-        """,
-        (rs, rowNum) -> new StudentDetailsResponse(
-            rs.getLong("id"),
-            rs.getString("full_name"),
-            rs.getObject("date_of_birth", LocalDate.class),
-            rs.getString("mobile_number"),
-            rs.getString("guardian_number"),
-            rs.getString("father_name"),
-            rs.getString("local_address"),
-            rs.getString("permanent_address"),
-            rs.getString("aadhaar_number"),
-            rs.getString("qualification"),
-            rs.getString("preparation_for"),
-            rs.getObject("date_of_admission", LocalDate.class),
-            rs.getString("enrollment_status"),
-            new ArrayList<>()
-        ),
-        studentId
+            """
+            SELECT
+                s.student_id,
+                s.full_name,
+                s.date_of_birth,
+                s.mobile_number,
+                s.guardian_number,
+                s.father_name,
+                s.local_address,
+                s.permanent_address,
+                s.aadhaar_number,
+                s.qualification,
+                s.preparation_for,
+                s.date_of_admission,
+                s.enrollment_status
+            FROM library.students s
+            WHERE s.student_id = ?
+            """,
+            (rs, rowNum) -> new StudentDetailsResponse(
+                    rs.getLong("student_id"),
+                    rs.getString("full_name"),
+                    rs.getObject("date_of_birth", LocalDate.class),
+                    rs.getString("mobile_number"),
+                    rs.getString("guardian_number"),
+                    rs.getString("father_name"),
+                    rs.getString("local_address"),
+                    rs.getString("permanent_address"),
+                    rs.getString("aadhaar_number"),
+                    rs.getString("qualification"),
+                    rs.getString("preparation_for"),
+                    rs.getObject("date_of_admission", LocalDate.class),
+                    rs.getString("enrollment_status"),
+                    new ArrayList<>()
+            ),
+            studentId
     );
 
     if (student == null) {
@@ -352,64 +363,66 @@ public StudentDetailsResponse getStudentDetails(Long studentId) {
     }
 
     List<StudentFeeHistoryResponse> feeRecords = jdbcTemplate.query(
-        """
-        SELECT
-            fr.id,
-            fr.batch_id,
-            b.batch_name,
-            fr.seat_id,
-            fr.seat_number,
-            fr.from_date,
-            fr.till_date,
-            fr.submitted_amount,
-            fr.discount_amount,
-            fr.pending_amount,
-            fr.payment_mode,
-            fr.transaction_id,
-            fr.payment_remark,
-            fr.created_by,
-            fr.created_at
-        FROM library.fee_records fr
-        LEFT JOIN library.batches b
-            ON b.id = fr.batch_id
-        WHERE fr.student_id = ?
-        ORDER BY fr.till_date ASC
-        """,
-        (rs, rowNum) -> new StudentFeeHistoryResponse(
-            rs.getLong("id"),
-            rs.getLong("batch_id"),
-            rs.getString("batch_name"),
-            rs.getObject("seat_id", Long.class),
-            rs.getString("seat_number"),
-            rs.getObject("from_date", LocalDate.class),
-            rs.getObject("till_date", LocalDate.class),
-            rs.getBigDecimal("submitted_amount"),
-            rs.getBigDecimal("discount_amount"),
-            rs.getBigDecimal("pending_amount"),
-            rs.getString("payment_mode"),
-            rs.getString("transaction_id"),
-            rs.getString("payment_remark"),
-            rs.getObject("created_by", Long.class),
-            rs.getObject("created_at", OffsetDateTime.class)
-        ),
-        studentId
+            """
+            SELECT
+                fr.id,
+                fr.batch_id,
+                b.batch_name,
+                fr.seat_id,
+                st.seat_number,
+                fr.from_date,
+                fr.till_date,
+                fr.submitted_amount,
+                fr.pending_amount,
+                fr.discount_amount,
+                fr.payment_mode,
+                fr.transaction_id,
+                fr.remarks,
+                fr.created_by,
+                fr.created_at
+            FROM library.fee_records fr
+            LEFT JOIN library.batches b
+                ON b.id = fr.batch_id
+            LEFT JOIN library.seats st
+                ON st.id = fr.seat_id
+            WHERE fr.student_id = ?
+            ORDER BY fr.id DESC
+            """,
+            (rs, rowNum) -> new StudentFeeHistoryResponse(
+                    rs.getLong("id"),
+                    rs.getLong("batch_id"),
+                    rs.getString("batch_name"),
+                    rs.getObject("seat_id", Long.class),
+                    rs.getString("seat_number"),
+                    rs.getObject("from_date", LocalDate.class),
+                    rs.getObject("till_date", LocalDate.class),
+                    rs.getBigDecimal("submitted_amount"),
+                    rs.getBigDecimal("pending_amount"),
+                    rs.getBigDecimal("discount_amount"),
+                    rs.getString("payment_mode"),
+                    rs.getString("transaction_id"),
+                    rs.getString("remarks"),
+                    rs.getObject("created_by", Long.class),
+                    rs.getObject("created_at", OffsetDateTime.class)
+            ),
+            studentId
     );
 
     return new StudentDetailsResponse(
-        student.studentId(),
-        student.fullName(),
-        student.dateOfBirth(),
-        student.mobileNumber(),
-        student.guardianNumber(),
-        student.fatherName(),
-        student.localAddress(),
-        student.permanentAddress(),
-        student.aadhaarNumber(),
-        student.qualification(),
-        student.preparationFor(),
-        student.dateOfAdmission(),
-        student.enrollmentStatus(),
-        feeRecords
+            student.studentId(),
+            student.fullName(),
+            student.dateOfBirth(),
+            student.mobileNumber(),
+            student.guardianNumber(),
+            student.fatherName(),
+            student.localAddress(),
+            student.permanentAddress(),
+            student.aadhaarNumber(),
+            student.qualification(),
+            student.preparationFor(),
+            student.dateOfAdmission(),
+            student.enrollmentStatus(),
+            feeRecords
     );
 }
 }

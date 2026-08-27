@@ -27,47 +27,58 @@
 
         </div>
 
-<div class="collection-summary">
+        <div class="finance-summary">
 
-    <span class="summary-title">
-        Total Collection
-    </span>
+            <!-- Collection -->
+            <div class="finance-section">
+                <h3>💰 Collection</h3>
 
-    <div class="summary-item">
+                <div class="finance-row">
+                    <span>💵 Cash</span>
+                    <strong id="cashCollection" class="cash">₹0</strong>
+                </div>
 
-        <span class="summary-label">
-            💵 Cash
-        </span>
+                <div class="finance-row">
+                    <span>💳 Online</span>
+                    <strong id="onlineCollection" class="online">₹0</strong>
+                </div>
+            </div>
 
-        <strong
-            id="cashCollection"
-            class="summary-value cash">
+            <div class="finance-divider"></div>
 
-            ₹0
+            <!-- Expenses -->
+            <div class="finance-section">
+                <h3>💸 Expenses</h3>
 
-        </strong>
+                <div class="finance-row">
+                    <span>💵 Cash</span>
+                    <strong id="cashExpense" class="expense">₹0</strong>
+                </div>
 
-    </div>
+                <div class="finance-row">
+                    <span>💳 Online</span>
+                    <strong id="onlineExpense" class="expense">₹0</strong>
+                </div>
+            </div>
 
-    <div class="summary-divider"></div>
+            <div class="finance-divider"></div>
 
-    <div class="summary-item">
+            <!-- Profit -->
+            <div class="finance-section">
+                <h3>💼 In Hand</h3>
 
-        <span class="summary-label">
-            💳 Online
-        </span>
+                <div class="finance-row">
+                    <span>💵 Cash</span>
+                    <strong id="cashProfit" class="profit">₹0</strong>
+                </div>
 
-        <strong
-            id="onlineCollection"
-            class="summary-value online">
+                <div class="finance-row">
+                    <span>💳 Online</span>
+                    <strong id="onlineProfit" class="profit">₹0</strong>
+                </div>
+            </div>
 
-            ₹0
-
-        </strong>
-
-    </div>
-
-</div>
+        </div>
 
     </div>
 
@@ -82,9 +93,9 @@
             <button id="allTab" class="tab">All Request Status</button>
         </div>
 
-        <button id="clearAllBtn" class="clear-btn">
+        <!-- <button id="clearAllBtn" class="clear-btn">
             🗑 Clear All
-        </button>
+        </button> -->
 
     </div>
 

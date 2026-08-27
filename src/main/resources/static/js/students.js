@@ -11,7 +11,6 @@ async function loadStudents() {
     try {
         students = await Api.get(Endpoints.students.list);
     } catch (error) {
-        alert(error.message || "Something went wrong.");
         console.error(error);
         students = [];
     } finally {
@@ -85,10 +84,37 @@ function createStudentRow(student) {
         viewStudentDetails(student.studentId);
     };
 
+    // const today = new Date();
+    // today.setHours(0, 0, 0, 0);
+    // const till = new Date(student.tillDate);
+    // till.setHours(0, 0, 0, 0);
+    // const diffDays = Math.floor((till - today) / (1000 * 60 * 60 * 24));
+
+     const diffDays = getDateDifferenceInDays(new Date(), student.tillDate)
+
+    // const isExpired = (diffDays < 0 && (student.enrollmentStatus === "ACTIVE"));
+    // const isDiscontinued = (diffDays < -10 && (student.enrollmentStatus === "ACTIVE"));
+    student.enrollmentStatus = getUpdatedEnrollment(Date(), student.tillDate , student.enrollmentStatus)
+    debugger;
+    const badgeClassMap = {
+        ACTIVE: "active",
+        EXPIRED: "expired",
+        DISCONTINUED: "discontinued",
+        TERMINATED: "terminated"
+    };
+
     const badgeClass =
-        student.enrollmentStatus === "ACTIVE"
-            ? "active"
-            : "expired";
+        badgeClassMap[student.enrollmentStatus?.toUpperCase()] || "";
+    let isTerminated = true;
+    let buttonMsg = null;
+    // console.log("diff" + diffDays);
+    if (student.enrollmentStatus === "TERMINATED") {
+        buttonMsg = `Student is terminated`;
+    } else if (diffDays > 3) {
+        buttonMsg = `You can only submit next fees if membership expires in 3 days`;
+    } else {
+        isTerminated = false
+    }
 
     row.innerHTML = `
         <td>
@@ -108,9 +134,9 @@ function createStudentRow(student) {
                 .toLocaleString("en-IN")}
         </td>
 
-        <td>${formatDate(student.membershipFrom)}</td>
+        <td>${formatDate(student.fromDate)}</td>
 
-        <td>${formatDate(student.membershipTill)}</td>
+        <td>${formatDate(student.tillDate)}</td>
 
         <td>
             <span class="badge ${badgeClass}">
@@ -123,14 +149,9 @@ function createStudentRow(student) {
         </td>
 
         <td>
-            <button
-                class="update-fees-btn"
-                onclick="updateFees(${student.studentId})">
-
-                <i class="fa-solid fa-money-bill-wave"></i>
-
-                Update Fees
-
+            <button class="update-fees-btn" ${isTerminated ? `disabled title="${buttonMsg}"` : `onclick="updateFees(${student.studentId})"`}>
+            <i class="fa-solid fa-money-bill-wave"></i>
+            Update Fees
             </button>
         </td>
     `;

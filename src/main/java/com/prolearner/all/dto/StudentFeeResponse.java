@@ -11,11 +11,9 @@ public record StudentFeeResponse(
 
         Long batchId,
 
-        Long seatId,
+        LocalDate fromDate,
 
-        LocalDate membershipFrom,
-
-        LocalDate membershipTill,
+        LocalDate tillDate,
 
         String enrollmentStatus,
 

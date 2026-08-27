@@ -7,7 +7,8 @@ window.libraryLookups = {
     qualifications: [],
     batches: [],
     preparations: [],
-    seats: []
+    seats: [],
+    loaded: false
 };
 
 let lookupsLoaded = false;
@@ -29,7 +30,7 @@ async function fetchLookup(endpoint) {
  */
 async function loadLookups(forceReload = false) {
 
-    if (lookupsLoaded && !forceReload) {
+    if (window.libraryLookups.loaded && !forceReload) {
         return;
     }
 
@@ -39,25 +40,48 @@ async function loadLookups(forceReload = false) {
         preparations,
         seats
     ] = await Promise.all([
-        fetchLookup(Endpoints.lookup.qualifications),
-        fetchLookup(Endpoints.lookup.batches),
-        fetchLookup(Endpoints.lookup.preparations),
-        fetchLookup(Endpoints.lookup.seats)
+        fetchLookup(Endpoints.lookups.qualifications),
+        fetchLookup(Endpoints.lookups.batches),
+        fetchLookup(Endpoints.lookups.preparations),
+        fetchLookup(Endpoints.lookups.seats)
     ]);
 
-    window.libraryLookups.qualifications = qualifications;
-    window.libraryLookups.batches = batches;
-    window.libraryLookups.preparations = preparations;
-    window.libraryLookups.seats = seats;
+    window.libraryLookups.qualifications = qualifications || [];
+    window.libraryLookups.batches = batches || [];
+    window.libraryLookups.preparations = preparations || [];
+    window.libraryLookups.seats = seats || [];
+
+    window.libraryLookups.loaded = true;   // ✅ single source of truth
 
     populateBatchFilter();
-
-    lookupsLoaded = true;
 
     window.dispatchEvent(
         new CustomEvent("library-lookups-ready")
     );
+}
 
+/**
+ * Reload ONLY seats lookup
+ */
+async function reloadSeats() {
+
+    try {
+        console.log("Reloading seats...");
+
+        const seats = await fetchLookup(Endpoints.lookups.seats);
+
+        window.libraryLookups.seats = seats || [];
+
+        console.log("Seats updated ✅");
+
+        // optional event (if UI depends on seats)
+        window.dispatchEvent(
+            new CustomEvent("library-seats-updated")
+        );
+
+    } catch (e) {
+        console.error("Failed to reload seats ❌", e);
+    }
 }
 
 /**
@@ -159,4 +183,18 @@ function findSeat(seatId) {
             String(seat.id) === String(seatId)
     );
 
+}
+
+async function filteredSeat(studentId) {
+    try {
+        await reloadSeats();
+        const lookups = window.libraryLookups || {};
+        const seats = lookups.seats || [];
+
+        return seats.filter(seat =>
+            !seat.student_id ||
+            String(seat.student_id) === String(studentId)
+        );
+    } catch (e) {
+    }
 }

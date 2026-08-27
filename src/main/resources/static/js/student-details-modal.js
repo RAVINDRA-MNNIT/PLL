@@ -143,7 +143,23 @@ window.StudentDetailsModal = {
         `);
     },
 
-    updateStatus() {
+    updateStatus(currentStatus) {
+        let options = `<option value="">-- Select Status --</option>`;
+
+        // Admin can reactivate terminated students
+        if (Session.isAdmin() && currentStatus === "TERMINATED") {
+            options += `<option value="ACTIVE">Active</option>`;
+        } else {
+            // Normal status changes
+            if (currentStatus !== "DISCONTINUED") {
+                options += `<option value="DISCONTINUED">Discontinued</option>`;
+            }
+
+            if (currentStatus !== "TERMINATED") {
+                options += `<option value="TERMINATED">Terminated</option>`;
+            }
+        }
+
         this.open(`
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
@@ -160,9 +176,7 @@ window.StudentDetailsModal = {
                     <label>Enrollment Status</label>
 
                     <select id="newEnrollmentStatus">
-                        <option value="">-- Select Status --</option>
-                        <option value="DISCONTINUED">Discontinued</option>
-                        <option value="TERMINATED">Terminated</option>
+                         ${options}
                     </select>
 
                 </div>

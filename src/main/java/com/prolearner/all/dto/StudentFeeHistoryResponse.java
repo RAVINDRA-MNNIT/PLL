@@ -15,8 +15,8 @@ public record StudentFeeHistoryResponse(
     Long seatId,
     String seatNumber,
 
-    LocalDate membershipFrom,
-    LocalDate membershipTill,
+    LocalDate fromDate,
+    LocalDate tillDate,
 
     BigDecimal submittedAmount,
     BigDecimal pendingAmount,

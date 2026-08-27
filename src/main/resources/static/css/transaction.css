@@ -1,0 +1,469 @@
+/* ==========================================================
+   Transaction Header
+========================================================== */
+
+.transaction-card {
+    padding: 16px 24px;
+    margin-bottom: 16px;
+}
+
+.transaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction-header h2 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* ==========================================================
+   Main Tabs
+========================================================== */
+
+.transaction-tabs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.transaction-tab {
+    border: none;
+    outline: none;
+    background: #eef2f7;
+    color: #374151;
+    padding: 9px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all .2s ease;
+}
+
+.transaction-tab:hover {
+    background: #dbe4f0;
+}
+
+.transaction-tab.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* ==========================================================
+   Toolbar
+========================================================== */
+
+.transaction-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.transaction-sub-tabs {
+    display: flex;
+    gap: 10px;
+}
+
+/* ==========================================================
+   Month Filter
+========================================================== */
+
+.month-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.month-filter label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.month-filter select {
+    min-width: 180px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+/* ==========================================================
+   Profit Cards
+========================================================== */
+
+.transaction-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.transaction-stats .stat {
+    padding: 18px;
+    border-radius: 10px;
+}
+
+.transaction-stats .stat h4 {
+    margin-bottom: 8px;
+}
+
+/* ==========================================================
+   Tables
+========================================================== */
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-table th,
+.transaction-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.transaction-table th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* ==========================================================
+   Table Wrapper
+========================================================== */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+/* ==========================================================
+   Compact Card
+========================================================== */
+
+.card.transaction-card {
+    min-height: auto;
+}
+
+.card {
+    margin-bottom: 18px;
+}
+
+/* ==========================================================
+   Responsive
+========================================================== */
+
+@media (max-width: 768px) {
+
+    .transaction-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .transaction-tabs {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .transaction-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .transaction-sub-tabs {
+        flex-wrap: wrap;
+    }
+
+    .month-filter {
+        width: 100%;
+    }
+
+    .month-filter select {
+        width: 100%;
+    }
+
+    .transaction-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+.expense-form{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.form-group label{
+    margin-bottom:6px;
+    font-weight:600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    font-size:14px;
+}
+
+.form-group textarea{
+    resize:vertical;
+}
+
+.full-width{
+    grid-column:1/-1;
+}
+
+.expense-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    margin-top:10px;
+}
+
+/* ==========================================================
+   Expense status
+========================================================== */
+
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status.approved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.status.rejected {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status.direct {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* ==========================================================
+   Expense cards
+========================================================== */
+
+.expense-analytics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;
+    margin-bottom:20px;
+}
+
+.stat-card{
+    background:#fff;
+    border-radius:12px;
+    padding:18px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.stat-card .title{
+    color:#6b7280;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.stat-card .value{
+    font-size:28px;
+    font-weight:700;
+    color:#2563eb;
+}
+
+.chart-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:20px;
+}
+
+.chart-grid .card{
+    height:340px;
+    padding:20px;
+}
+
+.chart-grid canvas{
+    width:100% !important;
+    height:280px !important;
+}
+
+.expense-dashboard-cards{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:18px;
+
+    margin-bottom:25px;
+
+}
+
+.expense-card{
+
+    display:flex;
+    align-items:center;
+
+    gap:18px;
+
+    padding:22px;
+
+    border-radius:14px;
+
+    color:white;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.expense-card.today{
+
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
+
+}
+
+.expense-card.month{
+
+    background:linear-gradient(135deg,#14b8a6,#0f766e);
+
+}
+
+.expense-card.pending{
+
+    background:linear-gradient(135deg,#f97316,#ea580c);
+
+}
+
+.expense-card.average{
+
+    background:linear-gradient(135deg,#8b5cf6,#6d28d9);
+
+}
+
+.expense-card.request{
+
+    background:linear-gradient(135deg,#ef4444,#b91c1c);
+
+}
+
+.card-icon{
+
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(255,255,255,.18);
+
+    font-size:26px;
+
+}
+
+.card-title{
+
+    font-size:14px;
+    opacity:.9;
+
+}
+
+.card-value{
+
+    font-size:28px;
+    font-weight:700;
+
+    margin-top:4px;
+
+}
+
+.expense-chart-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin:20px 0;
+}
+
+.chart-container{
+    position:relative;
+    height:320px;      /* Change this value */
+    width:100%;
+}
+
+.chart-container canvas{
+    width:100% !important;
+    height:100% !important;
+}
+
+
+@media(max-width:900px){
+
+    .expense-chart-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+.expense-size-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin:20px 0;
+}
+
+.expense-size-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.expense-size-card h4{
+    margin-bottom:12px;
+    color:#374151;
+}
+
+.size-count{
+    font-size:28px;
+    font-weight:700;
+    color:#2563eb;
+}
+
+.size-amount{
+    margin-top:8px;
+    font-size:20px;
+    font-weight:600;
+    color:#059669;
+}

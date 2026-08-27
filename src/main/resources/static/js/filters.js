@@ -74,8 +74,7 @@ function matchesSearch(
 
         case "id":
 
-            return String(student.studentId)
-                .includes(keyword);
+            return student.studentId === Number(keyword);
 
         case "name":
 

@@ -15,12 +15,9 @@ window.StudentActionsUI = {
         this.student = studentData;
 
         if (!this.container) {
-            console.error("❌ Actions container not found");
             return;
         }
 
-        console.log("Student data" + studentData)
-        console.log("Student id" + studentData?.studentId)
         this.studentId = studentData?.studentId;
 
         this.ensureModalRoot(); // ✅ important
@@ -30,16 +27,16 @@ window.StudentActionsUI = {
 
     // ================= UI =================
 
-    render() {
-        const showSeat = this.isSeatApplicable();
-
-        this.container.innerHTML = `
-            ${this.button("feeHistory", "fa-clock-rotate-left", "Fee Records")}
-            ${this.button("updateDetails", "fa-user-pen", "Update Details")}
-            ${showSeat ? this.button("changeSeat", "fa-chair", "Change Seat") : ""}
-            ${this.button("updateStatus", "fa-user-check", "Update Enrollment Status")}
-        `;
-    },
+    // render() {
+    //     const showSeat = this.isSeatApplicable();
+    //
+    //     this.container.innerHTML = `
+    //         ${this.button("feeHistory", "fa-clock-rotate-left", "Fee Records")}
+    //         ${this.button("updateDetails", "fa-user-pen", "Update Details")}
+    //         ${showSeat ? this.button("changeSeat", "fa-chair", "Change Seat") : ""}
+    //         ${this.button("updateStatus", "fa-user-check", "Update Enrollment Status")}
+    //     `;
+    // },
 
     button(action, icon, label) {
         return `
@@ -50,6 +47,38 @@ window.StudentActionsUI = {
         `;
     },
 
+    render() {
+        debugger;
+        const showSeat = this.isSeatApplicable();
+        const isAdmin = Session.isAdmin();
+        const isStudent = Session.isStudent();
+        const isManager = Session.isManager()
+        const isTerminated = this.student?.enrollmentStatus === "TERMINATED";
+        const last = this.student?.feeRecords?.at(0);
+        const diffDays = getDateDifferenceInDays(new Date(), last.tillDate)
+        let html = this.button("feeHistory", "fa-clock-rotate-left", "Fee Records");
+
+        if (isTerminated) {
+            if (isAdmin) {
+                html += this.button("updateStatus", "fa-user-check", "Update Enrollment Status");
+            }
+        } else {
+            if (isAdmin || isManager) {
+                html += this.button("updateDetails", "fa-user-pen", "Update Details");
+                if (showSeat) {
+                    html += this.button("changeSeat", "fa-chair", "Change Seat");
+                }
+                html += this.button("updateStatus", "fa-user-check", "Update Enrollment Status");
+            } else if (isStudent) {
+                html += this.button("updateStatus", "fa-user-check", "Update Enrollment Status");
+                if (!(diffDays > 3)) {
+                    html += this.button("updateFees", "fa-solid fa-money-bill-transfer", "Fees Update Request");
+                }
+            }
+        }
+        this.container.innerHTML = html;
+    },
+
     // ================= EVENTS =================
 
     bindEvents() {
@@ -58,23 +87,24 @@ window.StudentActionsUI = {
             if (!btn) return;
 
             const action = btn.dataset.action;
-            console.log("Action clicked:", action);
-
             switch (action) {
                 case "feeHistory":
                     this.showFeeHistory();
                     break;
 
                 case "updateDetails":
-                    this.showUpdateDetails();
+                    this.showUpdateDetails(this.student.enrollmentStatus);
                     break;
 
                 case "changeSeat":
-                    this.showChangeSeat();
+                    this.showChangeSeat(this.student.enrollmentStatus);
                     break;
 
                 case "updateStatus":
-                    this.showUpdateStatus();
+                    this.showUpdateStatus(this.student.enrollmentStatus);
+                    break;
+                case "updateFees":
+                    this.showFeeUpdate();
                     break;
             }
         });
@@ -161,9 +191,9 @@ showFeeHistory() {
                     <td>${r.batchName ?? "-"}</td>
                     <td>${r.seatNumber ?? "-"}</td>
                     <td>
-                        ${formatDate(r.membershipFrom)}<br>
+                        ${formatDate(r.fromDate)}<br>
                         <small>to</small><br>
-                        ${formatDate(r.membershipTill)}
+                        ${formatDate(r.tillDate)}
                     </td>
                     <td>₹${Number(r.submittedAmount ?? 0).toLocaleString("en-IN")}</td>
                     <td>₹${Number(r.discountAmount ?? 0).toLocaleString("en-IN")}</td>
@@ -223,8 +253,11 @@ showFeeHistory() {
     this.openModal(html);
 },
 
-showUpdateDetails() {
-
+showUpdateDetails(currentStatus) {
+    if (currentStatus === "TERMINATED") {
+        alert("You should not change the details of student if current status is terminated")
+        return;
+    }
     const html = `
         <div class="modal-content" style="max-width:550px;">
             <div class="modal-header">
@@ -275,15 +308,19 @@ showUpdateDetails() {
 
     this.openModal(html);
 },
-async showChangeSeat() {
-
-    await loadLookups();
+async showChangeSeat(currentStatus) {
+    if (currentStatus === "TERMINATED") {
+        alert("You should not change the seat of student if current status is terminated")
+        return;
+    }
+    const seats = await filteredSeat(this.studentId);
 
     let options = `<option value="">-- Select Seat --</option>`;
-
-    window.libraryLookups?.seats?.forEach(seat => {
+    seats?.forEach(seat => {
         options += `
-            <option value="${seat.id}">
+            <option 
+                value="${seat.id}" 
+                data-seat="${seat.seatNumber}">
                 ${seat.seatNumber}
             </option>
         `;
@@ -333,8 +370,35 @@ async showChangeSeat() {
     this.openModal(html);
 },
 
-showUpdateStatus() {
+showUpdateStatus(currentStatus) {
+    let options = `<option value="">-- Select Status --</option>`;
 
+    // Admin can reactivate terminated students
+    if (currentStatus === "TERMINATED") {
+        if (Session.isAdmin()) {
+            options += `<option value="ACTIVE">Active</option>`;
+        } else {
+            alert("Only Admin can update the status in case of student is terminated !")
+            return
+        }
+    } else {
+        if (Session.isStudent()) {
+            options += `<option value="DISCONTINUED">Discontinued</option>`;
+        } else {
+            // Normal status changes
+            if (currentStatus === "DISCONTINUED") {
+                options += `<option value="ACTIVE">Active</option>`;
+            }
+
+            if (currentStatus !== "DISCONTINUED") {
+                options += `<option value="DISCONTINUED">Discontinued</option>`;
+            }
+
+            if (currentStatus !== "TERMINATED") {
+                options += `<option value="TERMINATED">Terminated</option>`;
+            }
+        }
+    }
     const html = `
         <div class="modal-content" style="max-width:500px;">
 
@@ -352,9 +416,7 @@ showUpdateStatus() {
                     <label>Enrollment Status</label>
 
                     <select id="newEnrollmentStatus">
-                        <option value="">-- Select Status --</option>
-                        <option value="DISCONTINUED">Discontinued</option>
-                        <option value="TERMINATED">Terminated</option>
+                          ${options}
                     </select>
                 </div>
 
@@ -380,14 +442,97 @@ showUpdateStatus() {
     this.openModal(html);
 },
 
+    async showFeeUpdate() {
+        if (!confirm("As a student you cannot change anything like batch, seat, amount everything will be same as your previous fee record \n and only one month fees you can update. \n\n Do you want to want to continue?")) {
+            return;
+        }
+        if (!this.confirmFeeUpdate()) {
+            return;
+        }
+
+        const transactionId = prompt("Enter Transaction Id, \n\n !!!Make sure not to repeat previous transaction id, In case of duplicate transaction id, your registration might be cancel:");
+        if (!transactionId || !transactionId.trim()) {
+            alert("Transaction Id is required");
+            return;
+        }
+
+        const last = this.student?.feeRecords?.at(0);
+
+        const newTill = new Date(last.tillDate);
+        const day = newTill.getDate();
+        newTill.setDate(1);
+        newTill.setMonth(newTill.getMonth() + 1);
+        const lastDay = new Date(
+            newTill.getFullYear(),
+            newTill.getMonth() + 1,
+            0
+        ).getDate();
+        newTill.setDate(Math.min(day, lastDay));
+
+        const payload = {
+            studentId: this.studentId ,
+            batchId: last.batchId,
+            seatId: last.seatId,
+            fromDate: last.tillDate,
+            tillDate: newTill.toISOString().split("T")[0],
+            submittedAmount: last.submittedAmount,
+            pendingAmount: last.pendingAmount ?? 0,
+            discount: last.discount ?? last.discountAmount ?? 0,
+            paymentMode: "ONLINE",
+            transactionId: transactionId,
+            requestedBy: Session.getUserId()
+        };
+
+        if (!confirm(printPayload(payload))) {
+            return
+        }
+
+        try {
+            await Api.post(Endpoints.manager.createRequest("FEES"), payload);
+            alert("Fee request submitted successfully.");
+        } catch (error) {
+            alert(error.message || "Something went wrong.");
+        }
+    },
+
     // ================= HELPERS =================
 
     isSeatApplicable() {
-        const last = this.student?.feeRecords?.at(-1);
+        const last = this.student?.feeRecords?.at(0);
         if (!last?.batchName) return false;
-
+        if (getUpdatedEnrollment(Date(), last.tillDate, this.student?.enrollmentStatus) != "ACTIVE") return false;
         const name = last.batchName.toUpperCase();
         return name.includes("FULL DAY") || name.includes("24 HOURS");
+    },
+
+    confirmFeeUpdate() {
+        const last = this.student?.feeRecords?.at(0);
+
+        const newTill = new Date(last.tillDate);
+        const day = newTill.getDate();
+        newTill.setDate(1);
+        newTill.setMonth(newTill.getMonth() + 1);
+        const lastDay = new Date(
+            newTill.getFullYear(),
+            newTill.getMonth() + 1,
+            0
+        ).getDate();
+        newTill.setDate(Math.min(day, lastDay));
+
+        const message = `
+        Please review before request.
+        Student ID : ${this.studentId}
+        Student Name  : ${this.student.fullName}
+        Batch          : ${last.batchName}
+        Seat           : ${last.seatNumber}
+        Next From Date: ${formatDate(last.tillDate)}
+        Next Till Date: ${formatDate(newTill)}
+        Pay Amount     : ₹${last.submittedAmount}
+        Pending Amount : ₹${last.pendingAmount}
+        Payment Mode   : Online
+        Do you want to continue?
+                        `;
+        return confirm(message);
     },
 
 // ================= SAVE: UPDATE DETAILS =================
@@ -413,31 +558,51 @@ showUpdateStatus() {
             return;
         }
 
+        const isUnchanged =
+            fullName === (this.student.fullName || "") &&
+            mobile === (this.student.mobileNumber || "") &&
+            guardian === (this.student.guardianNumber || "");
+
+        if (isUnchanged) {
+            alert("No changes detected");
+            return;
+        }
+
 
         const payload = {
             fullName,
             mobileNumber: mobile,
-            guardianNumber: guardian
+            guardianNumber: guardian,
+            studentId: this.studentId,
+            requestedBy: Session.getUserId()
         };
-
+        console.log("url" + Endpoints.manager.createRequest("DETAILS"));
         try {
+            let endPoint = Endpoints.manager.createRequest("DETAILS")
+            if(Session.isAdmin()) {
+                endPoint = Endpoints.admin.updateStudent
+            }
             await Api.post(
-                Endpoints.pending.updateStudent(this.studentId),
+                endPoint,
                 payload
             );
-
-            alert("✅ Request sent for approval");
+            let msg = Session.isAdmin() ? "✅ Student detail changed successfully" : "✅ Student detail change request sent for approval";
+            alert(msg);
             StudentActionsUI.closeModal();
-
+            if (Session.isAdmin()) {
+                await StudentDetailsPage.loadStudent(this.studentId);
+            }
         } catch (err) {
             console.error(err);
-            alert("❌ Failed to update student");
         }
     },
 
     async saveSeatChange() {
 
-        const seatId = document.getElementById("newSeatId")?.value;
+        const select = document.getElementById("newSeatId");
+        const option = select.options[select.selectedIndex];
+        const seatId = select.value;
+        const seatNumber = option.dataset.seat;
 
         if (!seatId) {
             alert("Please select a seat");
@@ -447,21 +612,29 @@ showUpdateStatus() {
         const studentId = this.studentId;
 
         const payload = {
-            seatId: Number(seatId)
+            seatId: Number(seatId),
+            seatNumber: seatNumber,
+            studentId: this.studentId,
+            requestedBy: Session.getUserId()
         };
 
         try {
+            let endPoint = Endpoints.manager.createRequest("SEAT")
+            if(Session.isAdmin()) {
+                endPoint = Endpoints.admin.updateSeat
+            }
             await Api.post(
-                Endpoints.pending.updateSeat(this.studentId),
+                endPoint,
                 payload
             );
-
-            alert("✅ Seat change request sent for approval");
+            let msg = Session.isAdmin() ? "✅ Seat changed successfully" : "✅ Seat change request sent for approval";
+            alert(msg);
             StudentActionsUI.closeModal();
-
+            if (Session.isAdmin()) {
+                await StudentDetailsPage.loadStudent(this.studentId);
+            }
         } catch (err) {
             console.error(err);
-            alert("❌ Failed to update seat");
         }
     },
 
@@ -472,23 +645,41 @@ showUpdateStatus() {
             alert("Please select status");
             return;
         }
+        let message = `Are you to update status as ${status}?`;
+        if (status.toUpperCase() == "TERMINATED") {
+            if (!Session.isAdmin()) {
+                message = `Are you to update status as ${status}?\n\n After termination this students can become active only admin`;
+            }
+        }
+
+        if (!confirm(message)) {
+            return;
+        }
 
         const payload = {
-            enrollmentStatus: status
+            enrollmentStatus: status,
+            studentId: this.studentId,
+            requestedBy: Session.getUserId()
         };
 
         try {
+            let endPoint = Endpoints.manager.createRequest("ENROLLMENT")
+            if(Session.isAdmin()) {
+                endPoint = Endpoints.admin.updateEnrollmentStatus
+            }
             await Api.post(
-                Endpoints.pending.updateEnrollmentStatus(this.studentId),
+                endPoint,
                 payload
             );
 
-            alert("✅ Status update request sent for approval");
+            let msg = Session.isAdmin() ? "✅ Status changed successfully" : "✅ Status change request sent for approval";
+            alert(msg);
             StudentActionsUI.closeModal();
-
+            if (Session.isAdmin()) {
+                await StudentDetailsPage.loadStudent(this.studentId);
+            }
         } catch (err) {
             console.error(err);
-            alert("❌ Failed to update status");
         }
     }
 };

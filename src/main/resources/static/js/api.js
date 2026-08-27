@@ -15,38 +15,39 @@ window.Api = {
 
                 let message = "Something went wrong.";
 
+                const body = await response.text();
+
                 try {
-                    const error = await response.json();
+                    const error = JSON.parse(body);
                     message = error.message || message;
                 } catch {
-                    message = await response.text() || message;
+                    message = body || message;
                 }
-                switch (response.status) {
+                // switch (response.status) {
+                //     // case 400:
+                //     //     alert(message);
+                //     //     break;
 
-                    case 400:
-                        alert(message);
-                        break;
+                //     // case 401:
+                //     //     alert("Your session has expired. Please login again.");
+                //     //     redirectToLogin();
+                //     //     break;
 
-                    case 401:
-                        alert("Your session has expired. Please login again.");
-                        redirectToLogin();
-                        break;
+                //     // case 403:
+                //     //     alert("You are not authorized to perform this action.");
+                //     //     break;
 
-                    case 403:
-                        alert("You are not authorized to perform this action.");
-                        break;
+                //     // case 404:
+                //     //     alert("Requested resource was not found.");
+                //     //     break;
 
-                    case 404:
-                        alert("Requested resource was not found.");
-                        break;
+                //     // case 500:
+                //     //     alert("Internal server error. Please try again.");
+                //     //     break;
 
-                    case 500:
-                        alert("Internal server error. Please try again.");
-                        break;
-
-                    default:
-                        alert(message);
-                }
+                //     default:
+                //         alert(message);
+                // }
 
                 throw new Error(message);
             }

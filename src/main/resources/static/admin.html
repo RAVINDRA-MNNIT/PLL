@@ -1,508 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Library - Admin Dashboard</title>
-<style>
-:root{--primary:#2563eb;--primary-hover:#1d4ed8;--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--success:#15803d;--success-bg:#dcfce7;--danger:#b91c1c;--danger-bg:#fee2e2}
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:var(--bg);color:var(--text);display:flex;min-height:100vh}
-.sidebar{width:250px;background:#1e293b;color:#fff;padding:24px 16px;flex-shrink:0}
-.sidebar h2{font-size:1.25rem;margin-bottom:30px;padding-left:10px}
-.nav-item{padding:12px 16px;color:#94a3b8;border-radius:6px;margin-bottom:8px;cursor:pointer;font-weight:500}
-.nav-item:hover,.nav-item.active{background:var(--primary);color:#fff}
-.main{flex:1;padding:30px;overflow:auto}
-.header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px}
-.header h1{font-size:1.8rem}
-.user-area{display:flex;align-items:center;gap:16px}
-.welcome{color:var(--muted)} .welcome strong{color:var(--text)}
-button{border:none;border-radius:6px;padding:9px 14px;font-weight:600;cursor:pointer}
-.logout-btn{background:var(--danger-bg);color:var(--danger)} .logout-btn:hover{background:#fecaca}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-bottom:30px}
-.stat,.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px}
-.card{padding:24px;margin-bottom:30px}.card h2{margin-bottom:16px}
-.stat h4{color:var(--muted);font-size:.85rem;text-transform:uppercase;margin-bottom:8px}.stat .value{font-size:1.6rem;font-weight:700}
-.search{display:flex;gap:12px;margin-bottom:20px}
-input,select,textarea{padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-size:.95rem;background:#fff}.search input{flex:1}
-.table-wrapper{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:14px;border-bottom:1px solid var(--border);text-align:left}th{background:#f1f5f9;color:var(--muted)}
-.badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600}.badge.active{background:var(--success-bg);color:var(--success)}.badge.expired{background:var(--danger-bg);color:var(--danger)}
-#pageLoading{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:var(--bg);z-index:9999;font-size:18px;font-weight:600}
-#dashboard{display:none;width:100%;min-height:100vh}
-@media(max-width:800px){body{display:block}.sidebar{width:100%}.main{padding:16px}.header{align-items:flex-start;flex-direction:column}.user-area{width:100%;justify-content:space-between}.search{flex-direction:column}}
 
-/* =========================
-   REGISTRATION FORM
-   ========================= */
-.form-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:18px;
-}
-.form-group{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-}
-.form-group.full{
-    grid-column:1 / -1;
-}
-.form-group label{
-    font-weight:600;
-    font-size:.9rem;
-}
-.form-group input,
-.form-group select{
-    width:100%;
-}
-.form-actions{
-    grid-column:1 / -1;
-    display:flex;
-    justify-content:flex-end;
-    gap:12px;
-    margin-top:6px;
-}
-.primary-btn{
-    background:var(--primary);
-    color:white;
-}
-.primary-btn:hover{
-    background:var(--primary-hover);
-}
-.secondary-btn{
-    background:#e2e8f0;
-    color:var(--text);
-}
-.form-message{
-    grid-column:1 / -1;
-    min-height:20px;
-    font-size:.9rem;
-    font-weight:600;
-}
-.form-message.success{color:var(--success)}
-.form-message.error{color:var(--danger)}
-@media(max-width:800px){
-    .form-grid{grid-template-columns:1fr}
-}
+    <meta charset="UTF-8">
 
-</style>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Digital Library - Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link
+        rel="stylesheet"
+        href="/css/manager.css">
+
+    <link
+            rel="stylesheet"
+            href="/css/transaction.css">
+
 </head>
+
 <body>
 
-<div id="pageLoading">Loading Admin Dashboard...</div>
+<div id="pageLoading">
+
+    Loading Admin Dashboard...
+
+</div>
 
 <div id="dashboard">
-<aside class="sidebar">
-  <h2>📚 Library Admin</h2>
-  <div class="nav-item active" onclick="switchView('fees')">Student Fees</div>
-  <div class="nav-item" onclick="switchView('add')">Add New Student</div>
-  <div class="nav-item" onclick="switchView('pending')">Pending Approvals</div>
-</aside>
 
-<main class="main">
-  <div class="header">
-    <h1>Admin Dashboard</h1>
-    <div class="user-area">
-      <span class="welcome">Welcome, <strong id="adminName">Loading...</strong></span>
-      <button type="button" class="logout-btn" onclick="Session.logout()">Logout</button>
-    </div>
-  </div>
+    <aside class="sidebar">
 
-  <div id="feesView">
-    <div class="stats">
-      <div class="stat"><h4>Total Students</h4><div class="value" id="total">0</div></div>
-      <div class="stat"><h4>Active Memberships</h4><div class="value" id="activeCount">0</div></div>
-      <div class="stat"><h4>Expired Memberships</h4><div class="value" id="expiredCount">0</div></div>
-      <div class="stat"><h4>Pending Admin Approval</h4><div class="value" id="pendingCount">0</div></div>
-    </div>
-    <section class="card">
-      <h2>Student Fee Records</h2>
-      <div class="search">
-        <input id="search" type="text" placeholder="Search Membership ID, Name or Mobile..." oninput="renderStudents()">
-        <select id="statusFilter" onchange="renderStudents()">
-          <option value="">All Status</option>
-          <option value="Active">Active</option>
-          <option value="Expired">Expired</option>
-        </select>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>Membership ID</th><th>Name</th><th>Mobile</th><th>Batch</th><th>Fees</th><th>From</th><th>Till Date</th><th>Status</th></tr></thead>
-          <tbody id="studentRows"></tbody>
-        </table>
-      </div>
-    </section>
-  </div>
+        <h2>📚 Pro Learner's Digital Library</h2>
 
-  <div id="addView" style="display:none">
-    <div id="newAdmissionContainer">
-      <section class="card">
-        <p style="color:var(--muted)">Loading New Admission...</p>
-      </section>
-    </div>
-  </div>
+        <div
+            class="nav-item active"
+            onclick="switchView('fees')">
 
-<div id="pendingView" style="display:none">
+            Students
 
-    <div id="pendingApprovalContainer">
+        </div>
 
-        <section class="card">
+        <div
+            class="nav-item"
+            onclick="switchView('add')">
 
-            <p style="color:var(--muted)">
-                Loading Pending Approvals...
-            </p>
+            Add New Student
 
-        </section>
+        </div>
 
-    </div>
+        <div
+            class="nav-item"
+            onclick="switchView('pending')">
 
-</div>
-</main>
-</div>
-<script src="/js/session.js"></script>
-<script src="/js/admission.js"></script>
-<script>
-let students = [];
+            Pending Approvals
 
-function redirectToLogin(){ window.location.replace("/login.html"); }
+        </div>
 
+        <div
+                class="nav-item"
+                onclick="switchView('transactions')">
 
-async function loadDashboardData(){ renderStudents(); }
+            Transactions
 
-function renderStudents(){
-  const tbody=document.getElementById("studentRows");
-  const search=document.getElementById("search").value.trim().toLowerCase();
-  const status=document.getElementById("statusFilter").value;
-  const filtered=students.filter(s=>{
-    const id=String(s.id??"").toLowerCase();
-    const name=String(s.name??s.fullName??"").toLowerCase();
-    const mobile=String(s.mobile??"").toLowerCase();
-    return (!search||id.includes(search)||name.includes(search)||mobile.includes(search))&&(!status||s.status===status);
-  });
-  tbody.innerHTML="";
-  if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:#64748b;padding:30px">No students found.</td></tr>';
-  }else{
-    filtered.forEach(s=>{
-      const row=document.createElement("tr");
-      const badgeClass=s.status==="Active"?"active":"expired";
-      row.innerHTML=`<td><strong>${escapeHtml(s.id)}</strong></td><td>${escapeHtml(s.name??s.fullName)}</td><td>${escapeHtml(s.mobile)}</td><td>${escapeHtml(s.batch)}</td><td>₹${Number(s.fees??0).toLocaleString("en-IN")}</td><td>${escapeHtml(s.fromDate)}</td><td>${escapeHtml(s.dueDate)}</td><td><span class="badge ${badgeClass}">${escapeHtml(s.status)}</span></td>`;
-      tbody.appendChild(row);
-    });
-  }
-  updateStatistics();
-}
+        </div>
 
-function updateStatistics(){
-  document.getElementById("total").textContent=students.length;
-  document.getElementById("activeCount").textContent=students.filter(s=>s.status==="Active").length;
-  document.getElementById("expiredCount").textContent=students.filter(s=>s.status==="Expired").length;
-}
+    </aside>
 
+    <main class="main">
 
+        <div class="header">
 
-window.libraryLookups = {
-    qualifications: [],
-    batches: [],
-    preparations: [],
-    seats: []
-};
+            <h1>Admin Dashboard</h1>
 
-async function fetchLookup(endpoint){
-  const response=await fetch(endpoint,{
-    method:"GET",
-    credentials:"same-origin",
-    cache:"no-store"
-  });
+            <div class="user-area">
 
-  if(!response.ok){
-    throw new Error(`Lookup request failed: ${endpoint} (HTTP ${response.status})`);
-  }
+                <span class="welcome">
 
-  return response.json();
-}
+                    Welcome,
 
-async function loadLookups() {
+                    <strong id="adminName">
 
-  const [qualifications, batches, preparations, seats] = await Promise.all([
-    fetchLookup("/api/lookups/qualifications"),
-    fetchLookup("/api/lookups/batches"),
-    fetchLookup("/api/lookups/preparations"),
-    fetchLookup("/api/lookups/seats")
-  ]);
+                        Loading...
 
-  window.libraryLookups.qualifications = qualifications;
-  window.libraryLookups.batches = batches;
-  window.libraryLookups.preparations = preparations;
-  window.libraryLookups.seats = seats;
+                    </strong>
 
-  window.dispatchEvent(new CustomEvent("library-lookups-ready"));
-}
+                </span>
 
-async function loadPendingApprovalSubview(){
+                <button
+                    type="button"
+                    class="logout-btn"
+                    onclick="Session.logout()">
 
-    const container =
-        document.getElementById("pendingApprovalContainer");
+                    Logout
 
-    if(!container){
-        return;
-    }
+                </button>
 
-    if(container.dataset.loaded==="true"){
-        return;
-    }
+            </div>
 
-    container.innerHTML=`
-        <section class="card">
-            <p>Loading Pending Approvals...</p>
-        </section>
-    `;
+        </div>
 
-    try{
+        <!-- Fees -->
 
-        const response = await fetch(
-            "/pending-approvals.html",
-            {
-                credentials:"same-origin",
-                cache:"no-store"
-            }
-        );
+        <div id="feesView">
 
-        if(response.status===401){
-            redirectToLogin();
-            return;
-        }
+            <div class="stats">
 
-        if(!response.ok){
-            throw new Error(
-                "Unable to load Pending Approvals."
-            );
-        }
+                <div class="stat">
+                    <h4>Total Students</h4>
+                    <div class="value" id="total">0</div>
+                </div>
 
-        const html = await response.text();
+                <div class="stat">
+                    <h4>Active Memberships</h4>
+                    <div class="value" id="activeCount">0</div>
+                </div>
 
-        const template =
-            document.createElement("template");
+                <div class="stat">
+                    <h4>Expired Memberships</h4>
+                    <div class="value" id="expiredCount">0</div>
+                </div>
 
-        template.innerHTML = html.trim();
+                <div class="stat">
+                    <h4>Pending Admin Approval</h4>
+                    <div class="value" id="pendingCount">0</div>
+                </div>
 
-        const scripts = [
-            ...template.content.querySelectorAll("script")
-        ];
+            </div>
 
-        scripts.forEach(s=>s.remove());
-
-        container.replaceChildren(
-            template.content.cloneNode(true)
-        );
-
-for (const oldScript of scripts) {
-
-    const script = document.createElement("script");
-
-    // Copy attributes
-    for (const attr of oldScript.attributes) {
-        script.setAttribute(attr.name, attr.value);
-    }
-
-    if (oldScript.src) {
-
-        await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-
-            script.src = oldScript.src;
-
-            document.body.appendChild(script);
-        });
-
-    } else {
-
-        script.textContent = oldScript.textContent;
-
-        document.body.appendChild(script);
-
-        script.remove();
-    }
-}
-
-        container.dataset.loaded="true";
-
-    }catch(error){
-
-        console.error(error);
-
-        container.innerHTML=`
             <section class="card">
 
-                <h2>Pending Approvals</h2>
+                <h2>Student Fee Records</h2>
 
-                <p style="color:red">
+                <div class="student-filters">
 
-                    ${error.message}
+                    <select id="searchType">
+                        <option value="all">All</option>
+                        <option value="id">Student ID</option>
+                        <option value="name">Student Name</option>
+                        <option value="mobile">Mobile Number</option>
+                        <option value="seat">Seat Number</option>
+                    </select>
 
-                </p>
+                    <input
+                        id="search"
+                        type="text"
+                        placeholder="Search students...">
+
+                    <select id="batchFilter">
+                        <option value="">All Batches</option>
+                    </select>
+
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="EXPIRED">Expired</option>
+                        <option value="DISCONTINUED">Discontinued</option>
+                        <option value="TERMINATED">Terminated</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="resetFilters()">
+
+                        <i class="fa-solid fa-rotate-left"></i>
+
+                        Reset
+
+                    </button>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Batch</th>
+                                <th>Seat No.</th>
+                                <th>Fees</th>
+                                <th>From</th>
+                                <th>Till Date</th>
+                                <th>Status</th>
+                                <th>Pending Approval</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="studentRows"></tbody>
+
+                    </table>
+
+                </div>
 
             </section>
-        `;
-    }
-}
 
-async function loadNewAdmissionSubview() {
+        </div>
 
-    const container =
-        document.getElementById("newAdmissionContainer");
+        <!-- Admission -->
 
-    if (!container) {
-        return;
-    }
+        <div
+            id="addView"
+            style="display:none">
 
-    container.innerHTML = `
+            <div id="newAdmissionContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+
+                        Loading New Admission...
+
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- Pending -->
+
+        <div
+            id="pendingView"
+            style="display:none">
+
+            <div id="pendingApprovalContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+
+                        Loading Pending Approvals...
+
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- Transactions -->
+
+        <div
+                id="transactionsView"
+                style="display:none">
+
+            <div id="transactionContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+                        Loading Transactions...
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- Fee Modal -->
+
+<div
+    id="feeModal"
+    class="modal">
+
+    <div
+        class="modal-content"
+        style="max-width:900px">
+
+        <div class="modal-header">
+
+            <h2>
+
+                Update Fees
+
+            </h2>
+
+            <button
+                type="button"
+                onclick="closeFeeModal()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <div id="feeModalBody">
+
+            Loading...
+
+        </div>
+
+    </div>
+
+    <div id="global-loader">
+    <div class="loader-spinner"></div>
+</div>
+
+</div>
+
+<!-- JavaScript -->
+<!-- 🔹 CORE (must come first) -->
+<script src="/js/api.js"></script>
+<script src="/js/endpoints.js"></script>
+<!-- 🔹 UTILITIES -->
+<script src="/js/session.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/lookups.js"></script>
+<script src="/js/filters.js"></script>
+<!-- 🔹 SHARED UI -->
+<script src="/js/loader.js"></script>
+<!-- 🔹 STUDENT MODULE -->
+<script src="/js/student-details-modal.js"></script>
+<script src="/js/student-details.js"></script>
+<script src="/js/students.js"></script>
+<!-- 🔹 FEATURE MODULES -->
+<script src="/js/views.js"></script>
+<script src="/js/fee.js"></script>
+<script src="/js/admission.js"></script>
+<!-- 🔹 PENDING (depends on API + endpoints) -->
+<script src="/js/pending-templates.js"></script>
+<script src="/js/pending-approvals.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/transaction.js"></script>
+<!-- 🔹 ROOT CONTROLLER (last) -->
+<script src="/js/admin.js"></script>
+
+<div id="addView" style="display:none">
+
+    <!-- ✅ THIS IS YOUR CONTAINER -->
+    <div id="newAdmissionContainer">
+
+        <!-- default placeholder -->
         <section class="card">
             <p style="color:var(--muted)">
                 Loading New Admission...
             </p>
         </section>
-    `;
 
-    try {
+    </div>
 
-        const response = await fetch(
-            "/admission.html",
-            {
-                method: "GET",
-                credentials: "same-origin",
-                cache: "no-store"
-            }
-        );
+</div>
 
-        if (response.status === 401) {
-            redirectToLogin();
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                `Unable to load New Admission form (HTTP ${response.status}).`
-            );
-        }
-
-        const html = await response.text();
-
-        const template =
-            document.createElement("template");
-
-        template.innerHTML = html;
-
-        // admission.js is already loaded by admin.html
-        template.content
-            .querySelectorAll("script")
-            .forEach(script => script.remove());
-
-        container.replaceChildren(
-            template.content.cloneNode(true)
-        );
-
-        await loadLookups();
-
-        if (window.AdmissionForm) {
-
-            window.AdmissionForm.init();
-
-        } else {
-
-            console.error("AdmissionForm not loaded.");
-
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        container.innerHTML = `
-            <section class="card">
-                <h2>New Admission</h2>
-                <p style="color:red">
-                    ${escapeHtml(error.message)}
-                </p>
-            </section>
-        `;
-    }
-}
-
-function switchView(view){
-  const ids={fees:"feesView",add:"addView",pending:"pendingView"};
-
-  Object.values(ids).forEach(id=>{
-    document.getElementById(id).style.display="none";
-  });
-
-  const selectedView=ids[view]||ids.fees;
-  document.getElementById(selectedView).style.display="block";
-
-  const navItems=document.querySelectorAll(".nav-item");
-  navItems.forEach(n=>n.classList.remove("active"));
-
-  const index=view==="add"?1:view==="pending"?2:0;
-  navItems[index].classList.add("active");
-
-  if(view==="add"){
-    loadNewAdmissionSubview();
-  }
-
-  if(view==="pending"){
-    loadPendingApprovalSubview();
-}
-}
-
-function escapeHtml(value){
-  const div=document.createElement("div");
-  div.textContent=value==null?"":String(value);
-  return div.innerHTML;
-}
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // ==========================
-    // DEBUG AUTO LOGIN
-    // Remove before production
-    const loginResponse = await fetch("/api/auth/login", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            userId: 2,
-            password: "digital12"
-        })
-    });
-
-    // ==========================
-    const user = await Session.loadCurrentUser();
-
-    if (!user) {
-        Session.redirectToLogin();
-        return;
-    }
-
-    if (!Session.requireRole("ADMIN")) {
-        return;
-    }
-
-    document.getElementById("adminName").textContent=Session.getUserName();
-    document.getElementById("pageLoading").style.display="none";
-    document.getElementById("dashboard").style.display="flex";
-
-    await loadDashboardData();
-
-    try {
-        await loadLookups();
-    } catch (error) {
-        console.error("Unable to load library lookups:", error);
-    }
-
-});
-</script>
 </body>
+
 </html>
+

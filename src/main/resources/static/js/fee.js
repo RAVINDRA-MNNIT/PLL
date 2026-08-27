@@ -3,6 +3,7 @@ window.FeeForm = {
     editRequestId: null,
     currentFrom: null,
     currentTill: null,
+    currentPending: null,
 
     setStudent(id) {
         this.studentId = id;
@@ -30,7 +31,7 @@ window.FeeForm = {
     }
 },
 
-    populateLookups(lookups) {
+    populateLookups(seats) {
         const batchSelect = document.getElementById("batchId");
         const seatSelect = document.getElementById("seatId");
 
@@ -45,7 +46,7 @@ window.FeeForm = {
         batchSelect.replaceChildren();
         seatSelect.replaceChildren();
 
-        lookups.batches.forEach(batch => {
+        getBatches().forEach(batch => {
             batchSelect.innerHTML += `
             <option value="${batch.id}">
                 ${batch.name ?? batch.batchName}
@@ -53,27 +54,28 @@ window.FeeForm = {
             `;
         });
 
-        lookups.seats.forEach(seat => {
+        document.getElementById("batchId").onchange = toggleSeatField;
+        seats.forEach(seat => {
 
             seatSelect.innerHTML += `
             <option value="${seat.id}">
                 ${seat.seatNumber}
             </option>
             `;
-
         });
-        document.getElementById("batchId").onchange = toggleSeatField;
     },
 
     async openForEdit(requestId, data) {
+        FeeForm.reset();
         await this.loadForm();
+        const seats = await filteredSeat(data.studentId)
         this.setEditMode(requestId);
-        this.populateLookups(window.libraryLookups);
+        this.populateLookups(seats);
         this.populate(data);
     },
 
     async loadForm() {
-
+        closeFeeModal();
         const modal = document.getElementById("feeModal");
         const container = document.getElementById("feeModalBody");
 
@@ -123,16 +125,17 @@ window.FeeForm = {
 
     document.getElementById("pendingAmount").value =
         data.pendingAmount ?? "";
+    this.currentPending = Number(data.pendingAmount ?? 0)
 
     document.getElementById("discount").value =
-        data.discountAmount ?? "";
+        data.discount ?? data.discountAmount ?? "";
 
     document.getElementById("paymentMode").value =
         data.paymentMode ?? "";
 
     document.getElementById("transactionId").value = FeeForm.isEdit() ? (data.transactionId ?? "") : "";
 
-    document.getElementById("paymentRemarks").value = FeeForm.isEdit() ? (data.paymentRemark ?? "") : "";
+    document.getElementById("paymentRemarks").value = FeeForm.isEdit() ? (data.remarks ?? "") : "";
 
     // -------------------------
     // Membership
@@ -140,21 +143,21 @@ window.FeeForm = {
 
 
     if (FeeForm.isEdit()) {
+        this.currentFrom = data.lastFeeFromDate;
+        this.currentTill = data.lastFeeTillDate;
+    } else {
         this.currentFrom = data.fromDate;
         this.currentTill = data.tillDate;
-    } else {
-        this.currentFrom = data.membershipFrom;
-        this.currentTill = data.membershipTill;
     }
 
     document.getElementById("currentMembershipDuration").textContent =
         `${formatDate(this.currentFrom)} → ${formatDate(this.currentTill)}`;
 
-    document.getElementById("membershipFrom").value =
-        data.membershipFrom ?? "";
+    document.getElementById("fromDate").value =
+        data.fromDate ?? "";
 
-    document.getElementById("membershipTill").value =
-        data.membershipTill ?? "";
+    document.getElementById("tillDate").value =
+        data.tillDate ?? "";
 
     // -------------------------
     // Student Info
@@ -164,7 +167,7 @@ window.FeeForm = {
         data.studentId;
 
     document.getElementById("studentName").textContent =
-        data.fullName;
+        data.fullName ?? data.lastFullName;
 
     // -------------------------
     // Payment Mode
@@ -195,7 +198,7 @@ window.FeeForm = {
         document.getElementById("enrollmentStatus");
 
     statusElement.textContent =
-        data.enrollmentStatus ?? "";
+        data.enrollmentStatus ?? data.lastEnrollmentStatus ?? "";
 
     statusElement.className = "status-badge";
 
@@ -228,42 +231,74 @@ window.FeeForm = {
 },
 
     async save() {
+        let studentIdTemp = document.getElementById("membershipId").textContent;
         if (!validateFeeForm()) {
             return;
         }
         const body = {
+            id: this.editRequestId,
+            studentId: this.studentId ?? studentIdTemp,
             batchId: Number(document.getElementById("batchId").value),
-            seatId: Number(document.getElementById("seatId").value),
-            membershipFrom: document.getElementById("membershipFrom").value,
-            membershipTill: document.getElementById("membershipTill").value,
+            seatId: document.getElementById("seatId").value.trim() || null,
+            fromDate: document.getElementById("fromDate").value,
+            tillDate: document.getElementById("tillDate").value,
             submittedAmount: Number(document.getElementById("submittedAmount").value),
             discount: Number(document.getElementById("discount").value),
             pendingAmount: Number(document.getElementById("pendingAmount").value),
             paymentMode: document.getElementById("paymentMode").value,
             transactionId: document.getElementById("transactionId")?.value.trim() || null,
-            paymentRemark: document.getElementById("paymentRemarks")?.value.trim() || null
+            remarks: document.getElementById("paymentRemarks")?.value.trim() || null,
+            requestedBy: Session.getUserId()
         };
+        if (this.currentPending > 0) {
+            if (!confirm(`Current pending amount of this student is ₹${this.currentPending}.\n\n Make sure you have received the amount!`)) {
+                // User clicked Cancel
+                return;
+            }
+        }
 
-        if (!confirmFeeUpdate(body)) {
-            return;
+        // if (!confirmFeeUpdate(body)) {
+        //     return;
+        // }
+
+        if (!confirm(printPayload(body))) {
+            return
         }
 
         try {
             if (FeeForm.isEdit()) {
-                await Api.put(Endpoints.pending.fee(this.editRequestId), body);
+                await Api.put(Endpoints.manager.updateRequest(), body);
                 this.editRequestId = null;
             } else {
-                await Api.post(Endpoints.students.fees(this.studentId), body);
+                if (Session.isAdmin()) {
+                    await Api.post(Endpoints.admin.updateFeeRequest, body);
+                } else {
+                    await Api.post(Endpoints.manager.createRequest("FEES"), body);
+                }
             }
-            alert("Fee request submitted successfully.");
+            if (Session.isAdmin()) {
+                alert("Fee submitted successfully.");
+            } else {
+                alert("Fee request submitted successfully.");
+            }
             closeFeeModal();
-            if (FeeForm.isEdit()) {
-                await PendingApprovals.loadPendingFees();
+            // ✅ SAFE REFRESH
+            if (window.PendingApprovals?.current != null) {
+                await window.PendingApprovals.refresh();
             }
             await loadStudents();
         } catch (error) {
             alert(error.message || "Something went wrong.");
         }
+    },
+
+
+    reset() {
+        this.studentId = null;
+        this.editRequestId = null;
+        this.currentFrom = null;
+        this.currentTill = null;
+        this.currentPending = null;
     }
 };
 
@@ -311,8 +346,8 @@ function updateMembershipOption() {
         if (FeeForm.editRequestId != null) {
             return;
         }
-        document.getElementById("membershipFrom").value = newFrom.toISOString().split("T")[0];
-        document.getElementById("membershipTill").value = "";
+        document.getElementById("fromDate").value = newFrom.toISOString().split("T")[0];
+        document.getElementById("tillDate").value = "";
 
     } else {
         customSection.style.display = "none";
@@ -326,8 +361,8 @@ function updateMembershipOption() {
             0
         ).getDate();
         newTill.setDate(Math.min(day, lastDay));
-        document.getElementById("membershipFrom").value = newFrom.toISOString().split("T")[0];
-        document.getElementById("membershipTill").value = newTill.toISOString().split("T")[0];
+        document.getElementById("fromDate").value = newFrom.toISOString().split("T")[0];
+        document.getElementById("tillDate").value = newTill.toISOString().split("T")[0];
         preview.textContent = `${formatDate(newFrom)} to ${formatDate(newTill)}`;
     }
 }
@@ -368,15 +403,23 @@ function validateFeeForm() {
     const errors = [];
     const batchId = Number(document.getElementById("batchId").value);
     const seatId = Number(document.getElementById("seatId").value);
-    const membershipFrom = document.getElementById("membershipFrom").value;
-    const membershipTill = document.getElementById("membershipTill").value;
-    const payAmount = Number(document.getElementById("submittedAmount").value);
+    const fromDate = document.getElementById("fromDate").value;
+    const tillDate = document.getElementById("tillDate").value;
+    const submittedAmountInput = document.getElementById("submittedAmount");
+    const discountInput = document.getElementById("discount");
+    const pendingAmountInput = document.getElementById("pendingAmount");
+
     const paymentMode = document.getElementById("paymentMode").value;
     const transactionId = document.getElementById("transactionId").value.trim();
     const durationType =
         document.querySelector(
             "input[name='durationType']:checked"
         ).value;
+
+
+    const payAmount = Number(submittedAmountInput.value);
+    const discount = Number(discountInput.value);
+    const pendingAmount = Number(pendingAmountInput.value);
 
     // Batch
     if (!batchId) {
@@ -388,32 +431,37 @@ function validateFeeForm() {
         errors.push("Please select Seat Number.");
     }
 
+    if (getDateDifferenceInDays(new Date(), FeeForm.currentTill) > 3) {
+        alert(`You can only submit next fees if membership expires in 3 days`);
+        return false;
+    }
+
     // Membership validation (only for Custom Date)
     if (durationType === "CUSTOM") {
-        if (!membershipFrom) {
+        if (!fromDate) {
             errors.push("Please select Membership From date.");
         }
-        if (!membershipTill) {
+        if (!tillDate) {
             errors.push("Please select Membership Till date.");
         }
-        if (membershipFrom && membershipTill) {
-            const fromDate = new Date(membershipFrom);
-            const tillDate = new Date(membershipTill);
+        if (fromDate && tillDate) {
+            const fromDateTemp = new Date(fromDate);
+            const tillDateTemp = new Date(tillDate);
             const currentTill = new Date(FeeForm.currentTill);
             // Till >= From
-            if (tillDate < fromDate) {
+            if (tillDateTemp < fromDateTemp) {
                 errors.push(
                     "Membership Till date cannot be earlier than Membership From date."
                 );
             }
             // Till > Current Till
-            if (tillDate <= currentTill) {
+            if (tillDateTemp <= currentTill) {
                 errors.push(
                     "New Membership Till date must be greater than the current Membership Till date."
                 );
             }
             // From >= Current Till
-            if (fromDate < currentTill) {
+            if (fromDateTemp < currentTill) {
                 errors.push(
                     "Membership From date cannot be earlier than the current Membership Till date."
                 );
@@ -422,8 +470,16 @@ function validateFeeForm() {
     }
 
     // Pay Amount
-    if (isNaN(payAmount) || payAmount <= 0) {
-        errors.push("Please enter a valid Pay Amount.");
+    if (submittedAmountInput.value.trim() === "" || payAmount <= 0) {
+        errors.push("Please enter a valid Submitted Amount.");
+    }
+
+    if (discountInput.value.trim() === "" || discount < 0) {
+        errors.push("Please enter a valid Discount Amount.");
+    }
+
+    if (pendingAmountInput.value.trim() === "" || pendingAmount < 0) {
+        errors.push("Please enter a valid Pending Amount.");
     }
 
 
@@ -489,62 +545,39 @@ function confirmFeeUpdate(body) {
 
     const message = `
 Please review the changes before updating.
-
-Membership ID : ${document.getElementById("membershipId").textContent}
+Student ID : ${document.getElementById("membershipId").textContent}
 Student Name  : ${document.getElementById("studentName").textContent}
-
 Batch          : ${batchName}
 Seat           : ${seatName}
-
-Membership From: ${formatDate(body.membershipFrom)}
-Membership Till: ${formatDate(body.membershipTill)}
-
+Membership From: ${formatDate(body.fromDate)}
+Membership Till: ${formatDate(body.tillDate)}
 Pay Amount     : ₹${body.submittedAmount}
 Discount       : ₹${body.discount}
 Pending Amount : ₹${body.pendingAmount}
-
 Payment Mode   : ${body.paymentMode}
 ${body.paymentMode === "ONLINE"
     ? `Transaction ID: ${body.transactionId}`
     : ""}
-Remark         : ${body.paymentRemark || "-"}
+Remark         : ${body.remarks || "-"}
 
 Do you want to continue?
-`;
+                `;
 
     return confirm(message);
 }
 
 function closeFeeModal() {
+    FeeForm.reset();
 
-    FeeForm.studentId = null;
-    FeeForm.editRequestId = null;
-    FeeForm.currentFrom = null;
-    FeeForm.currentTill = null;
+    const modal = document.getElementById("feeModal");
+    const body = document.getElementById("feeModalBody");
 
-    const extendRadio = document.querySelector(
-        "input[name='durationType'][value='EXTEND']"
-    );
-
-    const customRadio = document.querySelector(
-        "input[name='durationType'][value='CUSTOM']"
-    );
-
-    if (extendRadio && customRadio) {
-
-        extendRadio.disabled = false;
-        extendRadio.checked = true;
-        customRadio.checked = false;
-
-    }
-
-    document.getElementById("feeModal").style.display = "none";
-
-    document.getElementById("feeModalBody").innerHTML = "";
-
+    if (modal) modal.style.display = "none";
+    if (body) body.innerHTML = "";
 }
 
 async function updateFees(studentId) {
+    FeeForm.reset();
 
     const modal = document.getElementById("feeModal");
     const container = document.getElementById("feeModalBody");
@@ -558,18 +591,15 @@ async function updateFees(studentId) {
     `;
 
     try {
-
+        const seats = await filteredSeat(studentId)
         const html = await fetchHtml("/fee.html");
-
         if (!html) {
             return;
         }
 
         container.innerHTML = html;
 
-        await loadLookups();
-
-        FeeForm.populateLookups(window.libraryLookups);
+        FeeForm.populateLookups(seats);
 
         const student = students.find(
             s => s.studentId === studentId
@@ -592,5 +622,4 @@ async function updateFees(studentId) {
         alert(error.message);
 
     }
-
 }

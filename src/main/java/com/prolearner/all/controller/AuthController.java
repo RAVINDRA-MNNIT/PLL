@@ -98,4 +98,32 @@ public class AuthController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/student/login")
+    public ResponseEntity<?> studentLogin(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest
+    ) {
+
+        try {
+
+            LoginResponse user = authService.studentLogin(
+                    request.userId(),
+                    request.password()
+            );
+
+            sessionService.createSession(
+                    httpRequest,
+                    user
+            );
+
+            return ResponseEntity.ok(user);
+
+        } catch (IllegalArgumentException exception) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(exception.getLocalizedMessage());
+        }
+    }
 }

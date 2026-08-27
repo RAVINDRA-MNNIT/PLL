@@ -9,9 +9,9 @@ public record UpdateFeeRequest(
 
         Long seatId,
 
-        LocalDate membershipFrom,
+        LocalDate fromDate,
 
-        LocalDate membershipTill,
+        LocalDate tillDate,
 
         BigDecimal submittedAmount,
 
