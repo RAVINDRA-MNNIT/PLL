@@ -75,7 +75,7 @@ public class AuthService {
         }
 
         String fullName = student.getFullName();
-        LocalDate dob = student.getDateOfBirth();
+    //    LocalDate dob = student.getDateOfBirth();
         String mobileNo = student.getMobileNumber();
 
 
@@ -87,9 +87,9 @@ public class AuthService {
 
         String lastThreeDigits = mobileNo.substring(mobileNo.length() - 3);
 
-        String year = String.valueOf(dob.getYear());
+    //    String year = String.valueOf(dob.getYear());
 
-        String expectedPassword = firstTwoLetters + lastThreeDigits + year;
+        String expectedPassword = firstTwoLetters + lastThreeDigits; //+ year;
 
         // Validate password
         if (!expectedPassword.equals(password)) {
