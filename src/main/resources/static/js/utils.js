@@ -58,6 +58,71 @@ function formatDate(dateString) {
 
 }
 
+function formatHiddenDob(dateString) {
+
+    if (!dateString) {
+        return "-";
+    }
+
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${day}/**/****`;
+}
+
+function formatHiddenMobileNumber(mobileNumber) {
+
+    if (!mobileNumber) {
+        return "-";
+    }
+
+    const mobile = String(mobileNumber);
+
+    if (mobile.length !== 10) {
+        return mobile;
+    }
+
+    return `${mobile[0]}*${mobile[2]}*${mobile[4]}*${mobile[6]}*${mobile[8]}*`;
+}
+
+function formatHiddenAadhaarNumber(aadhaarNumber) {
+
+    if (!aadhaarNumber) {
+        return "-";
+    }
+
+    const aadhaar = String(aadhaarNumber).replace(/\s/g, "");
+
+    return aadhaar
+        .split("")
+        .map((digit, index) => index % 2 === 0 ? digit : "*")
+        .join("");
+}
+
+function formatHiddenAddress(address) {
+
+    if (!address) {
+        return "-";
+    }
+
+    return address
+        .split("")
+        .map((ch, index) => {
+
+            if (ch === " ") {
+                return " ";
+            }
+
+            return index % 2 === 0 ? ch : "*";
+        })
+        .join("");
+}
+
 /**
  * Format amount.
  */

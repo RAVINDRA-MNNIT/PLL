@@ -82,12 +82,32 @@ initialize() {
     // ================= RENDER =================
 
     render() {
-        debugger;
+        const student = this.currentStudent;
+
+        if (!student) {
+            return;
+        }
+
         const btn = document.getElementById("headerActionBtn");
         const icon = document.getElementById("headerActionIcon");
         const text = document.getElementById("headerActionText");
 
+        var dob = "-";
+        var mobileNumber = "-";
+        var guardianNumber = "-";
+        var aadhaar = "-";
+        var localAddress = "-";
+        var permanentAddress = "-";
+
+        (Session.isStudent()) ? formatHiddenDob(student.dateOfBirth) : formatDate(student.dateOfBirth);
+
         if (Session.isStudent()) {
+            dob = formatHiddenDob(student.dateOfBirth);
+            mobileNumber = formatHiddenMobileNumber(student.mobileNumber);
+            guardianNumber = formatHiddenMobileNumber(student.guardianNumber);
+            aadhaar = formatHiddenAadhaarNumber(student.aadhaarNumber);
+            localAddress = formatHiddenAddress(student.localAddress);
+            permanentAddress = formatHiddenAddress(student.permanentAddress);
 
             icon.className = "fa-solid fa-right-from-bracket";
             text.textContent = "Logout";
@@ -98,30 +118,29 @@ initialize() {
             };
 
         } else {
+            dob = formatDate(student.dateOfBirth);
+            mobileNumber = student.mobileNumber;
+            guardianNumber = student.guardianNumber;
+            aadhaar = student.aadhaarNumber;
+            localAddress = student.localAddress;
+            permanentAddress = student.permanentAddress;
 
             icon.className = "fa-solid fa-arrow-left";
             text.textContent = "Back";
-
             btn.onclick = () => history.back();
 
-        }
-
-        const student = this.currentStudent;
-
-        if (!student) {
-            return;
         }
 
         this.setValue("studentId", student.studentId);
         this.setValue("admissionDate", formatDate(student.dateOfAdmission));
         this.setValue("fullName", student.fullName);
-        this.setValue("dateOfBirth", formatDate(student.dateOfBirth));
-        this.setValue("mobileNumber", student.mobileNumber);
-        this.setValue("guardianNumber", student.guardianNumber);
+        this.setValue("dateOfBirth", dob);
+        this.setValue("mobileNumber", mobileNumber);
+        this.setValue("guardianNumber", guardianNumber);
         this.setValue("fatherName", student.fatherName);
-        this.setValue("aadhaarNumber", student.aadhaarNumber);
-        this.setValue("localAddress", student.localAddress);
-        this.setValue("permanentAddress", student.permanentAddress);
+        this.setValue("aadhaarNumber", aadhaar);
+        this.setValue("localAddress", localAddress);
+        this.setValue("permanentAddress", permanentAddress);
         this.setValue("qualification", student.qualification);
         this.setValue("preparationFor", student.preparationFor);
 
