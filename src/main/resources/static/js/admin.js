@@ -11,17 +11,17 @@ async function initializeAdmin() {
         // DEBUG AUTO LOGIN
         // Remove before production
         // ==========================
-        await fetch("/api/auth/login", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                userId: 2,
-                password: "digital12"
-            })
-        });
+        // await fetch("/api/auth/login", {
+        //     method: "POST",
+        //     credentials: "same-origin",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         userId: 2,
+        //         password: "digital12"
+        //     })
+        // });
 
         // ==========================
         // Authentication

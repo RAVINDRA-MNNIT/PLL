@@ -11,17 +11,17 @@ async function initializeManager() {
         // DEBUG AUTO LOGIN
         // Remove before production
         // ==========================
-        await fetch("/api/auth/login", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                userId: 1,
-                password: "abhi1234"
-            })
-        });
+        // await fetch("/api/auth/login", {
+        //     method: "POST",
+        //     credentials: "same-origin",
+        //     headers: {
+        //         "Content-Type": "application/json"
+        //     },
+        //     body: JSON.stringify({
+        //         userId: 1,
+        //         password: "abhi1234"
+        //     })
+        // });
 
         // ==========================
         // Authentication
