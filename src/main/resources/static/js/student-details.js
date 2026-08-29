@@ -54,7 +54,7 @@ initialize() {
         await Session.loadCurrentUser();
         if (Session.getUser() == null) {
             await Api.postWithoutResponse(Endpoints.auth.logout);
-            window.location.href = "/student-login.html";
+            window.location.href = "/student.html";
             return
         }
         else if (Session.isStudent()) {
@@ -62,7 +62,7 @@ initialize() {
             const requestedStudentId = Number(studentId);
             if (loggedInStudentId !== requestedStudentId) {
                 await Api.postWithoutResponse(Endpoints.auth.logout);
-                window.location.href = "/student-login.html";
+                window.location.href = "/student.html";
                 return;
             }
         }
@@ -114,7 +114,7 @@ initialize() {
 
             btn.onclick = async () => {
                 await Api.postWithoutResponse(Endpoints.auth.logout);
-                window.location.href = "/student-login.html";
+                window.location.href = "/student.html";
             };
 
         } else {
