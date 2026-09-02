@@ -32,7 +32,8 @@ public class UserService {
                         user.getId(),
                         user.getFullName(),
                         user.getRole(),
-                        user.getActive()
+                        user.getActive(),
+                        user.getSuperAdmin()
                 ))
                 .toList();
     }
@@ -45,7 +46,8 @@ public class UserService {
                         user.getId(),
                         user.getFullName(),
                         user.getRole(),
-                        user.getActive()
+                        user.getActive(),
+                        user.getSuperAdmin()
                 ))
                 .toList();
     }
@@ -58,6 +60,7 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
         user.setActive(true);
+        user.setSuperAdmin(request.getSuperAdmin());
 
         OffsetDateTime now = OffsetDateTime.now();
         user.setCreatedAt(now);
@@ -84,6 +87,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setFullName(request.getFullName());
         user.setActive(request.getActive());
+        user.setSuperAdmin(request.getSuperAdmin());
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));

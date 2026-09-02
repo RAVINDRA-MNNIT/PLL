@@ -6,5 +6,6 @@ public record UserResponse(
         Long id,
         String fullName,
         UserRole role,
-        Boolean active
+        Boolean active,
+        Boolean superAdmin
 ) {}

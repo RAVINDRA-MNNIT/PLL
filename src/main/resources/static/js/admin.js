@@ -19,7 +19,7 @@ async function initializeAdmin() {
         //     },
         //     body: JSON.stringify({
         //         userId: 2,
-        //         password: "digital12"
+        //         password: "mr.mummy"
         //     })
         // });
 
@@ -50,6 +50,12 @@ async function initializeAdmin() {
         // ==========================
         // Initialize UI
         // ==========================
+        debugger;
+        const configNav = document.getElementById("configurationsNav");
+
+        if (configNav) {
+            configNav.style.display = Session.getSuperAdmin() ? "block" : "none";
+        }
         document.getElementById("adminName").textContent =
             Session.getUserName();
 

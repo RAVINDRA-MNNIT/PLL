@@ -38,4 +38,7 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
+    @Column(name = "super_admin", nullable = false)
+    private Boolean superAdmin = false;
 }

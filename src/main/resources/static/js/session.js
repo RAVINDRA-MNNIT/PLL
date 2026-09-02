@@ -36,6 +36,10 @@ window.Session = {
         return this.currentUser?.role;
     },
 
+    getSuperAdmin() {
+        return this.currentUser?.superAdmin;
+    },
+
     isAdmin() {
         return this.currentUser?.role === "ADMIN";
     },

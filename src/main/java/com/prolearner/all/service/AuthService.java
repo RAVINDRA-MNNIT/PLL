@@ -58,7 +58,8 @@ public class AuthService {
         return new LoginResponse(
                 user.getId(),
                 user.getFullName(),
-                user.getRole()
+                user.getRole(),
+                user.getSuperAdmin()
         );
     }
 
@@ -108,7 +109,8 @@ public class AuthService {
         return new LoginResponse(
                 studentId,
                 student.getFullName(),
-                UserRole.STUDENT
+                UserRole.STUDENT,
+                false
         );
     }
 }

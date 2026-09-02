@@ -171,7 +171,6 @@ debugger;
     },
 
     loadConfigurations() {
-debugger;
         const config = getConfigurations();
 
         document.getElementById("finePerDay").value =
@@ -247,10 +246,16 @@ debugger;
             return;
         }
 
+        const superAdmin = isAdmin
+            ? document.getElementById("isSuperAdmin").checked
+            : false;
+
+
         const request = {
             fullName,
             password,
-            role: user
+            role: user,
+            superAdmin
         };
 
         try {
@@ -325,7 +330,10 @@ debugger;
         tbody.innerHTML = admins.map(admin => `
             <tr>
                 <td>${admin.id}</td>
-                <td>${admin.fullName}</td>
+                <td>
+                    ${admin.superAdmin ? "👑 " : ""}
+                    ${admin.fullName}
+                </td>
                 <td>${admin.active ? "Active" : "Inactive"}</td>
                 <td>
                     <button class="secondary-btn"
@@ -530,15 +538,22 @@ debugger;
         document.getElementById("editUserName").value = user.fullName;
         document.getElementById("editUserPassword").value = "";
         document.getElementById("editUserActive").checked = user.active;
-debugger;
+        document.getElementById("editSuperAdmin").checked = user.superAdmin;
+        console.log(user);
+        console.log(user.superAdmin);
         const activeGroup = document.getElementById("editUserActive")
+            .closest(".form-group");
+        const superAdminGroup = document.getElementById("editSuperAdmin")
             .closest(".form-group");
 
         if (user.id === Session.getUserId()) {
+            superAdminGroup.style.display = "none";
             activeGroup.style.display = "none";
         } else {
             activeGroup.style.display = "block"; // or "" if your layout handles it
             document.getElementById("editUserActive").checked = user.active;
+            superAdminGroup.style.display = "block";
+            document.getElementById("editSuperAdmin").checked = user.superAdmin;
         }
         document.getElementById("userModal").classList.add("show");
 
@@ -609,6 +624,17 @@ debugger;
                         </label>
 
                     </div>
+                    
+                    <div class="form-group">
+                    <label class="switch-row">
+                    <span>Super Admin</span>
+                    
+                    <label class="switch">
+                    <input id="editSuperAdmin" type="checkbox">
+                    <span class="slider"></span>
+                    </label>
+                    </label>
+                    </div>
 
                 </div>
 
@@ -654,6 +680,7 @@ debugger;
 
     async updateUser() {
         const id = document.getElementById("editUserId").value;
+
         const fullName = document
             .getElementById("editUserName")
             .value
@@ -667,6 +694,10 @@ debugger;
             .getElementById("editUserActive")
             .checked;
 
+        const superAdmin = document
+            .getElementById("editSuperAdmin")
+            .checked;
+
         if (!fullName) {
             alert("Please enter name.");
             return;
@@ -675,7 +706,8 @@ debugger;
         const request = {
             id,
             fullName,
-            active
+            active,
+            superAdmin
         };
 
         // Only send password if it was changed

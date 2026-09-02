@@ -11,4 +11,5 @@ public class CreateUserRequest {
     private String password;
     private Boolean active;
     private UserRole role;
+    private Boolean superAdmin ;
 }

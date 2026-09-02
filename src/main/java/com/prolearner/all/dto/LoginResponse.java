@@ -5,5 +5,6 @@ import com.prolearner.all.entity.UserRole;
 public record LoginResponse(
         Long id,
         String fullName,
-        UserRole role
+        UserRole role,
+        Boolean superAdmin
 ) {}
