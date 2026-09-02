@@ -110,4 +110,9 @@ public class PendingQueryService {
                 onlinePendingExpenses
         );
     }
+
+    public Integer getPendingCount() {
+        return repo.countByStatus(PendingRequestStatus.PENDING);
+    }
+
 }

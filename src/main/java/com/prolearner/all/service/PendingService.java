@@ -66,4 +66,8 @@ public class PendingService {
         return queryService.getCollectionSummary(); // ✅ CORRECT
     }
 
+    public Integer getPendingCount() {
+        return queryService.getPendingCount();
+    }
+
 }

@@ -75,8 +75,8 @@ WHERE
     )
 
     OR (
-        :searchBy = 'seatId'
-        AND CAST(seat.id AS string) LIKE CONCAT('%', :search, '%')
+        :searchBy = 'seat'
+        AND CAST(seat.seatNumber AS string) LIKE CONCAT('%', :search, '%')
     )
 
     OR (

@@ -41,6 +41,7 @@ async function initializeAdmin() {
         // Load Lookup Data
         // ==========================
         await loadLookups();
+        await loadPendingCounts();
         // ==========================
         // Initialize Filters
         // ==========================

@@ -40,6 +40,7 @@ window.Endpoints = {
     // ================= PENDING (UNIFIED SYSTEM) =================
      pending: {
          collectionSummary: "/api/pending/collection-summary",
+         pendingCount: "/api/pending/count",
 
         listByType(type) {
             return `/api/pending?type=${type}`;

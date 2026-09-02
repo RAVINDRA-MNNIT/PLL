@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.persistence.EnumType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -46,6 +45,13 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
     // ====================================================
     long countByRequestTypeAndStatus(
             RequestType requestType,
+            PendingRequestStatus status
+    );
+
+    // ====================================================
+    // 🔹 COUNT BY STATUS (for dashboard)
+    // ====================================================
+    Integer countByStatus(
             PendingRequestStatus status
     );
 

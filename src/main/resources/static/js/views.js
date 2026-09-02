@@ -49,32 +49,6 @@ async function switchView(view) {
                     return
                 }
             }
-                        // ✅ LOAD DUMMY FORM HERE
-    //  const dummyData = {
-    //     fullName: "Abhinav Prabhakar",
-    //     dateOfBirth: "2002-05-14",
-    //     mobile: "9876543210",
-    //     guardianNumber: "9123456789",
-    //     fatherName: "Ramesh Prabhakar",
-    //     localAddress: "Civil Lines, Prayagraj",
-    //     permanentAddress: "Civil Lines, Prayagraj",
-    //     aadhaarNumber: "123412341234",
-    //     qualification: "B.Sc.",
-    //     batchId: 19,
-    //     batchName: "1 (8 HRS)",
-    //     seatNumber: "R1-16",
-    //     preparationFor: "SSC",
-    //     fromDate: "2026-08-01",
-    //     tillDate: "2027-08-01",
-    //     discount: 100,
-    //     submittedAmount: 500,
-    //     pendingAmount: 400,
-    //     paymentMode: "ONLINE",
-    //     transactionId: "TXN123456",
-    //     remarks: "Paid via UPI"
-    // };
-
-    //     AdmissionForm.openNewWithData(dummyData)
             await AdmissionForm.openNew();
             break;
 
@@ -274,5 +248,6 @@ async function loadPendingApprovalSubview() {
         `;
 
     }
+
 
 }

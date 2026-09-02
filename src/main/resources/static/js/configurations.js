@@ -229,10 +229,10 @@ debugger;
 
     async createUser(user) {
         var isAdmin = user === "ADMIN";
-        const name = document.getElementById(isAdmin ? "adminUserName" : "managerUserName").value.trim();
+        const fullName = document.getElementById(isAdmin ? "adminUserName" : "managerUserName").value.trim();
         const password = document.getElementById(isAdmin ? "adminPassword" : "managerPassword").value;
         // Validation
-        if (!name) {
+        if (!fullName) {
             alert("Please enter name.");
             return;
         }
@@ -248,7 +248,7 @@ debugger;
         }
 
         const request = {
-            name,
+            fullName,
             password,
             role: user
         };

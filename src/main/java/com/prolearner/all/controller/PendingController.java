@@ -65,4 +65,9 @@ public class PendingController {
     public PendingCollectionSummaryResponse getCollectionSummary() {
         return service.getCollectionSummary();
     }
+
+    @GetMapping("/pending/count")
+    public Integer getPendingCount() {
+        return service.getPendingCount();
+    }
 }

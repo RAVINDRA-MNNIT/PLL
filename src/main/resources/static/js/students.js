@@ -39,6 +39,19 @@ async function loadStudents(page = 1) {
     }
 }
 
+async function loadPendingCounts() {
+    try {
+        const response = await Api.get(
+            Endpoints.pending.pendingCount
+        );
+        document.getElementById("pendingCount").textContent = response;
+    } catch (error) {
+        console.error(error);
+        resetPage()
+    } finally {
+        renderStudents();
+    }
+}
 /**
  * Render students.
  */
@@ -241,14 +254,6 @@ function updateStatistics(data = students) {
             (student.enrollmentStatus ?? "")
                 .toUpperCase() === "EXPIRED"
         ).length;
-
-    document.getElementById("pendingCount").textContent =
-        data.reduce(
-            (count, student) =>
-                count + Number(student.pendingApprovalCount ?? 0),
-            0
-        );
-
 }
 
 function viewStudentDetails(studentId) {
