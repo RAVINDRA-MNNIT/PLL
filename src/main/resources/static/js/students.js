@@ -3,16 +3,37 @@
  * Handles student data and rendering.
  */
 let students = [];
+let currentPage = 1;
+let pageSize = 20;
+let totalPages = 1;
+let totalStudents = 0;
 
 /**
  * Load students from server.
  */
-async function loadStudents() {
+async function loadStudents(page = 1) {
+    const filters = getFilters();
     try {
-        students = await Api.get(Endpoints.students.list);
+        const response = await Api.get(
+            Endpoints.students.list(
+                filters.searchType,
+                filters.keyword,
+                filters.batch,
+                filters.status,
+                page,
+                pageSize
+            )
+        );
+
+        students = response.students || [];
+        currentPage = response.currentPage;
+        totalPages = response.totalPages;
+        totalStudents = response.total;
+        pageSize = response.size;
+
     } catch (error) {
         console.error(error);
-        students = [];
+        resetPage()
     } finally {
         renderStudents();
     }
@@ -22,14 +43,66 @@ async function loadStudents() {
  * Render students.
  */
 function renderStudents() {
+    document.getElementById("currentPage").textContent = currentPage;
+    document.getElementById("totalPages").textContent = totalPages;
 
-    const filtered =
-        filterStudents(students);
+    // const filtered =
+    //     filterStudents(students);
 
-    renderStudentTable(filtered);
+    renderStudentTable(students);
 
-    updateStatistics(filtered);
+    updateStatistics(students);
+    updatePaginationButtons();
 
+}
+
+function updatePaginationButtons() {
+
+    document.getElementById("firstPageBtn").disabled = currentPage === 1;
+    document.getElementById("prevPageBtn").disabled = currentPage === 1;
+
+    document.getElementById("nextPageBtn").disabled = currentPage === totalPages;
+    document.getElementById("lastPageBtn").disabled = currentPage === totalPages;
+}
+
+function setPaginationButtonandAction() {
+    pageSize = getConfigurations().PAGE_LIMIT;
+    document.getElementById("firstPageBtn").onclick = () => {
+        if (currentPage !== 1) {
+            loadStudents(1);
+        }
+    };
+
+    document.getElementById("prevPageBtn").onclick = () => {
+        if (currentPage > 1) {
+            loadStudents(currentPage - 1);
+        }
+    };
+
+    document.getElementById("nextPageBtn").onclick = () => {
+        if (currentPage < totalPages) {
+            loadStudents(currentPage + 1);
+        }
+    };
+
+    document.getElementById("lastPageBtn").onclick = () => {
+        if (currentPage !== totalPages) {
+            loadStudents(totalPages);
+        }
+    };
+}
+
+function  resetPage() {
+    students = [];
+    currentPage = 1;
+    pageSize = 20;
+    totalPages = 1;
+    totalStudents = 0;
+}
+
+function resetPageAndLoadStudent() {
+    resetPage();
+    loadStudents(1);
 }
 
 /**
@@ -41,7 +114,6 @@ function renderStudentTable(studentList) {
         document.getElementById("studentRows");
 
     tbody.innerHTML = "";
-
     if (studentList.length === 0) {
 
         tbody.innerHTML = `
@@ -52,11 +124,8 @@ function renderStudentTable(studentList) {
                 </td>
             </tr>
         `;
-
         return;
-
     }
-
     studentList.forEach(student => {
 
         tbody.appendChild(
@@ -64,14 +133,13 @@ function renderStudentTable(studentList) {
         );
 
     });
-
 }
+
 
 /**
  * Create row.
  */
 function createStudentRow(student) {
-
     const row = document.createElement("tr");
 
     row.classList.add("student-row");
@@ -94,15 +162,14 @@ function createStudentRow(student) {
 
     // const isExpired = (diffDays < 0 && (student.enrollmentStatus === "ACTIVE"));
     // const isDiscontinued = (diffDays < -10 && (student.enrollmentStatus === "ACTIVE"));
-    student.enrollmentStatus = getUpdatedEnrollment(Date(), student.tillDate , student.enrollmentStatus)
-    debugger;
+   // student.enrollmentStatus = getUpdatedEnrollment(Date(), student.tillDate , student.enrollmentStatus)
     const badgeClassMap = {
         ACTIVE: "active",
         EXPIRED: "expired",
         DISCONTINUED: "discontinued",
         TERMINATED: "terminated"
     };
-
+    const DAYS_BEFORE_NEXT_FEE_SUBMIT = getConfigurations().DAYS_BEFORE_NEXT_FEE_SUBMIT ?? 3
     const badgeClass =
         badgeClassMap[student.enrollmentStatus?.toUpperCase()] || "";
     let isTerminated = true;
@@ -110,8 +177,8 @@ function createStudentRow(student) {
     // console.log("diff" + diffDays);
     if (student.enrollmentStatus === "TERMINATED") {
         buttonMsg = `Student is terminated`;
-    } else if (diffDays > 3) {
-        buttonMsg = `You can only submit next fees if membership expires in 3 days`;
+    } else if (diffDays > DAYS_BEFORE_NEXT_FEE_SUBMIT) {
+        buttonMsg = `You can only submit next fees if membership expires in ${DAYS_BEFORE_NEXT_FEE_SUBMIT} days`;
     } else {
         isTerminated = false
     }
@@ -145,10 +212,6 @@ function createStudentRow(student) {
         </td>
 
         <td>
-            ${escapeHtml(student.pendingApprovalCount)}
-        </td>
-
-        <td>
             <button class="update-fees-btn" ${isTerminated ? `disabled title="${buttonMsg}"` : `onclick="updateFees(${student.studentId})"`}>
             <i class="fa-solid fa-money-bill-wave"></i>
             Update Fees
@@ -165,8 +228,7 @@ function createStudentRow(student) {
  */
 function updateStatistics(data = students) {
 
-    document.getElementById("total").textContent =
-        data.length;
+    document.getElementById("total").textContent = totalStudents;
 
     document.getElementById("activeCount").textContent =
         data.filter(student =>

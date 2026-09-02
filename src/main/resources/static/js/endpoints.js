@@ -9,17 +9,31 @@ window.Endpoints = {
 
     // ================= STUDENTS =================
     students: {
-        list: "/api/students",
+        list(searchBy, searchKey, batch, enrollmentStatus, page = 0, size = 20) {
+            const params = new URLSearchParams();
+            if (searchBy) {
+                params.append("searchBy", searchBy);
+            }
+            if (searchKey) {
+                params.append("searchKey", searchKey);
+            }
+            if (batch) {
+                params.append("batchId", batch);
+            }
+            if (enrollmentStatus) {
+                params.append("enrollmentStatus", enrollmentStatus);
+            }
+            params.append("page", page);
+            params.append("size", size);
+            return `/api/students?${params.toString()}`;
+        },
+
         details(studentId) {
             return `/api/students/${studentId}`;
         },
 
-        fees(studentId) {
-            return `/api/students/${studentId}/fees`;
-        },
-
-        changeSeat(studentId) {
-            return `/api/students/${studentId}/seat`;
+        feeHistory(studentId) {
+            return `/api/students/feeHistory/${studentId}`;
         },
     },
 
@@ -63,6 +77,27 @@ window.Endpoints = {
         clear() {
             return `/api/pending/clear`;
         },
+
+        saveGeneralConfiguration: `/api/admin/configuration/general`,
+        saveManagerConfiguration: `/api/admin/configuration/manager`,
+        saveStudentConfiguration: `/api/admin/configuration/student`,
+
+        addUser: `/api/users/addUser`,
+        updateUser: `/api/users/updateUser`,
+        getAllUsers(role) {
+            return `/api/users/all/${role}`;
+        },
+        deleteUser(id) {
+            return `/api/users/deleteUser/${id}`;
+        },
+
+        clearPendingApprovals: `/api/admin/pending-approvals`,
+        clearFeeRecords: `/api/admin/fee-records/cleanup`,
+        resetConfiguration: `/api/admin/configuration/reset`,
+        resetSeats: `/api/admin/seats/reset`,
+        clearTransactions(beforeDate) {
+            return `/api/admin/transactions/cleanup?beforeDate=${beforeDate}`;
+        },
     },
 
     manager: {
@@ -85,6 +120,7 @@ window.Endpoints = {
     
     // ================= LOOKUPS =================
     lookups: {
+        configurations: "/api/lookups/configurations",
         qualifications: "/api/lookups/qualifications",
         batches: "/api/lookups/batches",
         preparations: "/api/lookups/preparations",

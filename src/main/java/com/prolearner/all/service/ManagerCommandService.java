@@ -65,10 +65,26 @@ public class ManagerCommandService {
             newRequest.setFullName(body.getFullName());
             newRequest.setMobile(body.getMobileNumber());
             newRequest.setGuardianNumber(body.getGuardianNumber());
+            if (body.getDateOfBirth() != null) {
+                newRequest.setDateOfBirth(body.getDateOfBirth());
+            }
+            if (body.getFatherName() != null) {
+                newRequest.setFatherName(body.getFatherName());
+            }
+            if (body.getAadhaarNumber() != null) {
+                newRequest.setAadhaarNumber(body.getAadhaarNumber());
+            }
+            if (body.getLocalAddress() != null) {
+                newRequest.setLocalAddress(body.getLocalAddress());
+            }
+            if (body.getPermanentAddress() != null) {
+                newRequest.setPermanentAddress(body.getPermanentAddress());
+            }
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
         } else if (type == RequestType.SEAT) {
-            FeeRecord lastFee = feeRecordRepo.findTopByStudentIdOrderByCreatedAtDesc(body.getStudentId())
-                    .orElseThrow(() -> new RuntimeException("Fee Records not found"));
+            Students student = studentRepo.findByStudentId(body.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+            FeeRecord lastFee = student.getLastFee();
             if (lastFee.getSeatId().equals(body.getSeatId())) {
                 throw new IllegalStateException("Currently same seat is assigned, Please select another one!");
             }
@@ -126,7 +142,10 @@ public class ManagerCommandService {
                        String remark) {
         ApprovalRequest r = approvalRequestRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Request not found"));
-        if (r.getStatus() != PendingRequestStatus.PENDING) {
+        if (r.getStatus() == PendingRequestStatus.REJECTED) {
+
+        }
+        else if ((r.getStatus() != PendingRequestStatus.PENDING)){
             throw new IllegalStateException("Only pending request can be cancelled");
         }
         r.setStatus(PendingRequestStatus.CANCELLED);
@@ -134,15 +153,14 @@ public class ManagerCommandService {
         // ✅ save remark
         r.setRemarks(remark);
         approvalRequestRepo.save(r);
-        Optional<FeeRecord> lastFee = feeRecordRepo.findTopByStudentIdOrderByCreatedAtDesc(r.getStudentId());
+        Students student = studentRepo.findByStudentId(r.getStudentId())
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        FeeRecord lastFee = student.getLastFee();
         if (r.getRequestType() == RequestType.ADMISSION) {
             seatService.removeReservedSeat(r.getSeatId());
         } else if (r.getRequestType() == RequestType.FEES) {
-            if (lastFee.isPresent()) {
-                FeeRecord fee = lastFee.get();
-                if (!fee.getSeatId().equals(r.getSeatId())) {
-                    seatService.removeReservedSeat(r.getSeatId());
-                }
+            if (!Objects.equals(lastFee.getSeatId(), r.getSeatId())) {
+                seatService.removeReservedSeat(r.getSeatId());
             }
         }
     }
@@ -226,19 +244,16 @@ public class ManagerCommandService {
 
     public ApprovalRequest handleFees(ApprovalRequest request, PendingRequestDTO body, RequestType type, Long userId, Boolean isUpdateRequest) {
         Students student = studentRepo.findByStudentId(body.getStudentId())
-            .orElseThrow(() -> new RuntimeException("Student not found"));
-        Optional<FeeRecord> lastFee = feeRecordRepo.findTopByStudentIdOrderByCreatedAtDesc(body.getStudentId());
-        if (lastFee.isPresent()) {
-            FeeRecord fee = lastFee.get();
-            LocalDate tillDate = fee.getTillDate();
-            if (body.getFromDate().isBefore(tillDate)) {
-                throw new IllegalStateException("Membership from date should not be before last fees due date");
-            }
-            if (Objects.equals(fee.getSeatId(), request.getSeatId())) {
-                seatService.updateSeat(null, body.getSeatId(), body.getStudentId());
-            } else {
-                seatService.updateSeat(request.getSeatId(), body.getSeatId(), body.getStudentId());
-            }
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        FeeRecord lastFee = student.getLastFee();
+        LocalDate tillDate = lastFee.getTillDate();
+        if (body.getFromDate().isBefore(tillDate)) {
+            throw new IllegalStateException("Membership from date should not be before last fees due date");
+        }
+        if (Objects.equals(lastFee.getSeatId(), request.getSeatId())) {
+            seatService.updateSeat(null, body.getSeatId(), body.getStudentId());
+        } else {
+            seatService.updateSeat(request.getSeatId(), body.getSeatId(), body.getStudentId());
         }
 
         request.setBatchId(body.getBatchId());

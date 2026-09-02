@@ -26,8 +26,7 @@ public class SecurityConfig {
                 // Public pages/resources
                 .requestMatchers(
                     "/",
-                    "/login.html",
-                    "/favicon.ico"
+                    "/login.html"
                 ).permitAll()
 
                 // Login page needs these before authentication

@@ -37,8 +37,9 @@
 
     <aside class="sidebar">
 
-        <h2>📚 Pro Learner's Digital Library</h2>
-
+        <h2 id="managerLibraryName">
+            📚 Pro Learner's Digital Library
+        </h2>
         <div
             class="nav-item active"
             onclick="switchView('fees')">
@@ -194,7 +195,6 @@
                                 <th>From</th>
                                 <th>Till Date</th>
                                 <th>Status</th>
-                                <th>Pending Approval</th>
                                 <th>Actions</th>
                             </tr>
 
@@ -205,6 +205,54 @@
                     </table>
 
                 </div>
+
+
+
+                <div class="pagination-container">
+
+                        <button
+                                type="button"
+                                class="secondary-btn"
+                                id="firstPageBtn">
+                            <i class="fa-solid fa-angles-left"></i>
+                        </button>
+
+                        <button
+                                type="button"
+                                class="secondary-btn"
+                                id="prevPageBtn">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+
+                        <span class="page-number">
+                    Page
+                    <span id="currentPage">1</span>
+                    /
+                    <span id="totalPages">1</span>
+                </span>
+
+                        <button
+                                type="button"
+                                class="secondary-btn"
+                                id="nextPageBtn">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+
+                        <button
+                                type="button"
+                                class="secondary-btn"
+                                id="lastPageBtn">
+                            <i class="fa-solid fa-angles-right"></i>
+                        </button>
+
+                </div>
+
+
+
+
+
+
+
 
             </section>
 
@@ -332,7 +380,6 @@
 <!-- 🔹 SHARED UI -->
 <script src="/js/loader.js"></script>
 <!-- 🔹 STUDENT MODULE -->
-<script src="/js/student-details-modal.js"></script>
 <script src="/js/student-details.js"></script>
 <script src="/js/students.js"></script>
 <!-- 🔹 FEATURE MODULES -->

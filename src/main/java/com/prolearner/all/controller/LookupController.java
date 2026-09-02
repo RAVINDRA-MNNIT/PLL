@@ -3,6 +3,7 @@ package com.prolearner.all.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.prolearner.all.dto.ConfigurationDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,12 +24,19 @@ public class LookupController {
     }
 
     /**
+     * Returns all application configurations.
+     */
+    @GetMapping("/configurations")
+    public ConfigurationDTO getConfigurations() { return lookupService.getConfigurations();}
+
+    /**
      * Returns all qualifications.
      */
     @GetMapping("/qualifications")
     public List<String> getQualifications() {
         return lookupService.getQualifications();
     }
+
 
     /**
      * Returns all preparation types.

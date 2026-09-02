@@ -171,7 +171,7 @@ public class TransactionQueryService {
                         )
                         .stream()
                         .map(t -> TodayExpenseResponse.builder()
-                                .transactionDate(t.getTransactionDate())
+                                .transactionDate(OffsetDateTime.from(t.getTransactionDate()))
                                 .category(t.getExpenseCategory())
                                 .paymentMode(t.getPaymentMode())
                                 .amount(t.getAmount())
@@ -248,15 +248,15 @@ public class TransactionQueryService {
     public ProfitSummary getProfitSummary() {
 
         YearMonth month = YearMonth.now();
+        ZoneOffset ist = ZoneOffset.ofHoursMinutes(5, 30);
 
         OffsetDateTime from = month.atDay(1)
                 .atStartOfDay()
-                .atOffset(ZoneOffset.UTC);
+                .atOffset(ist);
 
         OffsetDateTime to = month.atEndOfMonth()
                 .atTime(LocalTime.MAX)
-                .atOffset(ZoneOffset.UTC);
-
+                .atOffset(ist);
         // Total summary
         Object[] wrapper = transactionRepository.getProfitSummary(
                 List.of(PendingRequestStatus.APPROVED,

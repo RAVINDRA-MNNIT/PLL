@@ -21,7 +21,7 @@ async function switchView(view) {
     document.getElementById("addView").style.display = "none";
     document.getElementById("pendingView").style.display = "none";
     document.getElementById("transactionsView").style.display = "none";
-
+    document.getElementById("configurationsView")?.style.setProperty("display", "none");
     // Remove active class
     document.querySelectorAll(".nav-item")
         .forEach(item => item.classList.remove("active"));
@@ -34,7 +34,7 @@ async function switchView(view) {
 
             document.querySelectorAll(".nav-item")[0]
                 .classList.add("active");
-            await loadStudents();
+           // await loadStudents();
             break;
 
         case "add":
@@ -43,7 +43,12 @@ async function switchView(view) {
 
             document.querySelectorAll(".nav-item")[1]
                 .classList.add("active");
-
+            if ((getConfigurations().ONLINE_ADMISSION_ENABLED ?? true) === false) {
+                if (Session.isManager()) {
+                    alert("Admin has disabled the online admission form, Please contact admin.")
+                    return
+                }
+            }
                         // ✅ LOAD DUMMY FORM HERE
     //  const dummyData = {
     //     fullName: "Abhinav Prabhakar",
@@ -90,6 +95,13 @@ async function switchView(view) {
             document.querySelectorAll(".nav-item")[3]
                 .classList.add("active");
             Transactions.load();
+            break;
+
+        case "configurations":
+            document.getElementById("configurationsView").style.display = "block";
+            document.querySelectorAll(".nav-item")[4]
+                .classList.add("active");
+            Configurations.load();
             break;
 
         default:

@@ -127,6 +127,7 @@ button:disabled{
 </div>
 
 <script>
+
 const userType = document.getElementById("userType");
 const personSelect = document.getElementById("personName");
 const personLabel = document.getElementById("personLabel");
@@ -222,7 +223,8 @@ async function login(event) {
         });
 
         if (response.status === 401) {
-            error.innerText = "Invalid user or password.";
+            const data = await response.json();
+            error.innerText = data.message || "Something went wrong.";
             return;
         }
 
@@ -242,7 +244,7 @@ async function login(event) {
         }
     } catch (err) {
         console.error(err);
-        error.innerText = "Could not connect to the server. Make sure Spring Boot is running.";
+        error.innerText = err.message ?? "Could not connect to the server. Make sure Spring Boot is running.";
     } finally {
         loginButton.disabled = false;
         loginButton.textContent = "Login";

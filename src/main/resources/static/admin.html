@@ -37,8 +37,9 @@
 
     <aside class="sidebar">
 
-        <h2>📚 Pro Learner's Digital Library</h2>
-
+        <h2 id="adminLibraryName">
+            📚 Pro Learner's Digital Library
+        </h2>
         <div
             class="nav-item active"
             onclick="switchView('fees')">
@@ -69,6 +70,12 @@
 
             Transactions
 
+        </div>
+
+        <div
+                class="nav-item"
+                onclick="switchView('configurations')">
+            Configurations
         </div>
 
     </aside>
@@ -178,33 +185,86 @@
 
                 </div>
 
+
+
+
+
+
+
+
+
+
+
+
                 <div class="table-wrapper">
-
                     <table>
-
                         <thead>
-
                             <tr>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Mobile</th>
-                                <th>Batch</th>
-                                <th>Seat No.</th>
-                                <th>Fees</th>
-                                <th>From</th>
-                                <th>Till Date</th>
-                                <th>Status</th>
-                                <th>Pending Approval</th>
-                                <th>Actions</th>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Batch</th>
+                            <th>Seat No.</th>
+                            <th>Fees</th>
+                            <th>From</th>
+                            <th>Till Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                             </tr>
-
                         </thead>
-
                         <tbody id="studentRows"></tbody>
-
                     </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+
+                    <button
+                            type="button"
+                            class="secondary-btn"
+                            id="firstPageBtn">
+                        <i class="fa-solid fa-angles-left"></i>
+                    </button>
+
+                    <button
+                            type="button"
+                            class="secondary-btn"
+                            id="prevPageBtn">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <span class="page-number">
+                    Page
+                    <span id="currentPage">1</span>
+                    /
+                    <span id="totalPages">1</span>
+                </span>
+
+                    <button
+                            type="button"
+                            class="secondary-btn"
+                            id="nextPageBtn">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+
+                    <button
+                            type="button"
+                            class="secondary-btn"
+                            id="lastPageBtn">
+                        <i class="fa-solid fa-angles-right"></i>
+                    </button>
 
                 </div>
+
+
+
+
+
+
+
+
+
+
 
             </section>
 
@@ -274,6 +334,26 @@
 
         </div>
 
+        <!-- Configuration -->
+
+        <div
+                id="configurationsView"
+                style="display:none">
+
+            <div id="configurationsContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+                        Loading Configurations...
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
     </main>
 
 </div>
@@ -332,7 +412,6 @@
 <!-- 🔹 SHARED UI -->
 <script src="/js/loader.js"></script>
 <!-- 🔹 STUDENT MODULE -->
-<script src="/js/student-details-modal.js"></script>
 <script src="/js/student-details.js"></script>
 <script src="/js/students.js"></script>
 <!-- 🔹 FEATURE MODULES -->
@@ -344,6 +423,8 @@
 <script src="/js/pending-approvals.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/js/transaction.js"></script>
+<script src="/js/configurations.js"></script>
+
 <!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/admin.js"></script>
 

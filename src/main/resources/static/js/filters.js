@@ -169,14 +169,24 @@ function matchesStatus(
  * Reset all filters.
  */
 function resetFilters() {
-
+    let filters = getFilters();
+    if (filters.batch.trim() === "" && filters.searchType.trim() === "all" && filters.status.trim() === "" && filters.keyword.trim() === "") {
+        return;
+    }
     document.getElementById("searchType").value = "all";
     document.getElementById("search").value = "";
     document.getElementById("batchFilter").value = "";
     document.getElementById("statusFilter").value = "";
+    resetPageAndLoadStudent();
+}
 
-    renderStudents();
+function debounce(fn, delay) {
+    let timeout;
 
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn(...args), delay);
+    };
 }
 
 /**
@@ -196,24 +206,25 @@ function initializeFilters() {
     const status =
         document.getElementById("statusFilter");
 
-    search?.addEventListener(
-        "input",
-        renderStudents
-    );
+    const debouncedSearch = debounce(() => {
+        resetPageAndLoadStudent();
+    }, 1000);
 
-    searchType?.addEventListener(
-        "change",
-        renderStudents
-    );
+    search?.addEventListener("input", debouncedSearch);
+
+    // searchType?.addEventListener(
+    //     "change",
+    //     resetPageAndLoadStudent
+    // );
 
     batch?.addEventListener(
         "change",
-        renderStudents
+        resetPageAndLoadStudent
     );
 
     status?.addEventListener(
         "change",
-        renderStudents
+        resetPageAndLoadStudent
     );
 
 }

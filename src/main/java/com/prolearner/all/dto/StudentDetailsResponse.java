@@ -31,6 +31,5 @@ public record StudentDetailsResponse(
 
     String enrollmentStatus,
 
-    List<StudentFeeHistoryResponse> feeRecords
-
+    StudentFeeHistoryResponse lastFee
 ) {}

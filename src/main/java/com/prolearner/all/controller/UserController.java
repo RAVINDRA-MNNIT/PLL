@@ -2,10 +2,8 @@ package com.prolearner.all.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.prolearner.all.dto.CreateUserRequest;
+import org.springframework.web.bind.annotation.*;
 
 import com.prolearner.all.dto.UserResponse;
 import com.prolearner.all.entity.UserRole;
@@ -26,5 +24,33 @@ public class UserController {
             @RequestParam UserRole role
     ) {
         return userService.getActiveUsers(role);
+    }
+
+    @GetMapping("/all/{role}")
+    public List<UserResponse> getAllUsers(
+            @PathVariable UserRole role
+    ) {
+        return userService.getAllUsers(role);
+    }
+
+    @PostMapping("/addUser")
+    public void addUser(
+            @RequestBody CreateUserRequest request
+    ) {
+        userService.addUser(request);
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    public void deleteAdmin(
+            @PathVariable Long id
+    ) {
+        userService.deleteUser(id);
+    }
+
+    @PutMapping("/updateUser")
+    public void updateUser(
+            @RequestBody CreateUserRequest request
+    ) {
+        userService.updateUser(request);
     }
 }

@@ -46,8 +46,16 @@ public class FeeRecord {
     @Column(name = "batch_id")
     private Long batchId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id", insertable = false, updatable = false)
+    private Batches batch;
+
     @Column(name = "seat_id")
     private Long seatId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_id", insertable = false, updatable = false)
+    private Seat seat;
 
     @Column(name = "payment_mode", length = 20)
     private String paymentMode;

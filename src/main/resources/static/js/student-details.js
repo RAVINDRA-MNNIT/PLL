@@ -19,7 +19,8 @@ init() {
 },
 
 initialize() {
-
+    document.getElementById("detailLibraryName").text =
+        `${getConfigurations().LIBRARY_NAME}`;
     try {
         // ✅ GET ID FROM URL (CORRECT FLOW)
         const params = new URLSearchParams(window.location.search);
@@ -39,7 +40,6 @@ initialize() {
     // ================= API =================
 
     async loadStudent(studentId) {
-        // debugger;
         // await fetch(Endpoints.auth.studentlogin, {
         //     method: "POST",
         //     credentials: "same-origin",
@@ -144,14 +144,14 @@ initialize() {
         this.setValue("qualification", student.qualification);
         this.setValue("preparationFor", student.preparationFor);
 
-        const lastFee = student.feeRecords?.[0] || null;
 
-        this.setValue("fromDate", formatDate(lastFee?.fromDate));
-        this.setValue("tillDate", formatDate(lastFee?.tillDate));
-        this.setValue("seatNumber", lastFee?.seatNumber ?? "-");
-        this.setValue("batchName", lastFee?.batchName ?? "-");
-        this.toggleSeatSection(this.isSeatApplicable(lastFee));
-        const enrollmentStatus = getUpdatedEnrollment(Date(), lastFee?.tillDate , student.enrollmentStatus)
+        this.setValue("fromDate", formatDate(student.lastFee.fromDate));
+        this.setValue("tillDate", formatDate(student.lastFee.tillDate));
+        this.setValue("seatNumber", student.lastFee.seatNumber ?? "-");
+        this.setValue("batchName", student.lastFee.batchName ?? "-");
+        this.toggleSeatSection(this.isSeatApplicable(student.lastFee));
+      //  const enrollmentStatus = getUpdatedEnrollment(Date(), student.lastFee.tillDate , student.enrollmentStatus)
+        const enrollmentStatus = student.enrollmentStatus;
         this.setValue("membershipTitle", enrollmentStatus === "ACTIVE" ? "Current Membership" : "Last Membership (Outdated)");
         this.updateEnrollmentStatus(enrollmentStatus);
         StudentActionsUI.init("studentActions", student);

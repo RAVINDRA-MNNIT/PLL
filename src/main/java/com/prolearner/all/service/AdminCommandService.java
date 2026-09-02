@@ -3,6 +3,7 @@ package com.prolearner.all.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import com.prolearner.all.entity.Transaction;
@@ -10,6 +11,7 @@ import com.prolearner.all.enums.*;
 import com.prolearner.all.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ import com.prolearner.all.repository.FeeRecordRepository;
 
 import com.prolearner.all.dto.PendingRequestDTO;
 import com.prolearner.all.dto.StudentIdAllocation;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Service
@@ -35,6 +38,7 @@ public class AdminCommandService {
     private final SeatService seatService;
     private final StudentIdService studentIdService;
     private final TransactionRepository transactionRepository;
+    private final ConfigurationService configurationService;
 
 
     // ====================================================
@@ -66,13 +70,10 @@ public class AdminCommandService {
         Long studentId = body.getStudentId();
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-            Optional<FeeRecord> lastFee = feeRecordRepository.findTopByStudentIdOrderByCreatedAtDesc(studentId);
-        if (lastFee.isPresent()) {
-            FeeRecord fee = lastFee.get();
-            LocalDate tillDate = fee.getTillDate();
-            if (body.getFromDate().isBefore(tillDate)) {
-                throw new IllegalStateException("Membership from date should not be before last fees due date");
-            }
+        FeeRecord lastFee = student.getLastFee();
+        LocalDate tillDate = lastFee.getTillDate();
+        if (body.getFromDate().isBefore(tillDate)) {
+            throw new IllegalStateException("Membership from date should not be before last fees due date");
         }
         FeeRecord fee = FeeRecord.builder()
                 .studentId(studentId)
@@ -95,13 +96,14 @@ public class AdminCommandService {
         } else {
             seatService.removeReservedSeat(body.getSeatId());
         }
+        feeRecordRepository.save(fee);
         student.setEnrollmentStatus(EnrollmentStatus.ACTIVE.name());
+        student.setLastFee(fee);
         studentRepo.save(student);
 
         // Update Transaction
         updateTransaction(studentId, body.getSubmittedAmount(), body.getPaymentMode(), SourceType.FEE, null, adminId);
 
-        feeRecordRepository.save(fee);
     }
 
     // ====================================================
@@ -156,7 +158,7 @@ public class AdminCommandService {
 
                     .build();
             // Save student first
-            Students savedStudent = studentRepo.save(student);
+            student = studentRepo.save(student);
 
             // Save fee record
             FeeRecord fee = FeeRecord.builder()
@@ -175,27 +177,34 @@ public class AdminCommandService {
                     .createdAt(OffsetDateTime.now())
                     .build();
 
-            feeRecordRepository.save(fee);
+                    fee = feeRecordRepository.save(fee);
 
-            // Update seat
-            seatService.updateSeat(null, r.getSeatId(), r.getStudentId());
-            // Update Transaction
-            updateTransaction(r.getStudentId(), r.getSubmittedAmount(), r.getPaymentMode(), SourceType.ADMISSION, 1L, adminId);
+                    // 3. Update last fee
+                    student.setLastFee(fee);
+                    studentRepo.save(student);
+
+                    // 4. Update seat
+                    seatService.updateSeat(null, r.getSeatId(), student.getStudentId());
+
+                    // 5. Update transaction
+                    updateTransaction(
+                        student.getStudentId(),
+                        r.getSubmittedAmount(),
+                        r.getPaymentMode(),
+                        SourceType.ADMISSION,
+                        1L,
+                        adminId
+                    );
 
         } else {
             Long studentId = r.getStudentId();
             Students student = studentRepo.findByStudentId(studentId)
                     .orElseThrow(() -> new RuntimeException("Student not found"));
             if (RequestType.FEES.equals(r.getRequestType())) {
-
-
-                Optional<FeeRecord> lastFee = feeRecordRepository.findTopByStudentIdOrderByCreatedAtDesc(studentId);
-                if (lastFee.isPresent()) {
-                    FeeRecord fee = lastFee.get();
-                    LocalDate tillDate = fee.getTillDate();
-                    if (r.getFromDate().isBefore(tillDate)) {
-                        throw new IllegalStateException("Membership from date should not be before last fees due date");
-                    }
+                FeeRecord lastFee = student.getLastFee();
+                LocalDate tillDate = lastFee.getTillDate();
+                if (r.getFromDate().isBefore(tillDate)) {
+                    throw new IllegalStateException("Membership from date should not be before last fees due date");
                 }
                 FeeRecord fee = FeeRecord.builder()
                         .studentId(studentId)
@@ -219,15 +228,31 @@ public class AdminCommandService {
                     seatService.removeReservedSeat(r.getSeatId());
                 }
                 student.setEnrollmentStatus(EnrollmentStatus.ACTIVE.name());
-                studentRepo.save(student);
                 // Update Transaction
                 updateTransaction(studentId, r.getSubmittedAmount(), r.getPaymentMode(), SourceType.FEE, 1L, adminId);
                 // Update Fee
                 feeRecordRepository.save(fee);
+                student.setLastFee(fee);
+                studentRepo.save(student);
 
             } else if (RequestType.SEAT.equals(r.getRequestType())) {
                 updateSeat(r.getStudentId(), r.getSeatId());
             } else if (RequestType.DETAILS.equals(r.getRequestType())) {
+                if (r.getDateOfBirth() != null) {
+                    student.setDateOfBirth(r.getDateOfBirth());
+                }
+                if (r.getFatherName() != null) {
+                    student.setFatherName(r.getFatherName());
+                }
+                if (r.getAadhaarNumber() != null) {
+                    student.setAadhaarNumber(r.getAadhaarNumber());
+                }
+                if (r.getLocalAddress() != null) {
+                    student.setLocalAddress(r.getLocalAddress());
+                }
+                if (r.getPermanentAddress() != null) {
+                    student.setPermanentAddress(r.getPermanentAddress());
+                }
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
                 updateEnrollment(student, r.getEnrollmentStatus());
@@ -251,6 +276,21 @@ public class AdminCommandService {
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
         } else if (RequestType.DETAILS.name().equals(type)) {
+            if (body.getDateOfBirth() != null) {
+                student.setDateOfBirth(body.getDateOfBirth());
+            }
+            if (body.getFatherName() != null) {
+                student.setFatherName(body.getFatherName());
+            }
+            if (body.getAadhaarNumber() != null) {
+                student.setAadhaarNumber(body.getAadhaarNumber());
+            }
+            if (body.getLocalAddress() != null) {
+                student.setLocalAddress(body.getLocalAddress());
+            }
+            if (body.getPermanentAddress() != null) {
+                student.setPermanentAddress(body.getPermanentAddress());
+            }
             updateDetail(student, body.getFullName(), body.getMobileNumber(), body.getGuardianNumber());
         } else {
             throw new IllegalStateException("Invalid type request");
@@ -262,8 +302,9 @@ public class AdminCommandService {
     // =========================================================
 
     public Students admissionSubmit(PendingRequestDTO body,
-                                           Long studentId,
-                                           Long adminId) {
+                                    Long studentId,
+                                    Long adminId) {
+
         Students student = Students.builder()
                 .studentId(studentId)
                 .fullName(body.getFullName())
@@ -281,14 +322,14 @@ public class AdminCommandService {
                 .createdBy(adminId)
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
-
                 .build();
-        // Save student first
-        Students savedStudent = studentRepo.save(student);
 
-        // Save fee record
+        // 1. Save student first
+        student = studentRepo.save(student);
+
+        // 2. Save fee record
         FeeRecord fee = FeeRecord.builder()
-                .studentId(studentId)
+                .studentId(student.getStudentId())
                 .batchId(body.getBatchId())
                 .seatId(body.getSeatId())
                 .fromDate(body.getFromDate())
@@ -303,16 +344,26 @@ public class AdminCommandService {
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-        feeRecordRepository.save(fee);
+        fee = feeRecordRepository.save(fee);
 
-        // Update seat
-        seatService.updateSeat(null, body.getSeatId(), studentId);
+        // 3. Update student's last fee
+        student.setLastFee(fee);
+        student = studentRepo.save(student);
 
-        // Update Transaction
-        updateTransaction(studentId, body.getSubmittedAmount(), body.getPaymentMode(), SourceType.ADMISSION, null, adminId);
+        // 4. Update seat
+        seatService.updateSeat(null, body.getSeatId(), student.getStudentId());
 
+        // 5. Update transaction
+        updateTransaction(
+                student.getStudentId(),
+                body.getSubmittedAmount(),
+                body.getPaymentMode(),
+                SourceType.ADMISSION,
+                null,
+                adminId
+        );
 
-        return savedStudent;
+        return student;
     }
 
     // =========================================================
@@ -320,11 +371,12 @@ public class AdminCommandService {
     // =========================================================
     public void updateSeat(Long studentId,
                            Long newSeatId) {
-        FeeRecord lastFee = feeRecordRepository.findTopByStudentIdOrderByCreatedAtDesc(studentId)
-                .orElseThrow(() -> new RuntimeException("Fee Records not found"));
-        seatService.updateSeat(lastFee.getSeatId(), newSeatId, studentId);
-        lastFee.setSeatId(newSeatId);
-        feeRecordRepository.save(lastFee);
+        Students student = studentRepo.findByStudentId(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        FeeRecord fr = student.getLastFee();
+        seatService.updateSeat(fr.getSeatId(), newSeatId, studentId);
+        fr.setSeatId(newSeatId);
+        feeRecordRepository.save(fr);
     }
 
     // =========================================================
@@ -346,8 +398,7 @@ public class AdminCommandService {
     public void updateEnrollment(Students student,
                                  String status) {
         student.setEnrollmentStatus(status);
-        FeeRecord lastFee = feeRecordRepository.findTopByStudentIdOrderByCreatedAtDesc(student.getStudentId())
-                .orElseThrow(() -> new RuntimeException("Fee Records not found"));
+        FeeRecord lastFee = student.getLastFee();
         if (EnrollmentStatus.DISCONTINUED.name().equals(status) || EnrollmentStatus.TERMINATED.name().equals(status)) {
             Long seatId = lastFee.getSeatId();
             seatService.removeReservedSeat(seatId);
@@ -387,5 +438,46 @@ public class AdminCommandService {
                 .build();
 
         transactionRepository.save(transaction);
+    }
+
+    public void clearPendingApprovals() {
+        approvalRequestRepo.clearProcessedApprovalRequests();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR FEE RECORDS
+    // ====================================================
+
+    public void clearFeeRecords() {
+        feeRecordRepository.clearFeeRecords();
+    }
+
+    // ====================================================
+    // 🔹 RESET CONFIGURATION
+    // ====================================================
+
+    public void resetConfiguration() {
+        configurationService.resetConfiguration();
+    }
+
+    // ====================================================
+    // 🔹 RESET SEATS
+    // ====================================================
+
+    public void resetSeats() {
+        seatService.resetSeats();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR TRANSACTIONS BEFORE DATE
+    // ====================================================
+
+    @Transactional
+    public void clearTransactionsBefore(LocalDate beforeDate) {
+
+        transactionRepository.clearTransactionsBefore(
+                beforeDate.atStartOfDay()
+                        .atOffset(ZoneOffset.ofHoursMinutes(5, 30))
+        );
     }
 }

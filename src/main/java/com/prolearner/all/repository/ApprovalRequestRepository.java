@@ -368,4 +368,21 @@ List<Map<String, Object>> fetchNonPending();
             @Param("statuses") Collection<PendingRequestStatus> statuses,
             @Param("studentId") Long studentId
     );
+
+    @Modifying
+    @Transactional
+    @Query("""
+        DELETE FROM ApprovalRequest a
+        WHERE NOT (
+            a.status = com.prolearner.all.enums.PendingRequestStatus.PENDING
+            OR (a.status = com.prolearner.all.enums.PendingRequestStatus.REJECTED
+                AND a.requestType IN (
+                    com.prolearner.all.enums.RequestType.FEES,
+                    com.prolearner.all.enums.RequestType.ADMISSION
+                ))
+            OR (a.status = com.prolearner.all.enums.PendingRequestStatus.CANCELLED
+                AND a.requestType = com.prolearner.all.enums.RequestType.ADMISSION)
+        )
+        """)
+    void clearProcessedApprovalRequests();
 }

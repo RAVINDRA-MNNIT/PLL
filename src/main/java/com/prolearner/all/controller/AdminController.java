@@ -2,15 +2,13 @@ package com.prolearner.all.controller;
 
 import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.Transaction;
-import com.prolearner.all.service.TransactionCommandService;
-import com.prolearner.all.service.TransactionQueryService;
-import com.prolearner.all.service.TransactionService;
+import com.prolearner.all.service.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import com.prolearner.all.entity.Students;
 
-import com.prolearner.all.service.AdminService;
-
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +20,13 @@ public class AdminController {
 
     private final AdminService adminService;
     private final TransactionService transactionService;
+    private final ConfigurationService configurationService;
 
 
-    public AdminController(AdminService as, TransactionService transactionService) {
+    public AdminController(AdminService as, TransactionService transactionService, ConfigurationService configurationService, PendingService pendingService) {
         this.adminService = as;
         this.transactionService = transactionService;
+        this.configurationService = configurationService;
     }
 
     // ====================================================
@@ -148,5 +148,98 @@ public class AdminController {
     public ProfitSummary getProfitSummary(
     ) {
         return transactionService.getProfitSummary();
+    }
+
+    // ====================================================
+    // 🔹 Save General configuration
+    // ====================================================
+
+    @PutMapping("/configuration/general")
+    public void saveGeneralConfiguration(
+            @RequestBody ConfigurationDTO configuration
+    ) {
+        configurationService.saveGeneralConfiguration(configuration);
+    }
+
+    // ====================================================
+    // 🔹 Save Manager configuration
+    // ====================================================
+
+    @PutMapping("/configuration/manager")
+    public void saveManagerConfiguration(
+            @RequestBody ConfigurationDTO configuration
+    ) {
+        configurationService.saveManagerConfiguration(configuration);
+    }
+
+    // ====================================================
+    // 🔹 Save Student configuration
+    // ====================================================
+
+    @PutMapping("/configuration/student")
+    public void saveStudentConfiguration(
+            @RequestBody ConfigurationDTO configuration
+    ) {
+        configurationService.saveStudentConfiguration(configuration);
+    }
+
+    // ====================================================
+    // 🔹 Save Student configuration
+    // ====================================================
+
+    @GetMapping("/get/users")
+    public void getUsers(
+            @RequestBody ConfigurationDTO configuration
+    ) {
+        configurationService.saveStudentConfiguration(configuration);
+    }
+
+    // ====================================================
+    // 🔹 CLEAR PENDING APPROVALS
+    // ====================================================
+
+    @DeleteMapping("/pending-approvals")
+    public void clearPendingApprovals() {
+        adminService.clearPendingApprovals();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR FEE RECORDS
+    // ====================================================
+
+    @PostMapping("/fee-records/cleanup")
+    public void clearFeeRecords() {
+        adminService.clearFeeRecords();
+    }
+
+    // ====================================================
+    // 🔹 RESET CONFIGURATION
+    // ====================================================
+
+    @PostMapping("/configuration/reset")
+    public void resetConfiguration() {
+        adminService.resetConfiguration();
+    }
+
+    // ====================================================
+    // 🔹 RESET SEATS
+    // ====================================================
+
+    @PostMapping("/seats/reset")
+    public void resetSeats() {
+        adminService.resetSeats();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR TRANSACTIONS BEFORE DATE
+    // ====================================================
+
+    @PostMapping("/transactions/cleanup")
+    public void clearTransactions(
+            @RequestParam("beforeDate")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate beforeDate
+    ) {
+        adminService.clearTransactionsBefore(beforeDate);
     }
 }

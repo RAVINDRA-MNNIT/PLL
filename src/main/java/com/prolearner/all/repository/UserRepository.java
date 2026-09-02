@@ -11,6 +11,8 @@ import com.prolearner.all.entity.UserRole;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByRoleAndActiveTrue(UserRole role);
-
+    List<User> findByRole(UserRole role);
     Optional<User> findByIdAndActiveTrue(Long id);
+
+    long countByRole(UserRole userRole);
 }

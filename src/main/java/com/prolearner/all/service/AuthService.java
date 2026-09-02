@@ -4,8 +4,6 @@ import com.prolearner.all.entity.ApprovalRequest;
 import com.prolearner.all.entity.Students;
 import com.prolearner.all.entity.UserRole;
 import com.prolearner.all.enums.EnrollmentStatus;
-import com.prolearner.all.enums.PendingRequestStatus;
-import com.prolearner.all.enums.RequestType;
 import com.prolearner.all.repository.ApprovalRequestRepository;
 import com.prolearner.all.repository.StudentRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +13,6 @@ import com.prolearner.all.dto.LoginResponse;
 import com.prolearner.all.entity.User;
 import com.prolearner.all.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 @Service
@@ -25,16 +22,21 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final ApprovalRequestRepository approvalRequestRepository;
+    private final ConfigurationService configurationService;
 
 
     public AuthService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder, StudentRepository studentRepository, ApprovalRequestRepository approvalRequestRepository
+            PasswordEncoder passwordEncoder,
+            StudentRepository studentRepository,
+            ApprovalRequestRepository approvalRequestRepository,
+            ConfigurationService configurationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.studentRepository = studentRepository;
         this.approvalRequestRepository = approvalRequestRepository;
+        this.configurationService = configurationService;
     }
 
     public LoginResponse login(Long userId, String password) {
@@ -43,6 +45,11 @@ public class AuthService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("Invalid user or password")
                 );
+        if (user.getRole() == UserRole.MANAGER) {
+            if (!configurationService.getManagerLoginEnable()) {
+                throw new IllegalArgumentException("Admin has disabled the manager login, Please contact admin.");
+            }
+        }
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new IllegalArgumentException("Invalid user or password");
@@ -60,7 +67,9 @@ public class AuthService {
         Students student = studentRepository
                 .findById(studentId)
                 .orElse(null);
-
+        if (!configurationService.getStudentLoginEnable()) {
+            throw new IllegalArgumentException("Admin has disabled the student login, Please contact admin.");
+        }
         if (student == null) {
             ApprovalRequest approvalRequest = approvalRequestRepository
                     .findByStudentId(studentId)

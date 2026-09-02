@@ -4,6 +4,7 @@
  */
 
 window.libraryLookups = {
+    configurations: {},
     qualifications: [],
     batches: [],
     preparations: [],
@@ -35,29 +36,47 @@ async function loadLookups(forceReload = false) {
     }
 
     const [
+        configurations,
         qualifications,
         batches,
         preparations,
         seats
     ] = await Promise.all([
+        fetchLookup(Endpoints.lookups.configurations),
         fetchLookup(Endpoints.lookups.qualifications),
         fetchLookup(Endpoints.lookups.batches),
         fetchLookup(Endpoints.lookups.preparations),
         fetchLookup(Endpoints.lookups.seats)
     ]);
-
+    window.libraryLookups.configurations = configurations
     window.libraryLookups.qualifications = qualifications || [];
     window.libraryLookups.batches = batches || [];
     window.libraryLookups.preparations = preparations || [];
     window.libraryLookups.seats = seats || [];
 
     window.libraryLookups.loaded = true;   // ✅ single source of truth
-
+    sessionStorage.setItem(
+        "configurations",
+        JSON.stringify(configurations)
+    );
     populateBatchFilter();
 
     window.dispatchEvent(
         new CustomEvent("library-lookups-ready")
     );
+}
+
+async function loadConfiguration() {
+    const [
+        configurations,
+    ] = await Promise.all([
+        fetchLookup(Endpoints.lookups.configurations),
+    ]);
+    sessionStorage.setItem(
+        "configurations",
+        JSON.stringify(configurations)
+    );
+    window.libraryLookups.configurations = configurations
 }
 
 /**
@@ -110,6 +129,15 @@ function populateBatchFilter() {
         batchFilter.appendChild(option);
 
     });
+
+}
+
+/**
+ * Configurations
+ */
+function getConfigurations() {
+
+    return window.libraryLookups.configurations;
 
 }
 

@@ -420,6 +420,7 @@ function validateFeeForm() {
     const payAmount = Number(submittedAmountInput.value);
     const discount = Number(discountInput.value);
     const pendingAmount = Number(pendingAmountInput.value);
+    const DAYS_BEFORE_NEXT_FEE_SUBMIT = getConfigurations().DAYS_BEFORE_NEXT_FEE_SUBMIT ?? 3
 
     // Batch
     if (!batchId) {
@@ -431,8 +432,8 @@ function validateFeeForm() {
         errors.push("Please select Seat Number.");
     }
 
-    if (getDateDifferenceInDays(new Date(), FeeForm.currentTill) > 3) {
-        alert(`You can only submit next fees if membership expires in 3 days`);
+    if (getDateDifferenceInDays(new Date(), FeeForm.currentTill) > DAYS_BEFORE_NEXT_FEE_SUBMIT) {
+        alert(`You can only submit next fees if membership expires in ${DAYS_BEFORE_NEXT_FEE_SUBMIT} days`);
         return false;
     }
 

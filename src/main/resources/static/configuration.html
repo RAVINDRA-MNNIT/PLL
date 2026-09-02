@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Configuration</title>
+
+    <link rel="stylesheet" href="/css/configuration.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fa-solid fa-gears"></i>
+                Configuration
+            </h1>
+            <p>Manage application settings.</p>
+        </div>
+    </div>
+
+    <div class="tabs">
+
+        <button class="tab-button active"
+                data-tab="general">
+            <i class="fa-solid fa-sliders"></i>
+            General
+        </button>
+
+        <button class="tab-button"
+                data-tab="admin">
+            <i class="fa-solid fa-user-shield"></i>
+            Admin
+        </button>
+
+        <button class="tab-button"
+                data-tab="manager">
+            <i class="fa-solid fa-users-gear"></i>
+            Manager
+        </button>
+
+        <button class="tab-button"
+                data-tab="student">
+            <i class="fa-solid fa-user-graduate"></i>
+            Student
+        </button>
+
+        <button class="tab-button" data-tab="clean-db">
+            <i class="fa-solid fa-database"></i>
+            Clean DB
+        </button>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- GENERAL -->
+    <!-- ========================================================= -->
+
+    <div class="tab-content active" id="general">
+
+        <!-- Library Settings -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-book"></i>
+                Library Settings
+            </h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Library Name</label>
+                    <input id="libraryName" type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Fine Per Day (₹)</label>
+                    <input id="finePerDay" type="number">
+                </div>
+
+                <div class="form-group">
+                    <label>Days For Expire</label>
+                    <input id="daysForExpire" type="number">
+                </div>
+
+                <div class="form-group">
+                    <label>Days For Discontinue</label>
+                    <input id="daysForDiscontinue" type="number">
+                </div>
+
+                <div class="form-group">
+                    <label>Days Before Next Fee Submit From Due Date</label>
+                    <input id="daysBeforeNextFeeSubmit" type="number">
+                </div>
+
+                <div class="form-group">
+                    <label>Page Limit</label>
+                    <input id="pageLimit" type="number">
+                </div>
+
+                <div class="form-group">
+
+                    <label>Default Page Sorting</label>
+
+                    <div class="radio-group">
+
+                        <label>
+                            <input type="radio"
+                                   name="pageSorting"
+                                   value="ASC">
+                            Ascending
+                        </label>
+
+                        <label>
+                            <input type="radio"
+                                   name="pageSorting"
+                                   value="DESC">
+                            Descending
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Application Settings -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-sliders"></i>
+                Application Settings
+            </h2>
+
+            <div class="settings-list">
+
+                <div class="setting-row">
+
+                    <label>Update Full Student Details</label>
+
+                    <label class="switch">
+                        <input id="updateFullDetail"
+                               type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+                <button
+                        id="saveGeneralBtn"
+                        class="primary-btn">
+                    Save General Settings
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- ADMIN -->
+    <!-- ========================================================= -->
+
+    <div class="tab-content" id="admin">
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-user-plus"></i>
+                Create Admin
+            </h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input id="adminUserName"
+                           type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input id="adminPassword"
+                           type="password">
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+
+                <button
+                        id="createAdminBtn"
+                        class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Create Admin
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h2>
+
+                <i class="fa-solid fa-users"></i>
+
+                Existing Admins
+
+            </h2>
+
+            <table class="table">
+
+                <thead>
+
+                <tr>
+                    <th>Id</th>
+
+                    <th>Name</th>
+
+                    <th>Status</th>
+
+                    <th width="180">Action</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="adminTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MANAGER -->
+    <!-- ========================================================= -->
+
+    <div class="tab-content" id="manager">
+
+        <!-- Manager Permissions -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-user-gear"></i>
+                Manager Permissions
+            </h2>
+
+            <div class="settings-list">
+
+                <div class="setting-row">
+                    <label>Manager Login Enabled</label>
+                    <label class="switch">
+                        <input id="managerLogin" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <label>Online Admission Enabled</label>
+                    <label class="switch">
+                        <input id="onlineAdmission" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <label>Manager Can Update Expenses</label>
+                    <label class="switch">
+                        <input id="managerExpense" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <label>Manager Can Update Cash Expenses</label>
+                    <label class="switch">
+                        <input id="managerCashExpense" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <label>Manager Can Update Online Expenses</label>
+                    <label class="switch">
+                        <input id="managerOnlineExpense" type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+
+                <button
+                        id="saveManagerBtn"
+                        class="primary-btn">
+                    Save Permissions
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Create Manager -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-user-plus"></i>
+                Create Manager
+            </h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input
+                            id="managerUserName"
+                            type="text">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input
+                            id="managerPassword"
+                            type="password">
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+
+                <button
+                        id="createManagerBtn"
+                        class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Create Manager
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Existing Managers -->
+
+        <div class="card">
+
+            <h2>
+
+                <i class="fa-solid fa-users"></i>
+
+                Existing Managers
+
+            </h2>
+
+            <table class="table">
+
+                <thead>
+
+                <tr>
+                    <th>Id</th>
+
+                    <th>Name</th>
+
+                    <th>Status</th>
+
+                    <th width="180">Action</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="managerTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- STUDENT -->
+    <!-- ========================================================= -->
+
+    <div class="tab-content" id="student">
+
+        <div class="card">
+
+            <h2>
+
+                <i class="fa-solid fa-user-graduate"></i>
+
+                Student Permissions
+
+            </h2>
+
+            <div class="settings-list">
+
+                <div class="setting-row">
+
+                    <label>Student Login Enabled</label>
+
+                    <label class="switch">
+
+                        <input id="studentLogin"
+                               type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Student Detail Update Enabled</label>
+
+                    <label class="switch">
+
+                        <input id="studentDetailUpdate"
+                               type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Student Fee Update Enabled</label>
+
+                    <label class="switch">
+
+                        <input id="studentFeeUpdate"
+                               type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+                <div class="setting-row">
+
+                    <label>Student Seat Update Enabled</label>
+
+                    <label class="switch">
+
+                        <input id="studentSeatUpdate"
+                               type="checkbox">
+
+                        <span class="slider"></span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+
+                <button
+                        id="saveStudentBtn"
+                        class="primary-btn">
+                    Save Student Settings
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- CLEAN DB -->
+    <!-- ========================================================= -->
+
+    <div class="tab-content" id="clean-db">
+
+        <!-- Pending Requests -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Pending Approval Requests
+            </h2>
+
+            <p>
+                Remove all pending approval requests that has been processed.
+            </p>
+
+            <div class="page-actions">
+                <button id="clearPendingApprovalBtn" class="danger-btn">
+                    Clean Pending Approvals
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Fee Records -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-money-check-dollar"></i>
+                Fee Records
+            </h2>
+            <p>
+                Deletes fee records except the first and last records according to the entered percentage.
+            </p>
+
+            <div class="page-actions">
+                <button id="clearFeeRecordsBtn" class="danger-btn">
+                    Clean Fee Records
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Transactions -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-wallet"></i>
+                Transactions
+            </h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>Delete Transactions Before</label>
+                    <input
+                            id="transactionBeforeDate"
+                            type="date">
+                </div>
+
+            </div>
+
+            <div class="page-actions">
+                <button id="clearTransactionsBtn" class="danger-btn">
+                    Clear Transactions
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Seats -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-chair"></i>
+                Seats
+            </h2>
+
+            <p>
+                Reset all seat assignments and availability.
+            </p>
+
+            <div class="page-actions">
+                <button id="resetSeatsBtn" class="danger-btn">
+                    Reset Seats
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Configuration -->
+
+        <div class="card">
+
+            <h2>
+                <i class="fa-solid fa-rotate-left"></i>
+                Configuration
+            </h2>
+
+            <p>
+                Restore all configuration values to their defaults.
+            </p>
+
+            <div class="page-actions">
+                <button id="resetConfigurationBtn" class="danger-btn">
+                    Reset Configuration
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/configurations.js"></script>
+
+</body>
+
+</html>

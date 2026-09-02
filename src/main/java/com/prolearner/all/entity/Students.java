@@ -78,4 +78,8 @@ public class Students {
 
     @Column(name = "student_id", nullable = false)
     private Long studentId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_fee_id")
+    private FeeRecord lastFee;
 }

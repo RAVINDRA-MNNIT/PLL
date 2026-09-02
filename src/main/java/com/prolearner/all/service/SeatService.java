@@ -56,5 +56,14 @@ public class SeatService {
         seat.setStudentId(null);
         seatRepo.save(seat);
     }
+
+    // ====================================================
+    // 🔹 RESET SEATS
+    // ====================================================
+
+    @Transactional
+    public void resetSeats() {
+        seatRepo.resetSeats();
+    }
 }
 

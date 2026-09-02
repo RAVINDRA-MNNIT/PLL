@@ -12,7 +12,6 @@ studentIdInput.addEventListener("input", () => {
 form.addEventListener("submit", login);
 
 async function login(event) {
-
     event.preventDefault();
 
     error.innerText = "";
@@ -58,7 +57,7 @@ async function login(event) {
                 password: password
             }
         );
-
+        await loadConfiguration();
         window.location.href = `/student-details.html?id=${studentId}`;
 
     } catch (e) {

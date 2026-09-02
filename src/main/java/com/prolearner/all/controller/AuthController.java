@@ -15,6 +15,8 @@ import com.prolearner.all.service.SessionService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -58,7 +60,7 @@ public class AuthController {
 
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid user or password");
+                    .body(Map.of("message", exception.getMessage()));
         }
     }
 
@@ -77,11 +79,11 @@ public class AuthController {
                     sessionService.getCurrentUser(request)
             );
 
-        } catch (IllegalStateException exception) {
+        } catch (IllegalArgumentException exception) {
 
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(exception.getMessage());
+                    .body(Map.of("message", exception.getMessage()));
         }
     }
 

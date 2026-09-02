@@ -38,27 +38,33 @@ async function initializeAdmin() {
         }
 
         // ==========================
-        // Initialize UI
-        // ==========================
-        document.getElementById("adminName").textContent =
-            Session.getUserName();
-        document.getElementById("pageLoading").style.display = "none";
-        document.getElementById("dashboard").style.display = "flex";
-
-        // ==========================
         // Load Lookup Data
         // ==========================
         await loadLookups();
-
         // ==========================
         // Initialize Filters
         // ==========================
         initializeFilters();
 
         // ==========================
-        // Load Students
+        // Initialize UI
         // ==========================
-        await loadStudents();
+        document.getElementById("adminName").textContent =
+            Session.getUserName();
+
+        document.getElementById("pageLoading").style.display = "none";
+        document.getElementById("dashboard").style.display = "flex";
+        document.getElementById("adminLibraryName").textContent =
+            `${getConfigurations().LIBRARY_NAME}`;
+        // ==========================
+        // Pagination Buttons
+        // ==========================
+        setPaginationButtonandAction();
+
+        // ==========================
+        // Load First Page
+        // ==========================
+        await loadStudents(1);
 
     } catch (error) {
         console.error("Admin initialization failed.", error);

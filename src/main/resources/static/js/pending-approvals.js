@@ -280,7 +280,6 @@ mapResponse(item) {
         ].includes(this.current);
 
 
-debugger;
         const comment =
             item.status === "REJECTED" && item.remarks?.trim()
                 ? item.remarks
@@ -372,7 +371,6 @@ async viewEdit(requestId) {
 
 
         if (!confirm("Approve this request?")) return;
-        debugger;
         try {
             await Api.post(Endpoints.admin.approveRequest, id);
             await this.refresh();

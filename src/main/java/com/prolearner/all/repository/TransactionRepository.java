@@ -5,7 +5,9 @@ import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.enums.PendingRequestStatus;
 import com.prolearner.all.enums.SourceType;
 import com.prolearner.all.enums.TransactionType;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -363,4 +365,19 @@ ORDER BY FUNCTION('DATE', t.transactionDate)
             @Param("statuses") List<PendingRequestStatus> statuses,
             @Param("from") OffsetDateTime from,
             @Param("to") OffsetDateTime to);
+
+    // ====================================================
+    // 🔹 CLEAR TRANSACTIONS BEFORE DATE
+    // ====================================================
+
+        @Modifying
+        @Transactional
+        @Query("""
+    DELETE FROM Transaction t
+    WHERE t.transactionDate < :beforeDate
+    """)
+        void clearTransactionsBefore(
+                @Param("beforeDate")
+                OffsetDateTime beforeDate
+        );
 }

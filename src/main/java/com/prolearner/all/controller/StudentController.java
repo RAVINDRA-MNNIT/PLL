@@ -2,20 +2,17 @@ package com.prolearner.all.controller;
 
 import java.util.List;
 
+import com.prolearner.all.dto.*;
+import com.prolearner.all.entity.Students;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.prolearner.all.dto.StudentDetailsResponse;
-import com.prolearner.all.dto.StudentFeeResponse;
-import com.prolearner.all.dto.StudentResponse;
-import com.prolearner.all.dto.UpdateFeeRequest;
 import com.prolearner.all.service.SessionService;
 import com.prolearner.all.service.StudentService;
 
@@ -26,77 +23,41 @@ import jakarta.servlet.http.HttpServletRequest;
 public class StudentController {
 
     private final StudentService studentService;
-    private final SessionService sessionService;
 
     public StudentController(
-            StudentService studentService,
-            SessionService sessionService
+            StudentService studentService
     ) {
         this.studentService = studentService;
-        this.sessionService = sessionService;
     }
 
-    /**
-     * Returns all students.
-     */
     @GetMapping
-    public List<StudentResponse> getStudents() {
-        return studentService.getStudents();
-    }
+    public StudentListResponse getStudents(
+            @RequestParam(defaultValue = "all") String searchBy,
+            @RequestParam(required = false) String searchKey,
+            @RequestParam(required = false) Long batchId,
+            @RequestParam(defaultValue = "all") String enrollmentStatus,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-    /**
-     * Returns fee details for a student.
-     */
-    @GetMapping("/{studentId}/fees")
-    public StudentFeeResponse getStudentFees(
-            @PathVariable Long studentId
-    ) {
-        return studentService.getStudentFees(studentId);
-    }
-
-    /**
-     * Creates a fee update approval request.
-     */
-    @PostMapping("/{studentId}/fees")
-    public ResponseEntity<Void> submitFeeUpdateRequest(
-            @PathVariable Long studentId,
-            @RequestBody UpdateFeeRequest request,
-            HttpServletRequest httpRequest
-    ) {
-
-        Long managerId =
-                sessionService.getCurrentUserId(httpRequest);
-
-        studentService.submitFeeUpdateRequest(
-                studentId,
-                managerId,
-                request
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return studentService.getStudents(
+                searchBy,
+                searchKey,
+                batchId,
+                enrollmentStatus,
+                pageable
         );
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .build();
     }
 
-        @PutMapping("/pending-fees/{requestId}")
-        public ResponseEntity<?> updatePendingFee(
-                @PathVariable Long requestId,
-                @RequestBody UpdateFeeRequest request
-        ) {
-
-        studentService.updatePendingFeeRequest(
-                requestId,
-                request
-        );
-
-        return ResponseEntity.ok().build();
-        }
-
-        @GetMapping("/{studentId}")
-        public StudentDetailsResponse getStudentDetails(
-                @PathVariable Long studentId) {
-
+    @GetMapping("/{studentId}")
+    public StudentDetailsResponse getStudentDetails(
+            @PathVariable Long studentId) {
         return studentService.getStudentDetails(studentId);
+    }
 
-        }
+    @GetMapping("/feeHistory/{studentId}")
+    public List<StudentFeeHistoryResponse> getStudentFeeHistory(
+            @PathVariable Long studentId) {
+        return studentService.getStudentFeeHistory(studentId);
+    }
 }

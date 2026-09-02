@@ -685,3 +685,41 @@ input[type="radio"]:disabled {
     background: #f1f5f9;
     border-color: #cbd5e1;
 }
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-number {
+    min-width: 120px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.pagination-controls button {
+    min-width: 40px;
+    height: 40px;
+}
+
+.pagination-controls button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}

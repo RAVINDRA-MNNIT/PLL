@@ -1,10 +1,16 @@
 package com.prolearner.all.service;
 
 import com.prolearner.all.dto.PendingRequestDTO;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import com.prolearner.all.entity.ApprovalRequest;
 import com.prolearner.all.entity.Students;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
 
 /**
  * Orchestrator Service
@@ -67,5 +73,47 @@ public class AdminService {
 
     public void updateStudent(String type, PendingRequestDTO body) {
         adminCommandService.updateStudent(type, body);
+    }
+
+
+
+    public void clearPendingApprovals() {
+        adminCommandService.clearPendingApprovals();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR FEE RECORDS
+    // ====================================================
+
+    public void clearFeeRecords() {
+        adminCommandService.clearFeeRecords();
+    }
+
+    // ====================================================
+    // 🔹 RESET CONFIGURATION
+    // ====================================================
+
+    public void resetConfiguration() {
+        adminCommandService.resetConfiguration();
+    }
+
+    // ====================================================
+    // 🔹 RESET SEATS
+    // ====================================================
+
+    public void resetSeats() {
+        adminCommandService.resetSeats();
+    }
+
+    // ====================================================
+    // 🔹 CLEAR TRANSACTIONS BEFORE DATE
+    // ====================================================
+
+    public void clearTransactionsBefore(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate beforeDate
+    ) {
+        adminCommandService.clearTransactionsBefore(beforeDate);
     }
 }

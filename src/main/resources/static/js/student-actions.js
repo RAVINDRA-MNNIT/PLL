@@ -9,6 +9,8 @@ window.StudentActionsUI = {
     student: null,
     modal: null,
     studentId: null,
+    UPDATE_FULL_DETAIL: true,
+
 
     init(containerId, studentData) {
         this.container = document.getElementById(containerId);
@@ -17,26 +19,14 @@ window.StudentActionsUI = {
         if (!this.container) {
             return;
         }
-
         this.studentId = studentData?.studentId;
-
+        this.UPDATE_FULL_DETAIL = this.getConfigurations().UPDATE_FULL_DETAIL ?? false;
         this.ensureModalRoot(); // ✅ important
         this.render();
         this.bindEvents();
     },
 
     // ================= UI =================
-
-    // render() {
-    //     const showSeat = this.isSeatApplicable();
-    //
-    //     this.container.innerHTML = `
-    //         ${this.button("feeHistory", "fa-clock-rotate-left", "Fee Records")}
-    //         ${this.button("updateDetails", "fa-user-pen", "Update Details")}
-    //         ${showSeat ? this.button("changeSeat", "fa-chair", "Change Seat") : ""}
-    //         ${this.button("updateStatus", "fa-user-check", "Update Enrollment Status")}
-    //     `;
-    // },
 
     button(action, icon, label) {
         return `
@@ -47,14 +37,26 @@ window.StudentActionsUI = {
         `;
     },
 
+    getConfigurations() {
+        const configurations = JSON.parse(
+            sessionStorage.getItem("configurations")
+        );
+        console.log(configurations)
+        return configurations;
+    },
+
     render() {
-        debugger;
+
+        const STUDENT_DETAIL_UPDATE_ENABLE = this.getConfigurations().STUDENT_DETAIL_UPDATE_ENABLE ?? false;
+        const STUDENT_FEE_UPDATE_ENABLE = this.getConfigurations().STUDENT_FEE_UPDATE_ENABLE ?? false;
+        const STUDENT_SEAT_UPDATE_ENABLE = this.getConfigurations().STUDENT_SEAT_UPDATE_ENABLE ?? false;
+debugger;
         const showSeat = this.isSeatApplicable();
         const isAdmin = Session.isAdmin();
         const isStudent = Session.isStudent();
         const isManager = Session.isManager()
         const isTerminated = this.student?.enrollmentStatus === "TERMINATED";
-        const last = this.student?.feeRecords?.at(0);
+        const last = this.student?.lastFee;
         const diffDays = getDateDifferenceInDays(new Date(), last.tillDate)
         let html = this.button("feeHistory", "fa-clock-rotate-left", "Fee Records");
 
@@ -70,9 +72,19 @@ window.StudentActionsUI = {
                 }
                 html += this.button("updateStatus", "fa-user-check", "Update Enrollment Status");
             } else if (isStudent) {
+                if (STUDENT_DETAIL_UPDATE_ENABLE) {
+                    html += this.button("updateDetails", "fa-user-pen", "Update Details");
+                }
+                if (STUDENT_SEAT_UPDATE_ENABLE) {
+                    if (showSeat) {
+                        html += this.button("changeSeat", "fa-chair", "Change Seat");
+                    }
+                }
                 html += this.button("updateStatus", "fa-user-check", "Update Enrollment Status");
-                if (!(diffDays > 3)) {
-                    html += this.button("updateFees", "fa-solid fa-money-bill-transfer", "Fees Update Request");
+                if (STUDENT_FEE_UPDATE_ENABLE) {
+                    if (!(diffDays > 3)) {
+                        html += this.button("updateFees", "fa-solid fa-money-bill-transfer", "Fees Update Request");
+                    }
                 }
             }
         }
@@ -168,9 +180,16 @@ window.StudentActionsUI = {
 
     // ================= ACTIONS =================
 
-showFeeHistory() {
+    async showFeeHistory() {
+        try {
+            let feeRecords = await Api.get(Endpoints.students.feeHistory(this.studentId));
+            this.renderFeeHistory(feeRecords);
+        } catch (error) {
+            alert(error.message || "Something went wrong.");
+        }
+    },
 
-    const feeRecords = this.student?.feeRecords ?? [];
+    renderFeeHistory(feeRecords) {
 
     let bodyContent = "";
 
@@ -253,12 +272,14 @@ showFeeHistory() {
     this.openModal(html);
 },
 
-showUpdateDetails(currentStatus) {
-    if (currentStatus === "TERMINATED") {
-        alert("You should not change the details of student if current status is terminated")
-        return;
-    }
-    const html = `
+    showUpdateDetails(currentStatus) {
+
+        if (currentStatus === "TERMINATED") {
+            alert("You should not change the details of student if current status is terminated");
+            return;
+        }
+
+        const html = `
         <div class="modal-content" style="max-width:550px;">
             <div class="modal-header">
                 <h2>
@@ -274,21 +295,68 @@ showUpdateDetails(currentStatus) {
 
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input id="updateFullName" type="text"
-                        value="${this.student.fullName ?? ""}">
+                    <input id="updateFullName"
+                           type="text"
+                           value="${this.student.fullName ?? ""}">
                 </div>
 
                 <div class="form-group">
                     <label>Mobile Number</label>
-                    <input id="updateMobileNumber" type="tel"
-                        value="${this.student.mobileNumber ?? ""}">
+                    <input id="updateMobileNumber"
+                           type="tel"
+                           maxlength="10"
+                           value="${this.student.mobileNumber ?? ""}">
                 </div>
 
                 <div class="form-group">
                     <label>Guardian Number</label>
-                    <input id="updateGuardianNumber" type="tel"
-                        value="${this.student.guardianNumber ?? ""}">
+                    <input id="updateGuardianNumber"
+                           type="tel"
+                           maxlength="10"
+                           value="${this.student.guardianNumber ?? ""}">
                 </div>
+
+                ${this.UPDATE_FULL_DETAIL ? `
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input id="updateDateOfBirth"
+                               type="date"
+                               value="${this.student.dateOfBirth ?? ""}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Father Name</label>
+                        <input id="updateFatherName"
+                               type="text"
+                               value="${this.student.fatherName ?? ""}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aadhaar Number</label>
+                        <input id="updateAadhaarNumber"
+                               type="text"
+                               maxlength="12"
+                               value="${this.student.aadhaarNumber ?? ""}"
+                               ${
+            Session.isStudent() &&
+            this.student.aadhaarNumber?.trim()
+                ? "disabled"
+                : ""
+        }>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Local Address</label>
+                        <textarea id="updateLocalAddress"
+                                  rows="3">${this.student.localAddress ?? ""}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Permanent Address</label>
+                        <textarea id="updatePermanentAddress"
+                                  rows="3">${this.student.permanentAddress ?? ""}</textarea>
+                    </div>
+                ` : ""}
 
             </div>
 
@@ -306,8 +374,9 @@ showUpdateDetails(currentStatus) {
         </div>
     `;
 
-    this.openModal(html);
-},
+        this.openModal(html);
+    },
+
 async showChangeSeat(currentStatus) {
     if (currentStatus === "TERMINATED") {
         alert("You should not change the seat of student if current status is terminated")
@@ -456,7 +525,7 @@ showUpdateStatus(currentStatus) {
             return;
         }
 
-        const last = this.student?.feeRecords?.at(0);
+        const last = this.student?.lastFee;
 
         const newTill = new Date(last.tillDate);
         const day = newTill.getDate();
@@ -498,7 +567,7 @@ showUpdateStatus(currentStatus) {
     // ================= HELPERS =================
 
     isSeatApplicable() {
-        const last = this.student?.feeRecords?.at(0);
+        const last = this.student?.lastFee;
         if (!last?.batchName) return false;
         if (getUpdatedEnrollment(Date(), last.tillDate, this.student?.enrollmentStatus) != "ACTIVE") return false;
         const name = last.batchName.toUpperCase();
@@ -506,7 +575,7 @@ showUpdateStatus(currentStatus) {
     },
 
     confirmFeeUpdate() {
-        const last = this.student?.feeRecords?.at(0);
+        const last = this.student?.lastFee;
 
         const newTill = new Date(last.tillDate);
         const day = newTill.getDate();
@@ -543,55 +612,89 @@ showUpdateStatus(currentStatus) {
         const mobile = document.getElementById("updateMobileNumber")?.value.trim();
         const guardian = document.getElementById("updateGuardianNumber")?.value.trim();
 
-        if (!fullName) {
-            alert("Full name is required");
-            return;
-        }
+        const dateOfBirth = document.getElementById("updateDateOfBirth")?.value || null;
+        const fatherName = document.getElementById("updateFatherName")?.value.trim() || "";
+        const aadhaarNumber = document.getElementById("updateAadhaarNumber")?.value.trim() || "";
+        const localAddress = document.getElementById("updateLocalAddress")?.value.trim() || "";
+        const permanentAddress = document.getElementById("updatePermanentAddress")?.value.trim() || "";
 
-        if (!/^[0-9]{10}$/.test(mobile)) {
-            alert("Enter valid 10-digit mobile number");
-            return;
-        }
+        try {
+            if (!fullName) {
+                throw new Error("Full name is required");
+            }
+            if (guardian && !/^[0-9]{10}$/.test(guardian)) {
+                throw new Error("Enter valid guardian number");
+            }
+            if (!fatherName) {
+                throw new Error("Father Name is required");
+            }
+            validateMobile(mobile);
 
-        if (guardian && !/^[0-9]{10}$/.test(guardian)) {
-            alert("Enter valid guardian number");
-            return;
+            if (this.UPDATE_FULL_DETAIL) {
+                validateDob(dateOfBirth);
+                validateAadhaar(aadhaarNumber);
+                validateAddress(localAddress, "Local Address");
+                validateAddress(permanentAddress, "Permanent Address");
+            }
+        } catch (validationError) {
+            alert(validationError.message);
+            return false;
         }
-
         const isUnchanged =
             fullName === (this.student.fullName || "") &&
             mobile === (this.student.mobileNumber || "") &&
-            guardian === (this.student.guardianNumber || "");
+            guardian === (this.student.guardianNumber || "") &&
+            (!this.UPDATE_FULL_DETAIL || (
+                dateOfBirth === (this.student.dateOfBirth || "") &&
+                fatherName === (this.student.fatherName || "") &&
+                aadhaarNumber === (this.student.aadhaarNumber || "") &&
+                localAddress === (this.student.localAddress || "") &&
+                permanentAddress === (this.student.permanentAddress || "")
+            ));
 
         if (isUnchanged) {
             alert("No changes detected");
             return;
         }
 
-
         const payload = {
+            studentId: this.studentId,
+            requestedBy: Session.getUserId(),
             fullName,
             mobileNumber: mobile,
-            guardianNumber: guardian,
-            studentId: this.studentId,
-            requestedBy: Session.getUserId()
+            guardianNumber: guardian
         };
-        console.log("url" + Endpoints.manager.createRequest("DETAILS"));
+
+        if (this.UPDATE_FULL_DETAIL) {
+            payload.dateOfBirth = dateOfBirth;
+            payload.fatherName = fatherName;
+            payload.aadhaarNumber = aadhaarNumber;
+            payload.localAddress = localAddress;
+            payload.permanentAddress = permanentAddress;
+        }
+
         try {
-            let endPoint = Endpoints.manager.createRequest("DETAILS")
-            if(Session.isAdmin()) {
-                endPoint = Endpoints.admin.updateStudent
+
+            let endPoint = Endpoints.manager.createRequest("DETAILS");
+
+            if (Session.isAdmin()) {
+                endPoint = Endpoints.admin.updateStudent;
             }
-            await Api.post(
-                endPoint,
-                payload
-            );
-            let msg = Session.isAdmin() ? "✅ Student detail changed successfully" : "✅ Student detail change request sent for approval";
+
+            await Api.post(endPoint, payload);
+
+            const msg = Session.isAdmin()
+                ? "✅ Student details updated successfully."
+                : "✅ Student detail change request sent for approval.";
+
             alert(msg);
+
             StudentActionsUI.closeModal();
+
             if (Session.isAdmin()) {
                 await StudentDetailsPage.loadStudent(this.studentId);
             }
+
         } catch (err) {
             console.error(err);
         }
