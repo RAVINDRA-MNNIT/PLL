@@ -4,7 +4,7 @@
  */
 let students = [];
 let currentPage = 1;
-let pageSize = 20;
+let pageSize = getConfigurations().PAGE_LIMIT ?? 20;
 let totalPages = 1;
 let totalStudents = 0;
 
@@ -29,7 +29,6 @@ async function loadStudents(page = 1) {
         currentPage = response.currentPage;
         totalPages = response.totalPages;
         totalStudents = response.total;
-        pageSize = response.size;
 
     } catch (error) {
         console.error(error);
@@ -79,7 +78,7 @@ function updatePaginationButtons() {
 }
 
 function setPaginationButtonandAction() {
-    pageSize = getConfigurations().PAGE_LIMIT;
+    pageSize = getConfigurations().PAGE_LIMIT ?? 20;
     document.getElementById("firstPageBtn").onclick = () => {
         if (currentPage !== 1) {
             loadStudents(1);
@@ -108,7 +107,6 @@ function setPaginationButtonandAction() {
 function  resetPage() {
     students = [];
     currentPage = 1;
-    pageSize = 20;
     totalPages = 1;
     totalStudents = 0;
 }
@@ -165,17 +163,8 @@ function createStudentRow(student) {
         viewStudentDetails(student.studentId);
     };
 
-    // const today = new Date();
-    // today.setHours(0, 0, 0, 0);
-    // const till = new Date(student.tillDate);
-    // till.setHours(0, 0, 0, 0);
-    // const diffDays = Math.floor((till - today) / (1000 * 60 * 60 * 24));
-
      const diffDays = getDateDifferenceInDays(new Date(), student.tillDate)
 
-    // const isExpired = (diffDays < 0 && (student.enrollmentStatus === "ACTIVE"));
-    // const isDiscontinued = (diffDays < -10 && (student.enrollmentStatus === "ACTIVE"));
-   // student.enrollmentStatus = getUpdatedEnrollment(Date(), student.tillDate , student.enrollmentStatus)
     const badgeClassMap = {
         ACTIVE: "active",
         EXPIRED: "expired",

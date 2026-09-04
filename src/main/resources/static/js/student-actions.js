@@ -453,9 +453,7 @@ showUpdateStatus(currentStatus) {
                 options += `<option value="ACTIVE">Active</option>`;
             }
 
-            if (currentStatus !== "DISCONTINUED") {
-                options += `<option value="DISCONTINUED">Discontinued</option>`;
-            }
+            options += `<option value="DISCONTINUED">Discontinued</option>`;
 
             if (currentStatus !== "TERMINATED") {
                 options += `<option value="TERMINATED">Terminated</option>`;

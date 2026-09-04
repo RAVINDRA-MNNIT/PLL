@@ -212,10 +212,11 @@ function initializeFilters() {
 
     search?.addEventListener("input", debouncedSearch);
 
-    // searchType?.addEventListener(
-    //     "change",
-    //     resetPageAndLoadStudent
-    // );
+    searchType?.addEventListener("change", () => {
+        if (search?.value.trim() !== "") {
+            resetPageAndLoadStudent();
+        }
+    });
 
     batch?.addEventListener(
         "change",

@@ -403,8 +403,11 @@ public class AdminCommandService {
             Long seatId = lastFee.getSeatId();
             seatService.removeReservedSeat(seatId);
             LocalDate today = LocalDate.now();
-            lastFee.setTillDate(today);
-            feeRecordRepository.save(lastFee);
+            // Update only if tillDate is null or in the future
+            if (lastFee.getTillDate() == null || lastFee.getTillDate().isAfter(today)) {
+                lastFee.setTillDate(today);
+                feeRecordRepository.save(lastFee);
+            }
         }
         studentRepo.save(student);
     }
