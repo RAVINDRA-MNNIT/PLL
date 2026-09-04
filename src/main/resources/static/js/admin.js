@@ -50,7 +50,6 @@ async function initializeAdmin() {
         // ==========================
         // Initialize UI
         // ==========================
-        debugger;
         const configNav = document.getElementById("configurationsNav");
 
         if (configNav) {

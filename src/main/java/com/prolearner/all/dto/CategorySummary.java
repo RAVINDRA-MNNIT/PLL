@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategorySummary {
-
     private String category;
     private BigDecimal amount;
 }

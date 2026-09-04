@@ -73,6 +73,12 @@
         </div>
 
         <div
+                class="nav-item"
+                onclick="switchView('strength')">
+            Strength
+        </div>
+
+        <div
                 id="configurationsNav"
                 class="nav-item"
                 onclick="switchView('configurations')">
@@ -335,6 +341,26 @@
 
         </div>
 
+        <!-- Strength -->
+
+        <div
+                id="strengthView"
+                style="display:none">
+
+            <div id="strengthContainer">
+
+                <section class="card">
+
+                    <p style="color:var(--muted)">
+                        Loading Strength...
+                    </p>
+
+                </section>
+
+            </div>
+
+        </div>
+
         <!-- Configuration -->
 
         <div
@@ -425,7 +451,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/js/transaction.js"></script>
 <script src="/js/configurations.js"></script>
-
+<script src="/js/studentStrength.js"></script>
 <!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/admin.js"></script>
 

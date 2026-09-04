@@ -11,8 +11,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentModeSummary {
-
     private PaymentMode paymentMode;
     private BigDecimal amount;
-
 }

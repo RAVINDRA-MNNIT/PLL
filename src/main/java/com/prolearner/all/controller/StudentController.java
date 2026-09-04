@@ -3,20 +3,11 @@ package com.prolearner.all.controller;
 import java.util.List;
 
 import com.prolearner.all.dto.*;
-import com.prolearner.all.entity.Students;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.prolearner.all.service.SessionService;
 import com.prolearner.all.service.StudentService;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/students")
@@ -59,5 +50,31 @@ public class StudentController {
     public List<StudentFeeHistoryResponse> getStudentFeeHistory(
             @PathVariable Long studentId) {
         return studentService.getStudentFeeHistory(studentId);
+    }
+
+
+    @GetMapping("/strength/overall")
+    public OverallStrengthResponse getOverallStrength() {
+        return studentService.getOverallStrength();
+    }
+
+    @GetMapping("/strength/fullday")
+    public FullDayStrengthResponse getFullDayStrength() {
+        return studentService.getStrength(List.of("R1", "R2", "R3"));
+    }
+
+    @GetMapping("/strength/room1")
+    public FullDayStrengthResponse getRoom1Strength() {
+        return studentService.getStrength(List.of("R1"));
+    }
+
+    @GetMapping("/strength/room2")
+    public ShiftStrengthResponse getRoom2Strength() {
+        return studentService.getRoom2Strength();
+    }
+
+    @GetMapping("/strength/room3")
+    public ShiftStrengthResponse getRoom3Strength() {
+        return studentService.getRoom3Strength();
     }
 }

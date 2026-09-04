@@ -214,9 +214,6 @@ debugger;
                         <small>to</small><br>
                         ${formatDate(r.tillDate)}
                     </td>
-                    <td>₹${Number(r.submittedAmount ?? 0).toLocaleString("en-IN")}</td>
-                    <td>₹${Number(r.discountAmount ?? 0).toLocaleString("en-IN")}</td>
-                    <td>₹${Number(r.pendingAmount ?? 0).toLocaleString("en-IN")}</td>
                     <td>${r.paymentMode ?? "-"}</td>
                     <td>${r.transactionId ?? "-"}</td>
                     <td>${formatDate(r.createdAt)}</td>
@@ -232,9 +229,6 @@ debugger;
                         <th>Batch</th>
                         <th>Seat</th>
                         <th>Membership</th>
-                        <th>Submitted</th>
-                        <th>Discount</th>
-                        <th>Pending</th>
                         <th>Payment</th>
                         <th>Transaction Id</th>
                         <th>Created On</th>
@@ -625,12 +619,12 @@ showUpdateStatus(currentStatus) {
             if (guardian && !/^[0-9]{10}$/.test(guardian)) {
                 throw new Error("Enter valid guardian number");
             }
-            if (!fatherName) {
-                throw new Error("Father Name is required");
-            }
             validateMobile(mobile);
 
             if (this.UPDATE_FULL_DETAIL) {
+                if (!fatherName) {
+                    throw new Error("Father Name is required");
+                }
                 validateDob(dateOfBirth);
                 validateAadhaar(aadhaarNumber);
                 validateAddress(localAddress, "Local Address");

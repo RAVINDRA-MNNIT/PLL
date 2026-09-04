@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Strength</title>
+
+    <link rel="stylesheet"
+          href="/css/style.css">
+
+    <link rel="stylesheet"
+          href="/css/studentStrength.css">
+
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>📚 Student Strength</h2>
+
+            <p class="page-subtitle">
+                View room-wise seating and student allocation.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Main Tabs -->
+    <!-- ============================================ -->
+
+    <div class="strength-tabs">
+
+        <button class="strength-tab active" data-tab="overall">
+            Overall
+        </button>
+
+        <button class="strength-tab" data-tab="fullday">
+            Full Day
+        </button>
+
+        <button class="strength-tab" data-tab="room1">
+            Room 1
+        </button>
+
+        <button class="strength-tab" data-tab="room2">
+            Room 2
+        </button>
+
+        <button class="strength-tab" data-tab="room3">
+            Room 3
+        </button>
+
+        <div id="strengthSummary" class="dashboard-summary">
+            <div class="summary-item total">
+                <span class="summary-label">Total Students</span>
+                <span class="summary-value" id="totalStudents">0</span>
+            </div>
+
+            <div id="summaryItemId" class="summary-item">
+                <span class="summary-label">Available Seats</span>
+                <span class="summary-value" id="availableSeats">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Overall -->
+    <!-- ============================================ -->
+
+    <div id="overall"
+         class="tab-content active">
+
+        <div id="overallContainer">
+
+            <!-- Room 1 -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    📍 Room 1
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Students</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room1Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room1Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- Room 2 -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    📍 Room 2
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Students</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room2Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room2Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- Room 3 -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    📍 Room 3
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Students</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room3Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room3Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- Night Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    🌙 Night Shift
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Students</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="nightStrength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="nightTotal">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- ============================================ -->
+    <!-- Full Day -->
+    <!-- ============================================ -->
+
+    <div id="fullday"
+         class="tab-content">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h3>Full Day</h3>
+
+            </div>
+
+            <table class="strength-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>Seat</th>
+
+                    <th>Student Id</th>
+
+                    <th>Name</th>
+
+                    <th>Mobile</th>
+
+                    <th>Enrollment Status</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="fulldayTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Room 1 -->
+    <!-- ============================================ -->
+
+    <div id="room1"
+         class="tab-content">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h3>Room 1</h3>
+
+                <span>Seats 1 - 53</span>
+
+            </div>
+
+            <table class="strength-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>Seat</th>
+
+                    <th>Student Id</th>
+
+                    <th>Name</th>
+
+                    <th>Mobile</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="room1Table">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================ -->
+    <!-- Room 2 -->
+    <!-- ============================================ -->
+    <div id="room2"
+         class="tab-content">
+
+        <div class="shift-summary">
+
+            <!-- 1st Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    1ST SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room2Shift1Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room2Shift1Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- 2nd Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    2ND SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room2Shift2Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room2Shift2Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- 3rd Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    3RD SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room2Shift3Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room2Shift3Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- ============================================ -->
+    <!-- Room 3 -->
+    <!-- ============================================ -->
+
+    <div id="room3" class="tab-content">
+
+        <div class="shift-summary">
+
+            <!-- 1st Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    1ST SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room3Shift1Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room3Shift1Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- 2nd Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    2ND SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room3Shift2Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room3Shift2Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- 3rd Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    3RD SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room3Shift3Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room3Shift3Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <!-- 4th Shift -->
+            <div class="strength-card">
+
+                <div class="strength-header">
+                    4TH SHIFT COUNT
+                </div>
+
+                <table class="strength-table">
+
+                    <thead>
+                    <tr>
+                        <th>Batch</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="room3Shift4Strength"></tbody>
+
+                    <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <th id="room3Shift4Total">0</th>
+                    </tr>
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/studentStrength.js"></script>
+
+</body>
+
+</html>

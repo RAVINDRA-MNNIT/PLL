@@ -11,13 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExpenseDashboardResponse {
-
     private BigDecimal todayExpense;
-
     private BigDecimal monthExpense;
-
     private BigDecimal pendingAmount;
-
     private BigDecimal averagePerDay;
 
     // Expense Size
@@ -32,7 +28,6 @@ public class ExpenseDashboardResponse {
 
     // Charts
     private List<CategorySummary> categorySummary;
-
     private List<PaymentModeSummary> paymentModeSummary;
 
     // Today's table

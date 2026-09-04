@@ -6,57 +6,41 @@ import java.time.LocalDate;
 public class PendingRequestDTO {
 
     private Long id;
-
     private Long studentId;
-
     private String fullName;
     private LocalDate dateOfBirth;
     private String mobileNumber;
     private String guardianNumber;
     private String fatherName;
-
     private String localAddress;
     private String permanentAddress;
-
     private String aadhaarNumber;
     private String qualification;
     private String preparationFor;
-
     private Long batchId;
     private Long seatId;
-
     private LocalDate fromDate;
     private LocalDate tillDate;
-
     private BigDecimal submittedAmount;
     private BigDecimal discount; 
     private BigDecimal pendingAmount;
-
     private String paymentMode;
     private String transactionId;
     private String remarks;
-
     private String enrollmentStatus;
     private Long requestedBy;
-
-
     public Long getStudentId() {
         return studentId;
     }
-
     public Long getId() {
         return id;
     }
-
     public void setStudentId(Long studentId) {
         this.studentId = studentId;
     }
-
-
     public String getFullName() {
         return fullName;
     }
-
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }

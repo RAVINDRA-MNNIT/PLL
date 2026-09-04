@@ -55,6 +55,15 @@ window.Endpoints = {
         },
     },
 
+    // ================= Strength =================
+    strength: {
+        overall: "/api/students/strength/overall",
+        fullDayStatus: "/api/students/strength/fullday",
+        room1Status: "/api/students/strength/room1",
+        room2Status: "/api/students/strength/room2",
+        room3Status: "/api/students/strength/room3",
+    },
+
     admin: {
         admissionRequest: `/api/admin/admission`,
         updateFeeRequest: `/api/admin/updatefee`,

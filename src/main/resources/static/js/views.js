@@ -21,7 +21,9 @@ async function switchView(view) {
     document.getElementById("addView").style.display = "none";
     document.getElementById("pendingView").style.display = "none";
     document.getElementById("transactionsView").style.display = "none";
+    document.getElementById("strengthView")?.style.setProperty("display", "none");
     document.getElementById("configurationsView")?.style.setProperty("display", "none");
+
     // Remove active class
     document.querySelectorAll(".nav-item")
         .forEach(item => item.classList.remove("active"));
@@ -71,9 +73,16 @@ async function switchView(view) {
             Transactions.load();
             break;
 
+        case "strength":
+            document.getElementById("strengthView").style.display = "block";
+            document.querySelectorAll(".nav-item")[4]
+                .classList.add("active");
+            Strength.load();
+            break;
+
         case "configurations":
             document.getElementById("configurationsView").style.display = "block";
-            document.querySelectorAll(".nav-item")[4]
+            document.querySelectorAll(".nav-item")[5]
                 .classList.add("active");
             Configurations.load();
             break;
