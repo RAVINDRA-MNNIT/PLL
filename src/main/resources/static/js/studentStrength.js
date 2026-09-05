@@ -355,6 +355,7 @@ const Strength = {
                 <td>${student.studentId ?? "—"}</td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
+                <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
                 <td>
                     ${
                     occupied
@@ -425,6 +426,7 @@ const Strength = {
                 <td>${student.studentId ?? "—"}</td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
+                <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
                 <td>
                     ${
                     occupied
@@ -440,6 +442,45 @@ const Strength = {
 
     },
 
+    printSection(sectionId, title) {
+
+    const content = document.getElementById(sectionId).innerHTML;
+
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${title}</title>
+
+            <link rel="stylesheet" href="/css/manager.css">
+            <link rel="stylesheet" href="/css/studentStrength.css">
+
+            <style>
+                .print-btn{
+                    display:none;
+                }
+            </style>
+
+        </head>
+
+        <body>
+
+            ${content}
+
+        </body>
+
+        </html>
+    `);
+
+    printWindow.document.close();
+
+    printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+    };
+},
     async loadRoom2() {
 
         try {

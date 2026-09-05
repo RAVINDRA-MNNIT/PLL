@@ -236,7 +236,8 @@ public class StudentService {
                         s.getStudentId(),
                         s.getFullName(),
                         s.getMobileNumber(),
-                        s.getStatus()
+                        s.getStatus(),
+                        s.getTillDate()
                 ))
                 .toList();
 

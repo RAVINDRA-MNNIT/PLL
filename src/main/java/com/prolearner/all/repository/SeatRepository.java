@@ -45,6 +45,7 @@ SELECT
     st.student_id AS studentId,
     st.full_name AS fullName,
     st.mobile_number AS mobileNumber,
+    fr.till_date AS tillDate,
 
     CASE
         WHEN st.id IS NULL THEN NULL
