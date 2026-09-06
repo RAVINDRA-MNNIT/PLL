@@ -1,4 +1,7 @@
 const Strength = {
+    fullDayData: [],
+    room1Data: [],
+    activeTab: "overall",
 
     async load() {
 
@@ -74,6 +77,10 @@ const Strength = {
         const summary =
             container.querySelector("#strengthSummary");
 
+       const sortSection = document.getElementById("sortSection");
+       sortSection.style.display = "none";
+
+
         const availableSection =
             container.querySelector("#summaryItemId");
 
@@ -107,30 +114,35 @@ const Strength = {
                 switch (tab.dataset.tab) {
 
                     case "overall":
-
+                        this.activeTab = "overall";
                         availableSection.style.display = "none";
+                        sortSection.style.display = "none";
                         await this.loadOverall();
                         break;
 
                     case "fullday":
-
+                        this.activeTab = "fullday";
+                       sortSection.style.display = "";
                         await this.loadFullDay();
                         break;
 
                     case "room1":
-
+                        this.activeTab = "room1";
+                       sortSection.style.display = "";
                         await this.loadRoom1();
                         break;
 
                     case "room2":
-
+                        this.activeTab = "room2";
                         summary.style.display = "none";
+                        sortSection.style.display = "none";
                         await this.loadRoom2();
                         break;
 
                     case "room3":
-
+                        this.activeTab = "room3";
                         summary.style.display = "none";
+                        sortSection.style.display = "none";
                         await this.loadRoom3();
                         break;
                 }
@@ -304,11 +316,11 @@ const Strength = {
 
         try {
 
-            const data = await Api.get(
+            this.fullDayData = await Api.get(
                 Endpoints.strength.fullDayStatus
             );
 
-            this.renderFullDay(data);
+            this.renderFullDay(this.fullDayData);
 
         } catch (e) {
 
@@ -319,7 +331,6 @@ const Strength = {
     },
 
     renderFullDay(data) {
-
         const tbody = document.getElementById("fulldayTable");
 
         document.getElementById("totalStudents").textContent =
@@ -375,11 +386,11 @@ const Strength = {
 
         try {
 
-            const data = await Api.get(
+            this.room1Data = await Api.get(
                 Endpoints.strength.room1Status
             );
 
-            this.renderRoom1(data);
+            this.renderRoom1(this.room1Data);
 
         } catch (e) {
 
@@ -610,4 +621,44 @@ const Strength = {
 
     },
 
+    sort(data, sortBy) {
+
+        const students = [...data.students];
+
+        switch (sortBy) {
+
+            case "studentId":
+                students.sort((a, b) =>
+                    (a.studentId || "").localeCompare(b.studentId || "")
+                );
+                break;
+
+            case "tillDate":
+                students.sort((a, b) =>
+                    new Date(a.tillDate || 0) - new Date(b.tillDate || 0)
+                );
+                break;
+        }
+
+        return {
+            ...data,
+            students
+        };
+    },
+
+};
+
+Strength.sortCurrentTab = function(sortBy) {
+    console.log(this.activeTab);
+    switch (this.activeTab) {
+        case "fullday":
+            console.log("fullDay");
+            this.renderFullDay(this.sort(this.fullDayData, sortBy));
+            break;
+
+        case "room1":
+            console.log("room1");
+            this.renderRoom1(this.sort(this.room1Data, sortBy));
+            break;
+    }
 };

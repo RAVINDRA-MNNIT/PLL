@@ -62,7 +62,30 @@
             Room 3
         </button>
 
+        <!-- Push everything after this to the right -->
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+
+            <div id="sortSection" class="sort-section">
+
+                <label for="strengthSort">
+                    Sort By
+                </label>
+
+                <select id="strengthSort"
+                        onchange="Strength.sortCurrentTab(this.value)">
+
+                    <option value="">Default</option>
+                    <option value="studentId">Student ID</option>
+                    <option value="tillDate">Till Date</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
         <div id="strengthSummary" class="dashboard-summary">
+
             <div class="summary-item total">
                 <span class="summary-label">Total Students</span>
                 <span class="summary-value" id="totalStudents">0</span>
@@ -72,6 +95,7 @@
                 <span class="summary-label">Available Seats</span>
                 <span class="summary-value" id="availableSeats">0</span>
             </div>
+
         </div>
 
     </div>
