@@ -492,6 +492,54 @@ const Strength = {
         printWindow.close();
     };
 },
+
+    printWithOutNumber(sectionId, title) {
+
+        // Clone so the original page is untouched
+        const clone = document.getElementById(sectionId).cloneNode(true);
+
+        // Hide 4th column (Mobile)
+        clone.querySelectorAll("table tr").forEach(row => {
+
+            if (row.children.length >= 4) {
+                row.children[3].style.display = "none";
+            }
+
+        });
+
+        const printWindow = window.open("", "_blank");
+
+        printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${title}</title>
+
+            <link rel="stylesheet" href="/css/manager.css">
+            <link rel="stylesheet" href="/css/studentStrength.css">
+
+            <style>
+                .print-btn{
+                    display:none;
+                }
+            </style>
+
+        </head>
+
+        <body>
+            ${clone.innerHTML}
+        </body>
+        </html>
+    `);
+
+        printWindow.document.close();
+
+        printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close();
+        };
+    },
+
     async loadRoom2() {
 
         try {
@@ -629,7 +677,9 @@ const Strength = {
 
             case "studentId":
                 students.sort((a, b) =>
-                    (a.studentId || "").localeCompare(b.studentId || "")
+                    String(a.studentId ?? "").localeCompare(
+                        String(b.studentId ?? "")
+                    )
                 );
                 break;
 
