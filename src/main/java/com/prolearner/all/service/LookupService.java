@@ -1,12 +1,15 @@
 package com.prolearner.all.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.prolearner.all.dto.ConfigurationDTO;
 import com.prolearner.all.entity.Configuration;
+import com.prolearner.all.repository.BatchRepository;
 import com.prolearner.all.repository.ConfigurationRepository;
+import com.prolearner.all.repository.SeatRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +20,16 @@ public class LookupService {
 
     private final JdbcTemplate jdbcTemplate;
     private final ConfigurationRepository configurationRepo;
+    private final BatchRepository batchRepo;
+    private final SeatRepository seatRepo;
 
-    public LookupService(JdbcTemplate jdbcTemplate, ConfigurationRepository configurationRepo) {
+    public LookupService(JdbcTemplate jdbcTemplate, ConfigurationRepository configurationRepo,
+                         BatchRepository batchRepo,
+                         SeatRepository seatRepo) {
         this.jdbcTemplate = jdbcTemplate;
         this.configurationRepo = configurationRepo;
+        this.batchRepo = batchRepo;
+        this.seatRepo = seatRepo;
     }
 
     /**
@@ -81,52 +90,35 @@ public class LookupService {
      * Returns all active batches.
      */
     public List<Map<String, Object>> getBatches() {
-
-        String sql = """
-                SELECT
-                    id,
-                    batch_name,
-                    batch_alias
-                FROM library.batches
-                WHERE is_active = TRUE
-                ORDER BY id;
-                """;
-
-        return jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> Map.of(
-                        "id", rs.getLong("id"),
-                        "name", rs.getString("batch_name"),
-                        "batchAlias", rs.getString("batch_alias")
-                )
-        );
+        return batchRepo.findAllOrderedByCategory()
+                .stream()
+                .map(batch -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", batch.getId());
+                    map.put("name", batch.getBatchName());
+                    map.put("batchAlias", batch.getBatchAlias());
+                    map.put("category", batch.getCategory());
+                    map.put("room", batch.getRoom());
+                    map.put("baseAmount", batch.getBaseAmount());
+                    map.put("isActive", batch.getIsActive());
+                    return map;
+                })
+                .toList();
     }
 
     /**
      * Returns all active seats.
      */
     public List<SeatResponse> getSeats() {
-
-        String sql = """
-            SELECT
-                id,
-                seat_number,
-                is_active,
-                student_id
-            FROM library.seats
-            WHERE is_active = TRUE
-            ORDER BY id;
-                """;
-
-        return jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> new SeatResponse(
-                        rs.getLong("id"),
-                        rs.getString("seat_number"),
-                        rs.getBoolean("is_active"),
-                        rs.getLong("student_id")
-                )
-        );
+        return seatRepo.findByIsActiveTrueOrderById()
+                .stream()
+                .map(seat -> new SeatResponse(
+                        seat.getId(),
+                        seat.getSeatNumber(),
+                        seat.getIsActive(),
+                        seat.getStudentId()
+                ))
+                .toList();
     }
 
     /**

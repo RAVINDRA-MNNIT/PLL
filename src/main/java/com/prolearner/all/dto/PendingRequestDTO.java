@@ -22,6 +22,8 @@ public class PendingRequestDTO {
     private LocalDate fromDate;
     private LocalDate tillDate;
     private BigDecimal submittedAmount;
+    private BigDecimal cashAmount;
+    private BigDecimal onlineAmount;
     private BigDecimal discount; 
     private BigDecimal pendingAmount;
     private String paymentMode;
@@ -171,6 +173,13 @@ public class PendingRequestDTO {
         this.submittedAmount = submittedAmount;
     }
 
+    public BigDecimal getCashAmount() { return cashAmount;}
+
+    public void setCashAmount(BigDecimal cashAmount) { this.cashAmount = cashAmount; }
+
+    public BigDecimal getOnlineAmount() { return onlineAmount; }
+
+    public void setOnlineAmount(BigDecimal onlineAmount) { this.onlineAmount = onlineAmount; }
 
     public BigDecimal getDiscount() {
         return discount;
@@ -179,7 +188,6 @@ public class PendingRequestDTO {
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
-
 
     public BigDecimal getPendingAmount() {
         return pendingAmount;

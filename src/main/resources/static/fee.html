@@ -1,206 +1,158 @@
 <form id="feeForm">
 <div class="form-grid">
-
     <div class="section-title center-title">
         Student Details
     </div>
-
     <div class="student-info">
         <span class="info-item">
             <span class="info-label">Student ID:</span>
             <span id="membershipId" class="info-value"></span>
         </span>
-
         <span class="info-item">
             <span class="info-label">Name:</span>
             <span id="studentName" class="info-value"></span>
         </span>
-
         <span class="info-item">
             <span class="info-label">Status:</span>
             <span id="enrollmentStatus" class="status-badge"></span>
         </span>
     </div>
-
     <div class="section-title center-title">
         Fee Details & Batch Detail
     </div>
-
     <div class="form-group">
         <label>Batch</label>
         <select id="batchId"></select>
     </div>
-
     <div class="form-group" id="seatContainer" style="display:none;">
         <label>Seat Number <span style="color:red">*</span></label>
         <select id="seatId"></select>
     </div>
-
     <div class="membership-duration-row">
         <span class="duration-label">
             Current Membership Duration:
         </span>
-
         <span
             id="currentMembershipDuration"
             class="duration-value">
         </span>
     </div>
-
     <div class="duration-option-row">
-
         <span class="duration-option-label">
             Update Membership Duration:
         </span>
-
         <label class="radio-option">
-            <input
-                type="radio"
-                name="durationType"
-                value="EXTEND"
-                checked>
-
+            <input type="radio" name="durationType" value="EXTEND" checked>
             1 Month Extension
         </label>
-
         <label class="radio-option">
-            <input
-                type="radio"
-                name="durationType"
-                value="CUSTOM">
-
+            <input type="radio" name="durationType" value="CUSTOM">
             Custom Date
         </label>
-
     </div>
 
     <!-- Next Membership Duration -->
     <div
         id="nextMembershipRow"
         class="next-membership-row">
-
         <span class="next-membership-label">
             Next Membership Duration:
         </span>
-
         <span
             id="nextMembershipDuration"
             class="next-membership-value">
         </span>
-
     </div>
 
-    <!-- Custom Date -->
-    <div
-        id="customDateSection"
-        class="custom-date-section"
-        style="display:none;">
+    <div id="customDateSection" class="custom-date-section" style="display:none;">
 
+        <!-- Membership From -->
         <div class="form-group">
-            <label>Membership From <span style="color:red">*</span></label>
-            <input
-                type="date"
-                id="fromDate">
+
+            <div class="date-label-row">
+                <label for="fromDate">
+                    Membership From <span style="color:red">*</span>
+                </label>
+
+                <button
+                        type="button"
+                        class="today-btn"
+                        onclick="setMembershipFromToday()">
+                    Today
+                </button>
+            </div>
+
+            <input type="date" id="fromDate">
+
         </div>
 
+        <!-- Membership Till -->
         <div class="form-group">
-            <label>Membership Till <span style="color:red">*</span></label>
-            <input
-                type="date"
-                id="tillDate">
+
+            <div class="date-label-row">
+                <label for="tillDate">
+                    Membership Till <span style="color:red">*</span>
+                </label>
+            </div>
+
+            <input type="date" id="tillDate">
+
         </div>
 
     </div>
-
     <div class="form-group">
         <label>Submitted Amount *</label>
-        <input
-            type="number"
-            id="submittedAmount">
+        <input type="number" id="submittedAmount" readonly>
     </div>
 
     <div class="form-group">
         <label>Discount</label>
-        <input
-            type="number"
-            id="discount"
-            value="0">
+        <input type="number" id="discount" value="0" readonly>
     </div>
-
-    <div class="form-group">
+    <div class="form-group" id="pendingAmountGroup">
         <label>Pending Amount</label>
-        <input
-            type="number"
-            id="pendingAmount"
-            value="0">
-        </div>
-
+        <input type="number" id="pendingAmount" value="0">
+    </div>
     <div class="form-group">
         <label>Payment Mode</label>
-
         <select id="paymentMode">
-
             <option value="">Select</option>
             <option value="CASH">Cash</option>
             <option value="ONLINE">Online</option>
-
+            <option value="BOTH">Both</option>
         </select>
-
     </div>
 
-    <div
-        class="form-group"
-        id="transactionIdContainer"
-        style="display:none;">
+    <div class="form-group" id="cashAmountContainer" style="display:none;">
+        <label>Cash Amount</label>
+        <input type="number" id="cashAmount" min="0" value="0" readonly>
+    </div>
 
+    <div class="form-group" id="onlineAmountContainer" style="display:none;">
+        <label>Online Amount</label>
+        <input type="number" id="onlineAmount" min="0" value="0">
+    </div>
+
+    <div class="form-group" id="transactionIdContainer" style="display:none;">
         <label>
             Transaction ID
             <span style="color:red">*</span>
         </label>
-
-        <input
-            id="transactionId"
-            placeholder="Enter Transaction ID">
-
+        <input id="transactionId" placeholder="Enter Transaction ID">
     </div>
-
     <div class="form-group full">
         <label>Remark</label>
-
-        <textarea
-            id="paymentRemarks"
-            rows="3"></textarea>
-
+        <textarea id="paymentRemarks" rows="3"></textarea>
     </div>
-
-       <div
-        id="feeMessage"
-        class="form-message"
-        style="display:none;">
+       <div id="feeMessage" class="form-message" style="display:none;">
     </div>
-
     <div class="form-actions">
-
-        <button
-            type="button"
-            class="secondary-btn"
-            onclick="closeFeeModal()">
-
+        <button type="button" class="secondary-btn" onclick="closeFeeModal()">
             Cancel
-
         </button>
-
-        <button
-            type="button"
-            class="primary-btn"
-            onclick="FeeForm.save()">
-
+        <button type="button" class="primary-btn" onclick="FeeForm.save()">
             Update Fees
-
         </button>
-
     </div>
-
 </div>
-
 </form>

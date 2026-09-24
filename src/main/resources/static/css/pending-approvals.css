@@ -287,3 +287,85 @@ td {
 .finance-value.profit {
     color: #059669;
 }
+
+.amount-highlight {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   CUSTOM MEMBERSHIP DATES
+   ========================================================== */
+
+#customDateSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    align-items: start;
+}
+
+#customDateSection .form-group {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    align-self: start;
+}
+
+#customDateSection .date-label-row {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    min-height: 32px;
+    margin: 0 0 8px 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#customDateSection .date-label-row label {
+    margin: 0;
+    padding: 0;
+    line-height: 32px;
+}
+
+#customDateSection .today-btn {
+    width: auto !important;
+    height: 32px;
+    min-height: 32px;
+
+    margin: 0 0 0 8px;
+    padding: 0 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #e5e7eb;
+    color: #111827;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+#customDateSection .today-btn:hover {
+    background: #d1d5db;
+}
+
+#customDateSection input[type="date"] {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.remarks {
+    white-space: pre-line;
+}

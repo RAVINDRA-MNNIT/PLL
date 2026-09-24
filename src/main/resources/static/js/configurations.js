@@ -4,7 +4,6 @@ const Configurations = {
     managers: [],
 
     async load() {
-debugger;
         const container =
             document.getElementById("configurationsContainer");
 
@@ -555,6 +554,10 @@ debugger;
             superAdminGroup.style.display = "block";
             document.getElementById("editSuperAdmin").checked = user.superAdmin;
         }
+
+        if (user.role === "MANAGER") {
+            superAdminGroup.style.display = "none";
+        }
         document.getElementById("userModal").classList.add("show");
 
     },
@@ -757,7 +760,9 @@ debugger;
     },
 
     async clearFeeRecords() {
-
+        if (!confirm("Are you sure you want to clear fee records?")) {
+            return;
+        }
         try {
 
             await Api.post(

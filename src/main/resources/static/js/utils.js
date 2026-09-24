@@ -498,3 +498,82 @@ function getUpdatedEnrollment(fromDate, toDate, enrollmentStatus) {
     }
 }
 
+function calculateMembershipDays(fromDate, tillDate) {
+    if (!fromDate || !tillDate) {
+        return 0;
+    }
+
+    const from = new Date(fromDate + "T00:00:00");
+    const till = new Date(tillDate + "T00:00:00");
+
+    if (till < from) {
+        return 0;
+    }
+
+    // Every month = exactly 30 days
+    return (
+        (till.getFullYear() - from.getFullYear()) * 360 +
+        (till.getMonth() - from.getMonth()) * 30 +
+        (till.getDate() - from.getDate())
+    );
+}
+
+function calculateTotalFee(baseAmount, membershipDays) {
+
+    baseAmount = Number(baseAmount || 0);
+    membershipDays = Number(membershipDays || 0);
+
+    if (baseAmount <= 0 || membershipDays <= 0) {
+        return 0;
+    }
+
+    const dailyFee =
+        baseAmount / 30;
+
+    return membershipDays * dailyFee;
+}
+
+function addOneMonth(date) {
+    const result = new Date(date);
+    const day = result.getDate();
+    // Prevent month overflow
+    result.setDate(1);
+    result.setMonth(result.getMonth() + 1);
+    const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+    result.setDate(Math.min(day, lastDay));
+    return result;
+}
+
+function parseLocalDate(dateValue) {
+    if (!dateValue) return null;
+
+    if (dateValue instanceof Date) {
+        return new Date(
+            dateValue.getFullYear(),
+            dateValue.getMonth(),
+            dateValue.getDate()
+        );
+    }
+
+    const value = String(dateValue).trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        const [year, month, day] = value.split("-").map(Number);
+        return new Date(year, month - 1, day);
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+        const [day, month, year] = value.split("/").map(Number);
+        return new Date(year, month - 1, day);
+    }
+
+    return null;
+}
+
+function formatInputDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}

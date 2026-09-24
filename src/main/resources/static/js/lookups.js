@@ -7,6 +7,7 @@ window.libraryLookups = {
     configurations: {},
     qualifications: [],
     batches: [],
+    fullBatchList: [],
     preparations: [],
     seats: [],
     loaded: false
@@ -50,20 +51,15 @@ async function loadLookups(forceReload = false) {
     ]);
     window.libraryLookups.configurations = configurations
     window.libraryLookups.qualifications = qualifications || [];
-    window.libraryLookups.batches = batches || [];
+    window.libraryLookups.fullBatchList = batches || [];
+    window.libraryLookups.batches = (batches || []).filter(batch => batch.isActive === true);
     window.libraryLookups.preparations = preparations || [];
     window.libraryLookups.seats = seats || [];
 
     window.libraryLookups.loaded = true;   // ✅ single source of truth
-    sessionStorage.setItem(
-        "configurations",
-        JSON.stringify(configurations)
-    );
+    sessionStorage.setItem("configurations", JSON.stringify(configurations));
     populateBatchFilter();
-
-    window.dispatchEvent(
-        new CustomEvent("library-lookups-ready")
-    );
+    window.dispatchEvent(new CustomEvent("library-lookups-ready"));
 }
 
 async function loadConfiguration() {
@@ -83,23 +79,26 @@ async function loadConfiguration() {
  * Reload ONLY seats lookup
  */
 async function reloadSeats() {
-
     try {
         console.log("Reloading seats...");
-
         const seats = await fetchLookup(Endpoints.lookups.seats);
-
         window.libraryLookups.seats = seats || [];
-
         console.log("Seats updated ✅");
-
-        // optional event (if UI depends on seats)
-        window.dispatchEvent(
-            new CustomEvent("library-seats-updated")
-        );
-
     } catch (e) {
         console.error("Failed to reload seats ❌", e);
+    }
+}
+
+/**
+ * Reload ONLY batches lookup
+ */
+async function reloadBatches() {
+    try {
+        const batches = await fetchLookup(Endpoints.lookups.batches);
+        window.libraryLookups.fullBatchList = batches || [];
+        window.libraryLookups.batches = (batches || []).filter(batch => batch.isActive === true);
+    } catch (e) {
+        console.error("Failed to reload batches ❌", e);
     }
 }
 
@@ -160,6 +159,15 @@ function getBatches() {
 }
 
 /**
+ * Full Batches
+ */
+function getFullBatchesList() {
+
+    return window.libraryLookups.fullBatchList;
+
+}
+
+/**
  * Preparations
  */
 function getPreparations() {
@@ -214,15 +222,33 @@ function findSeat(seatId) {
 }
 
 async function filteredSeat(studentId) {
-    try {
-        await reloadSeats();
-        const lookups = window.libraryLookups || {};
-        const seats = lookups.seats || [];
-
+    const lookups = window.libraryLookups || {};
+    var seats = lookups.seats || [];
+    if (seats.length > 0) {
         return seats.filter(seat =>
             !seat.student_id ||
             String(seat.student_id) === String(studentId)
         );
+    }
+    try {
+        await reloadSeats();
+        return seats.filter(seat =>
+            !seat.student_id ||
+            String(seat.student_id) === String(studentId)
+        );
+    } catch (e) {
+    }
+}
+
+async function getUpdatedBatch() {
+    const lookups = window.libraryLookups || {};
+    var batches = lookups.batches || [];
+    if (batches.length > 0) {
+        return batches
+    }
+    try {
+        await reloadBatches();
+        return getBatches();
     } catch (e) {
     }
 }

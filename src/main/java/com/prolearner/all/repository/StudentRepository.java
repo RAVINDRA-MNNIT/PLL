@@ -32,6 +32,7 @@ SELECT new com.prolearner.all.dto.StudentListItem(
     s.studentId,
     s.fullName,
     s.mobileNumber,
+    s.allowedDiscount,
     b.id,
     b.batchName,
     seat.id,
@@ -112,6 +113,15 @@ AND (
         END
     ) = :enrollmentStatus
 )
+AND (
+    :pendingFees = false
+    OR COALESCE(fr.pendingAmount, 0) > 0
+)
+AND (
+    :discount = false
+    OR COALESCE(fr.discountAmount, 0) > 0
+    OR COALESCE(s.allowedDiscount, 0) > 0
+)
 ORDER BY s.studentId DESC
 """)
     Page<StudentListItem> findStudents(
@@ -119,6 +129,8 @@ ORDER BY s.studentId DESC
             @Param("search") String search,
             @Param("batchId") Long batchId,
             @Param("enrollmentStatus") String enrollmentStatus,
+            @Param("pendingFees") boolean pendingFees,
+            @Param("discount") boolean discount,
             @Param("discontinuedDate") LocalDate discontinuedDate,
             Pageable pageable
     );

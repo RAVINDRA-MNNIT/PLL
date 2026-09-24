@@ -1,0 +1,400 @@
+<!-- =========================================================
+     BATCH MANAGEMENT
+========================================================= -->
+
+
+<!-- =========================================================
+     PAGE HEADER
+========================================================= -->
+
+<div class="batch-page-header">
+
+    <div class="batch-page-title">
+
+        <i class="fa-solid fa-layer-group"></i>
+
+        <div>
+
+            <h1>
+                Batch Management
+            </h1>
+
+            <p>
+                View and manage all library batches.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Add Batch -->
+
+    <button
+            type="button"
+            class="primary-btn batch-add-btn"
+            onclick="BatchManager.openAddModal()">
+
+        <i class="fa-solid fa-plus"></i>
+
+        Add Batch
+
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     EXISTING BATCHES
+========================================================= -->
+
+<section class="card batch-management-card">
+
+    <div class="batch-card-title">
+        <h2>
+            <i class="fa-solid fa-layer-group"></i>
+            Existing Batches
+        </h2>
+        <div class="batch-status-filter">
+            <label for="batchStatusFilter">
+                Status
+            </label>
+            <select
+                    id="batchStatusFilter"
+                    onchange="BatchManager.filterByStatus(this.value)">
+                <option value="ALL">All</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+            </select>
+            <button
+                    type="button"
+                    class="primary-btn batch-print-btn"
+                    onclick="BatchManager.print()">
+                <i class="fa-solid fa-print"></i>
+                Print
+            </button>
+        </div>
+        <p class="batch-count-text">
+            Total Batches:
+            <strong id="batchCount">0</strong>
+        </p>
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
+
+    <div class="batch-table-wrapper">
+
+        <table class="batch-table">
+
+            <thead>
+
+            <tr>
+
+                <th>Id</th>
+
+                <th>Batch Name</th>
+
+                <th>Timing</th>
+
+                <th>Category</th>
+
+                <th>Room</th>
+
+                <th>Base Amount</th>
+
+                <th>Status</th>
+
+                <th>Action</th>
+
+            </tr>
+
+            </thead>
+
+
+            <tbody id="batchRows">
+
+            <tr>
+
+                <td
+                        colspan="8"
+                        class="batch-empty">
+
+                    Loading batches...
+
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ADD / EDIT BATCH MODAL
+========================================================= -->
+
+<div
+        id="batchModal"
+        class="batch-modal">
+
+    <div class="batch-modal-content">
+
+
+        <!-- =================================================
+             MODAL HEADER
+        ================================================== -->
+
+        <div class="batch-modal-header">
+
+            <h2 id="batchModalTitle">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Create Batch
+
+            </h2>
+
+
+            <button
+                    type="button"
+                    class="batch-close-btn"
+                    onclick="BatchManager.closeModal()"
+                    aria-label="Close">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <form
+                id="batchForm"
+                onsubmit="BatchManager.save(event)">
+
+
+            <input
+                    type="hidden"
+                    id="editBatchId">
+
+
+            <div class="batch-form">
+
+
+                <!-- =========================================
+                     Batch Name
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="editBatchName">
+
+                        Batch Name
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+                    <input
+                            type="text"
+                            id="editBatchName"
+                            maxlength="150"
+                            placeholder="Enter batch name"
+                            required>
+
+                </div>
+
+
+                <!-- =========================================
+                     Batch Alias
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="editBatchAlias">
+                        Batch Alias
+                        <span class="required">
+                            *
+                        </span>
+                    </label>
+
+                    <input
+                            type="text"
+                            id="editBatchAlias"
+                            maxlength="50"
+                            placeholder="Enter batch alias"
+                            required>
+
+                </div>
+
+
+                <!-- =========================================
+                     Category
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="editBatchCategory">
+
+                        Category
+
+                        <span class="required">
+                            *
+                        </span>
+
+                    </label>
+
+                    <select
+                            id="editBatchCategory"
+                            required>
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- =========================================
+                     Room
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="editBatchRoom">
+                        Room
+                    </label>
+
+                    <input
+                            type="text"
+                            id="editBatchRoom"
+                            maxlength="50"
+                            placeholder="Example: R1">
+
+                </div>
+
+
+                <!-- =========================================
+                     Base Amount
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label for="editBaseAmount">
+                        Base Amount
+                        <span class="required">
+                            *
+                        </span>
+                    </label>
+
+                    <input
+                            type="text"
+                            id="editBaseAmount"
+                            inputmode="decimal"
+                            maxlength="12"
+                            placeholder="Enter base amount"
+                            required>
+
+                </div>
+
+
+                <!-- =========================================
+                     Status
+                ========================================== -->
+
+                <div class="form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <div class="batch-radio-group">
+
+                        <label class="batch-radio">
+
+                            <input
+                                    type="radio"
+                                    name="batchStatus"
+                                    id="batchActive"
+                                    value="true"
+                                    checked>
+
+                            <span>
+                                Active
+                            </span>
+
+                        </label>
+
+
+                        <label class="batch-radio">
+
+                            <input
+                                    type="radio"
+                                    name="batchStatus"
+                                    id="batchInactive"
+                                    value="false">
+
+                            <span>
+                                Inactive
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 FOOTER
+            ================================================== -->
+
+            <div class="batch-modal-footer">
+
+                <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="BatchManager.closeModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                        type="submit"
+                        class="primary-btn"
+                        id="saveBatchBtn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    <span id="saveBatchText">
+                        Create Batch
+                    </span>
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>

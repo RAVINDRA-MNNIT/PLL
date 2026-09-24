@@ -41,14 +41,20 @@ public class StudentService {
             String search,
             Long batchId,
             String enrollmentStatus,
+            boolean pendingFees,
+            boolean discount,
             Pageable pageable) {
-        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+
+        LocalDate discontinuedDate =
+                LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
 
         Page<StudentListItem> page = studentRepo.findStudents(
                 searchBy,
                 search,
                 batchId,
                 enrollmentStatus,
+                pendingFees,
+                discount,
                 discontinuedDate,
                 pageable
         );
@@ -75,11 +81,14 @@ public class StudentService {
                     fee.getId(),
                     fee.getBatch() == null ? null : fee.getBatch().getId(),
                     fee.getBatch() == null ? null : fee.getBatch().getBatchName(),
+                    fee.getBatch() == null ? null : fee.getBatch().getBatchAlias(),
                     fee.getSeat() == null ? null : fee.getSeat().getId(),
                     fee.getSeat() == null ? null : fee.getSeat().getSeatNumber(),
                     fee.getFromDate(),
                     fee.getTillDate(),
                     fee.getSubmittedAmount(),
+                    fee.getCashAmount(),
+                    fee.getOnlineAmount(),
                     fee.getPendingAmount(),
                     fee.getDiscountAmount(),
                     fee.getPaymentMode(),
@@ -140,6 +149,7 @@ public class StudentService {
                 student.getPreparationFor(),
                 student.getDateOfAdmission(),
                 enrollmentStatus.name(),
+                student.getAllowedDiscount(),
                 lastFee
         );
     }
@@ -153,11 +163,14 @@ public class StudentService {
                         fee.getId(),
                         fee.getBatch() == null ? null : fee.getBatch().getId(),
                         fee.getBatch() == null ? null : fee.getBatch().getBatchName(),
+                        fee.getBatch() == null ? null : fee.getBatch().getBatchAlias(),
                         fee.getSeat() == null ? null : fee.getSeat().getId(),
                         fee.getSeat() == null ? null : fee.getSeat().getSeatNumber(),
                         fee.getFromDate(),
                         fee.getTillDate(),
                         fee.getSubmittedAmount(),
+                        fee.getCashAmount(),
+                        fee.getOnlineAmount(),
                         fee.getPendingAmount(),
                         fee.getDiscountAmount(),
                         fee.getPaymentMode(),

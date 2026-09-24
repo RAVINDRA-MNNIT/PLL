@@ -20,6 +20,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     // Find seat by seat number
     Optional<Seat> findBySeatNumber(String seatNumber);
+    List<Seat> findByIsActiveTrueOrderById();
 
     // Check whether a seat number already exists
     boolean existsBySeatNumber(String seatNumber);

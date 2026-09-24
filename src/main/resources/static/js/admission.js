@@ -65,6 +65,8 @@ function populateBatchSelect(values) {
 
         const opt = document.createElement("option");
         opt.value = item.id;
+        // Store base amount on option
+        opt.dataset.baseAmount = item.baseAmount ?? 0;
         opt.textContent = item.name;
         select.appendChild(opt);
     });
@@ -103,26 +105,119 @@ function populateAdmissionLookups() {
 // ✅ INIT
 //////////////////////////////////////////////////////
 
-function init() {
+    function init() {
+        configureSubmittedAmount();
+        togglePaymentMode();
+        toggleSeatSelection();
 
-    const batch = document.getElementById("studentBatch");
-    if (batch) batch.addEventListener("change", toggleSeatSelection);
-
-    const checkbox = document.getElementById("sameAsLocalAddress");
-    if (checkbox) checkbox.addEventListener("change", togglePermanentAddress);
-
-    togglePaymentMode();
-    toggleSeatSelection();
-
-    if (window.libraryLookups) {
-        populateAdmissionLookups();
-    } else {
-        window.addEventListener("library-lookups-ready", populateAdmissionLookups, { once: true });
+        if (window.libraryLookups) {
+            populateAdmissionLookups();
+        } else {
+            window.addEventListener("library-lookups-ready", populateAdmissionLookups, { once: true });
+        }
+        window.togglePaymentMode = togglePaymentMode;
+        window.submitStudentRegistration = submitStudentRegistration;
+        window.calculateSubmittedAmount = calculateSubmittedAmount;
     }
 
-    window.togglePaymentMode = togglePaymentMode;
-    window.submitStudentRegistration = submitStudentRegistration;
-}
+    function addAllListeners() {
+        const batch = document.getElementById("studentBatch");
+
+        if (batch) {
+            batch.addEventListener("change", () => {
+                toggleSeatSelection();
+                const fromDate = document.getElementById("fromDate")?.value;
+                const tillDate = document.getElementById("tillDate")?.value;
+                if (fromDate && tillDate) {
+                    calculateSubmittedAmount();
+                }
+            });
+        }
+
+
+        const discount = document.getElementById("discount");
+
+        if (discount) {
+            discount.addEventListener("input", calculateSubmittedAmount);
+        }
+
+
+        const pending = document.getElementById("pendingAmount");
+
+        if (pending) {
+            pending.addEventListener("input", calculateSubmittedAmount);
+        }
+
+
+        const fromDate =
+            document.getElementById("fromDate");
+
+        const tillDate =
+            document.getElementById("tillDate");
+
+
+        if (fromDate) {
+            fromDate.addEventListener("change", () => {
+
+                if (fromDate.value && tillDate?.value) {
+                    calculateSubmittedAmount();
+                }
+
+            });
+        }
+
+
+        if (tillDate) {
+            tillDate.addEventListener("change", () => {
+
+                if (fromDate?.value && tillDate.value) {
+                    calculateSubmittedAmount();
+                }
+
+            });
+        }
+
+
+        const onlineAmount =
+            document.getElementById("onlineAmount");
+
+        if (onlineAmount) {
+            onlineAmount.addEventListener(
+                "input",
+                calculateSplitPayment
+            );
+        }
+
+
+        const checkbox =
+            document.getElementById("sameAsLocalAddress");
+
+        if (checkbox) {
+            checkbox.addEventListener(
+                "change",
+                togglePermanentAddress
+            );
+        }
+    }
+
+    //////////////////////////////////////////////////////
+    // ✅ SUBMITTED AMOUNT ACCESS
+    //////////////////////////////////////////////////////
+
+    function configureSubmittedAmount() {
+        const submittedAmount =
+            document.getElementById("submittedAmount");
+
+        if (!submittedAmount) return;
+
+        if (Session.isAdmin()) {
+            // Admin can edit submitted amount
+            submittedAmount.readOnly = false;
+        } else {
+            // Manager cannot edit submitted amount
+            submittedAmount.readOnly = true;
+        }
+    }
 
 //////////////////////////////////////////////////////
 // ✅ LOAD FORM (COMMON)
@@ -241,6 +336,7 @@ function bindFormEvents() {
         e.preventDefault();
         submitStudentRegistration(e);
     };
+    addAllListeners()
 }
 
 //////////////////////////////////////////////////////
@@ -260,18 +356,28 @@ function populate(data = {}) {
     setValue("studentBatch", data.batchId);
     setValue("seatNumber", data.seatId);
     setValue("preparationFor", data.preparationFor);
-    setValue("fromDate", data.fromDate);
-    setValue("tillDate", data.tillDate);
+    if (editMode) {
+        setValue("fromDate", data.fromDate);
+        setValue("tillDate", data.tillDate);
+    } else {
+        // Auto populate dates
+        const fromDate = new Date();
+        const tillDate = addOneMonth(fromDate);
+        setValue("fromDate", formatInputDate(fromDate));
+        setValue("tillDate", formatInputDate(tillDate));
+    }
+
     setValue("discount", data.discount || 0);
-    setValue("submittedAmount", data.submittedAmount || 0);
     setValue("pendingAmount", data.pendingAmount || 0);
+    setValue("onlineAmount", data.onlineAmount);
     setValue("transactionId", data.transactionId || 0);
     setValue("paymentRemarks", data.remarks);
-
     const mode = data.paymentMode || "CASH";
     const radio = document.querySelector(`input[name="paymentMode"][value="${mode}"]`);
     if (radio) radio.checked = true;
 
+    // Calculate from current batch + discount + pending
+    calculateSubmittedAmount();
     togglePaymentMode();
     toggleSeatSelection();
 }
@@ -289,6 +395,42 @@ function validateAll() {
         validatePositiveNumber(document.getElementById("submittedAmount")?.value, "Submitted Amount");
         validateNumber(document.getElementById("discount")?.value, "Discount");
         validateNumber(document.getElementById("pendingAmount")?.value, "Pending Amount");
+        // ✅ PAYMENT VALIDATION
+
+        const paymentMode = document.querySelector('input[name="paymentMode"]:checked')?.value;
+        // ONLINE / BOTH
+        if (paymentMode === "ONLINE" || paymentMode === "BOTH") {
+            const transactionId = document.getElementById("transactionId")?.value?.trim();
+            if (!transactionId) {
+                throw new Error("Transaction ID / UTR Number is required for online payment.");
+            }
+        }
+        // BOTH PAYMENT
+        if (paymentMode === "BOTH") {
+            const submittedAmount = Number(document.getElementById("submittedAmount")?.value || 0);
+            const onlineAmount = Number(document.getElementById("onlineAmount")?.value || 0);
+            const cashAmount = Number(document.getElementById("cashAmount")?.value || 0);
+            // Online amount cannot be negative
+            if (onlineAmount <= 0) {
+                throw new Error("Online Amount cannot be zero or negative.");
+            }
+
+            // Cash amount cannot be negative
+            if (cashAmount <= 0) {
+                throw new Error("Cash Amount cannot be zero or negative.");
+            }
+            // Cash + Online must equal Submitted Amount
+            const totalPaid = cashAmount + onlineAmount;
+            if (totalPaid !== submittedAmount) {
+                throw new Error(
+                    `Cash Amount + Online Amount must equal Submitted Amount.\n\n` +
+                    `Submitted Amount: ₹${submittedAmount}\n` +
+                    `Cash Amount: ₹${cashAmount}\n` +
+                    `Online Amount: ₹${onlineAmount}`
+                );
+            }
+        }
+
         return true
     } catch (validationError) {
         alert(validationError.message);
@@ -333,6 +475,8 @@ async function submitStudentRegistration(event) {
         pendingAmount: Number(document.getElementById("pendingAmount")?.value || 0),
         submittedAmount: Number(document.getElementById("submittedAmount")?.value || 0),
         paymentMode: document.querySelector('input[name="paymentMode"]:checked')?.value || "CASH",
+        cashAmount: Number(document.getElementById("cashAmount")?.value || 0),
+        onlineAmount: Number(document.getElementById("onlineAmount")?.value || 0),
         remarks: document.getElementById("paymentRemarks")?.value || null,
         seatId: document.querySelector("#seatNumber")?.value || null,
         transactionId: document.querySelector("#transactionId")?.value || null
@@ -376,12 +520,10 @@ async function submitStudentRegistration(event) {
         );
         const successMessage = successLines.join("\n");
         alert(successMessage);
-
         // ✅ SAFE REFRESH
         if (window.PendingApprovals?.current != null) {
             await window.PendingApprovals.refresh();
         }
-
         // ==========================================
         // EDIT → CLOSE MODAL
         // ==========================================
@@ -426,47 +568,117 @@ async function submitStudentRegistration(event) {
 // ✅ EXTRA
 //////////////////////////////////////////////////////
 
-function togglePaymentMode() {
+    function togglePaymentMode() {
 
-    const mode = document.querySelector('input[name="paymentMode"]:checked')?.value;
+        const mode = document.querySelector('input[name="paymentMode"]:checked')?.value;
+        const section = document.getElementById("onlinePaymentSection");
+        const txnField = document.getElementById("transactionId");
+        const splitSection = document.getElementById("splitPaymentSection");
+        const cashAmount = document.getElementById("cashAmount");
+        const onlineAmount = document.getElementById("onlineAmount");
+        if (!section || !txnField) return;
 
-    const section = document.getElementById("onlinePaymentSection");
-    const txnField = document.getElementById("transactionId");
-
-    if (!section || !txnField) return;
-
-    if (mode === "ONLINE") {
-        section.style.display = "block";   // ✅ SHOW
-        txnField.required = true;          // ✅ REQUIRED
-    } else {
-        section.style.display = "none";    // ❌ HIDE
-        txnField.required = false;
-        txnField.value = "";               // 🔥 CLEAR OLD VALUE
+        if (mode === "ONLINE") {
+            section.style.display = "block";
+            txnField.required = true;
+            if (splitSection) {
+                splitSection.style.display = "none";
+            }
+        } else if (mode === "BOTH") {
+            section.style.display = "block";
+            txnField.required = true;
+            if (splitSection) {
+                splitSection.style.display = "block";
+            }
+            calculateSplitPayment();
+        } else {
+            // CASH
+            section.style.display = "none";
+            txnField.required = false;
+            txnField.value = "";
+            if (splitSection) {
+                splitSection.style.display = "none";
+            }
+            if (cashAmount) {
+                cashAmount.value = "0";
+            }
+            if (onlineAmount) {
+                onlineAmount.value = "0";
+            }
+        }
     }
-}
 
-function toggleSeatSelection() {
-    const batch = document.getElementById("studentBatch");
-    const seatGroup = document.getElementById("seatGroup");
+    function calculateSplitPayment() {
+        const paymentMode = document.querySelector('input[name="paymentMode"]:checked')?.value;
+        if (paymentMode !== "BOTH") return;
+        const submittedAmount =
+            Number(document.getElementById("submittedAmount")?.value || 0);
+        const onlineAmount =
+            Number(document.getElementById("onlineAmount")?.value || 0);
+        const cashAmount =
+            document.getElementById("cashAmount");
+        if (!cashAmount) return;
 
-    if (!batch || !seatGroup) return;
-
-    const name = batch.options[batch.selectedIndex]?.text?.toUpperCase() || "";
-
-    if (name.includes("FULL DAY") || name.includes("24 HOURS")) {
-        seatGroup.style.display = "flex";
-    } else {
-        seatGroup.style.display = "none";
-        const seat = document.getElementById("seatNumber");
-        if (seat) seat.value = "";
+        cashAmount.value = Math.max(0, submittedAmount - onlineAmount);
     }
-}
+
+    function toggleSeatSelection() {
+        const batch = document.getElementById("studentBatch");
+        const seatGroup = document.getElementById("seatGroup");
+
+        if (!batch || !seatGroup) return;
+
+        const name = batch.options[batch.selectedIndex]?.text?.toUpperCase() || "";
+
+        if (name.includes("FULL DAY") || name.includes("24 HOURS")) {
+            seatGroup.style.display = "flex";
+        } else {
+            seatGroup.style.display = "none";
+            const seat = document.getElementById("seatNumber");
+            if (seat) seat.value = "";
+        }
+    }
+
+//////////////////////////////////////////////////////
+// ✅ CALCULATE SUBMITTED AMOUNT
 //////////////////////////////////////////////////////
 
-return {
-    openNew,
-    openForEdit,
-    closeAdmissionModal
-};
+    function calculateSubmittedAmount() {
+
+        const batch = document.getElementById("studentBatch");
+        const fromDate = document.getElementById("fromDate")?.value;
+        const tillDate = document.getElementById("tillDate")?.value;
+        const discount = Number(document.getElementById("discount")?.value || 0);
+        const pending = Number(document.getElementById("pendingAmount")?.value || 0);
+        const submittedAmount = document.getElementById("submittedAmount");
+
+        if (!batch || !submittedAmount) {
+            return;
+        }
+        const selectedOption = batch.options[batch.selectedIndex];
+        const baseAmount = Number(selectedOption?.dataset?.baseAmount || 0);
+        if (!baseAmount || !fromDate || !tillDate) {
+            submittedAmount.value = 0;
+            calculateSplitPayment();
+            return;
+        }
+        const membershipDays = calculateMembershipDays(fromDate, tillDate);
+        if (membershipDays <= 0) {
+            submittedAmount.value = 0;
+            calculateSplitPayment();
+            return;
+        }
+        const totalFee = calculateTotalFee(baseAmount, membershipDays);
+        const finalAmount = Math.max(0, totalFee - discount - pending);
+        submittedAmount.value = Math.round(finalAmount);
+        calculateSplitPayment();
+    }
+//////////////////////////////////////////////////////
+
+    return {
+        openNew,
+        openForEdit,
+        closeAdmissionModal
+    };
 
 })();

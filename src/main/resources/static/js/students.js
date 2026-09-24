@@ -20,6 +20,8 @@ async function loadStudents(page = 1) {
                 filters.keyword,
                 filters.batch,
                 filters.status,
+                filters.pendingFees,
+                filters.discount,
                 page,
                 pageSize
             )
@@ -190,7 +192,7 @@ function createStudentRow(student) {
             <strong>${escapeHtml(student.studentId)}</strong>
         </td>
 
-        <td>${escapeHtml(student.fullName)}</td>
+        <td>${escapeHtml(student.fullName.toUpperCase())}</td>
 
         <td>${escapeHtml(student.mobileNumber)}</td>
 

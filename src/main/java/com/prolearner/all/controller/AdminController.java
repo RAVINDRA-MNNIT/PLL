@@ -4,6 +4,8 @@ import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.service.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.prolearner.all.entity.Students;
@@ -21,12 +23,18 @@ public class AdminController {
     private final AdminService adminService;
     private final TransactionService transactionService;
     private final ConfigurationService configurationService;
+    private final BatchService batchService;
 
 
-    public AdminController(AdminService as, TransactionService transactionService, ConfigurationService configurationService, PendingService pendingService) {
+    public AdminController(AdminService as,
+                           TransactionService transactionService,
+                           ConfigurationService configurationService,
+                           PendingService pendingService,
+                           BatchService batchService) {
         this.adminService = as;
         this.transactionService = transactionService;
         this.configurationService = configurationService;
+        this.batchService = batchService;
     }
 
     // ====================================================
@@ -35,7 +43,7 @@ public class AdminController {
 
     @PostMapping("/admission")
     public Students admission(
-        @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body
     ) {
         Long userId = 2L; // TODO: replace with logged-in user
         return adminService.admission(body, userId);
@@ -47,7 +55,7 @@ public class AdminController {
 
     @PostMapping("/updatefee")
     public void updateFee(
-        @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body
     ) {
         Long userId = 2L; // TODO: replace with logged-in user
         adminService.updateFee(body, userId);
@@ -57,14 +65,14 @@ public class AdminController {
     // 🔹 Update Detail Request
     // ====================================================
 
-     @PostMapping("/updatestudent/{type}")
-     public void updateStudent(
-             @PathVariable String type,
-             @RequestBody PendingRequestDTO body
-     ) {
-         //Long userId = 2L; // TODO: from auth
-         adminService.updateStudent(type, body);
-     }
+    @PostMapping("/updatestudent/{type}")
+    public void updateStudent(
+            @PathVariable String type,
+            @RequestBody PendingRequestDTO body
+    ) {
+        //Long userId = 2L; // TODO: from auth
+        adminService.updateStudent(type, body);
+    }
 
     // ====================================================
     // 🔹 Approve Request
@@ -87,7 +95,7 @@ public class AdminController {
             @RequestBody CancelRequestDTO request
     ) {
         Long adminId = 2L;
-        adminService.reject(request.getId(),  request.getReason(), adminId);
+        adminService.reject(request.getId(), request.getReason(), adminId);
     }
 
     // ====================================================
@@ -241,5 +249,43 @@ public class AdminController {
             LocalDate beforeDate
     ) {
         adminService.clearTransactionsBefore(beforeDate);
+    }
+
+    // ====================================================
+    // 🔹 CREATE BATCH
+    // ====================================================
+
+    @PostMapping("/batch/create")
+    public ResponseEntity<BatchResponse> create(
+            @RequestBody BatchRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(batchService.create(request));
+    }
+
+    // ====================================================
+    // 🔹 UPDATE BATCH
+    // ====================================================
+
+    @PutMapping("/batch/update/{id}")
+    public BatchResponse update(
+            @PathVariable Long id,
+            @RequestBody BatchRequest request
+    ) {
+        return batchService.update(id, request);
+    }
+
+    // ====================================================
+    // 🔹 DELETE BATCH
+    // ====================================================
+
+    @DeleteMapping("/batch/delete/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @RequestParam Long replaceWithBatchId
+    ) {
+        batchService.delete(id, replaceWithBatchId);
+        return ResponseEntity.noContent().build();
     }
 }

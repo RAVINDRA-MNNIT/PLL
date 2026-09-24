@@ -11,6 +11,7 @@ public record StudentFeeHistoryResponse(
 
     Long batchId,
     String batchName,
+    String batchAlias,
 
     Long seatId,
     String seatNumber,
@@ -19,6 +20,8 @@ public record StudentFeeHistoryResponse(
     LocalDate tillDate,
 
     BigDecimal submittedAmount,
+    BigDecimal cashAmount,
+    BigDecimal onlineAmount,
     BigDecimal pendingAmount,
     BigDecimal discountAmount,
 

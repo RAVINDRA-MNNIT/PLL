@@ -4,6 +4,10 @@ window.FeeForm = {
     currentFrom: null,
     currentTill: null,
     currentPending: null,
+    prevPending: null,
+    allowedDiscount: null,
+    currentBatchId: null,
+
 
     setStudent(id) {
         this.studentId = id;
@@ -54,7 +58,11 @@ window.FeeForm = {
             `;
         });
 
-        document.getElementById("batchId").onchange = toggleSeatField;
+        document.getElementById("batchId").onchange = () => {
+            toggleSeatField();
+            this.calculateFeeSubmittedAmount();
+        };
+
         seats.forEach(seat => {
 
             seatSelect.innerHTML += `
@@ -98,15 +106,37 @@ window.FeeForm = {
     },
 
   populate(data) {
+      this.currentPending = Number(data.pendingAmount ?? 0)
+      this.prevPending = Number(data.lastFeePendingAmount ?? 0)
+      document.getElementById("pendingAmount")?.addEventListener("input", this.calculateFeeSubmittedAmount);
+      document.getElementById("discount")?.addEventListener("input", this.calculateFeeSubmittedAmount);
+      document.getElementById("onlineAmount")?.addEventListener("input", FeeForm.calculateSplitPayment);
+      const fromDate = document.getElementById("fromDate");
+      const tillDate = document.getElementById("tillDate");
+      if (fromDate) {
+          fromDate.addEventListener("change", () => {
+              if (fromDate.value && tillDate?.value) {
+                  this.calculateFeeSubmittedAmount();
+              }
+          });
+      }
 
-    // -------------------------
+      if (tillDate) {
+          tillDate.addEventListener("change", () => {
+              if (fromDate?.value && tillDate.value) {
+                  this.calculateFeeSubmittedAmount();
+              }
+          });
+      }
+
+      // -------------------------
     // Batch & Seat
     // -------------------------
 
     const batchId = document.getElementById("batchId");
     const seatId = document.getElementById("seatId");
-
-    batchId.value = String(data.batchId);
+      FeeForm.currentBatchId = data.batchId ?? 0;
+      batchId.value = String(data.batchId);
 
     // Show/Hide seat section depending on batch
     toggleSeatField();
@@ -119,24 +149,15 @@ window.FeeForm = {
     // -------------------------
     // Fee Details
     // -------------------------
-
-    document.getElementById("submittedAmount").value =
-        data.submittedAmount ?? "";
-
-    document.getElementById("pendingAmount").value =
-        data.pendingAmount ?? "";
-    this.currentPending = Number(data.pendingAmount ?? 0)
-
-    document.getElementById("discount").value =
-        data.discount ?? data.discountAmount ?? "";
-
-    document.getElementById("paymentMode").value =
-        data.paymentMode ?? "";
-
-    document.getElementById("transactionId").value = FeeForm.isEdit() ? (data.transactionId ?? "") : "";
-
+      if (this.isEdit()) {
+          document.getElementById("pendingAmountGroup").style.display = "none";
+      }
+    document.getElementById("pendingAmount").value = data.pendingAmount ?? "";
+    FeeForm.allowedDiscount = data.allowedDiscount ?? 0;
+    document.getElementById("paymentMode").value = this.isEdit() ? (data.paymentMode ?? "CASH") : "CASH";
+      document.getElementById("onlineAmount").value = data.onlineAmount ?? "0";
+      document.getElementById("transactionId").value = FeeForm.isEdit() ? (data.transactionId ?? "") : "";
     document.getElementById("paymentRemarks").value = FeeForm.isEdit() ? (data.remarks ?? "") : "";
-
     // -------------------------
     // Membership
     // -------------------------
@@ -187,8 +208,8 @@ window.FeeForm = {
         .forEach(radio => {
             radio.onchange = updateMembershipOption;
         });
-
     updateMembershipOption();
+      this.calculateFeeSubmittedAmount();
 
     // -------------------------
     // Status
@@ -235,6 +256,7 @@ window.FeeForm = {
         if (!validateFeeForm()) {
             return;
         }
+        const paymentMode = document.getElementById("paymentMode").value;
         const body = {
             id: this.editRequestId,
             studentId: this.studentId ?? studentIdTemp,
@@ -245,7 +267,9 @@ window.FeeForm = {
             submittedAmount: Number(document.getElementById("submittedAmount").value),
             discount: Number(document.getElementById("discount").value),
             pendingAmount: Number(document.getElementById("pendingAmount").value),
-            paymentMode: document.getElementById("paymentMode").value,
+            paymentMode: paymentMode,
+            cashAmount: (paymentMode === "BOTH") ? Number(document.getElementById("cashAmount").value || 0) : 0,
+            onlineAmount: (paymentMode === "BOTH") ? Number(document.getElementById("onlineAmount").value || 0) : 0,
             transactionId: document.getElementById("transactionId")?.value.trim() || null,
             remarks: document.getElementById("paymentRemarks")?.value.trim() || null,
             requestedBy: Session.getUserId()
@@ -299,24 +323,96 @@ window.FeeForm = {
         this.currentFrom = null;
         this.currentTill = null;
         this.currentPending = null;
+    },
+
+    //////////////////////////////////////////////////////
+    // ✅ CALCULATE SUBMITTED AMOUNT
+    //////////////////////////////////////////////////////
+
+    calculateFeeSubmittedAmount() {
+        const batchId = Number(document.getElementById("batchId").value);
+        const batch = window.libraryLookups.batches.find(b => Number(b.id) === batchId);
+        const fromDate = document.getElementById("fromDate")?.value;
+        const tillDate = document.getElementById("tillDate")?.value;
+        const pending = Number(document.getElementById("pendingAmount")?.value || 0);
+        const submittedAmount = document.getElementById("submittedAmount");
+
+        if (FeeForm.currentBatchId !== batchId) {
+            document.getElementById("discount").value = 0;
+        } else {
+            document.getElementById("discount").value = FeeForm.allowedDiscount;
+        }
+        const discount = Number(document.getElementById("discount")?.value || 0);
+        if (!batch || !submittedAmount) {
+            document.getElementById("submittedAmount").value = "";
+            return;
+        }
+        const baseAmount = Number(batch.baseAmount ?? batch.base_amount ?? 0);
+        if (!baseAmount || !fromDate || !tillDate) {
+            submittedAmount.value = 0;
+            FeeForm.calculateSplitPayment();
+            return;
+        }
+        const membershipDays = calculateMembershipDays(fromDate, tillDate);
+        if (membershipDays <= 0) {
+            submittedAmount.value = 0;
+            FeeForm.calculateSplitPayment();
+            return;
+        }
+        const prevPending = FeeForm.isEdit() ?  FeeForm.prevPending : 0
+        const totalFee = (calculateTotalFee(baseAmount, membershipDays) + (FeeForm.currentPending ?? 0) + prevPending);
+        console.log(FeeForm.currentPending)
+        console.log(totalFee)
+        const finalAmount = Math.max(0, (totalFee - (discount + pending)));
+        submittedAmount.value = Math.round(finalAmount);
+        FeeForm.calculateSplitPayment();
+    },
+
+    calculateSplitPayment() {
+        const paymentMode = document.getElementById("paymentMode").value;
+        if (paymentMode !== "BOTH") return;
+        const submittedAmount =
+            Number(document.getElementById("submittedAmount")?.value || 0);
+        const onlineAmount =
+            Number(document.getElementById("onlineAmount")?.value || 0);
+        const cashAmount =
+            document.getElementById("cashAmount");
+        if (!cashAmount) return;
+
+        cashAmount.value = Math.max(0, submittedAmount - onlineAmount);
     }
 };
 
 function toggleTransactionId() {
-    const paymentMode =
-        document.getElementById("paymentMode").value;
-    const container =
-        document.getElementById("transactionIdContainer");
-    const transactionId =
-        document.getElementById("transactionId");
+    const paymentMode = document.getElementById("paymentMode").value;
+    const cashContainer = document.getElementById("cashAmountContainer");
+    const onlineContainer = document.getElementById("onlineAmountContainer");
+    const transactionContainer = document.getElementById("transactionIdContainer");
+    const cashAmount = document.getElementById("cashAmount");
+    const onlineAmount = document.getElementById("onlineAmount");
+    const transactionId = document.getElementById("transactionId");
+
+    // Reset
+    cashContainer.style.display = "none";
+    onlineContainer.style.display = "none";
+    transactionContainer.style.display = "none";
+
+    cashAmount.required = false;
+    onlineAmount.required = false;
+    transactionId.required = false;
+
     if (paymentMode === "ONLINE") {
-        container.style.display = "flex";
-        container.style.flexDirection = "column";
+        transactionContainer.style.display = "flex";
         transactionId.required = true;
-    } else {
-        container.style.display = "none";
-        transactionId.required = false;
-        transactionId.value = "";
+    } else if (paymentMode === "BOTH") {
+        cashContainer.style.display = "flex";
+        onlineContainer.style.display = "flex";
+        transactionContainer.style.display = "flex";
+
+        cashAmount.required = true;
+        onlineAmount.required = true;
+        transactionId.required = true;
+        FeeForm.calculateSplitPayment();
     }
 }
 
@@ -337,34 +433,27 @@ function updateMembershipOption() {
         return;
     }
 
-    const newFrom = new Date(currentTill);
-    const newTill = new Date(currentTill);
+    const newFrom = parseLocalDate(FeeForm.currentTill);
+    const newTill = addOneMonth(newFrom);
 
     if (type === "CUSTOM") {
         customSection.style.display = "grid";
         previewRow.style.display = "none";
-        if (FeeForm.editRequestId != null) {
-            return;
-        }
-        document.getElementById("fromDate").value = newFrom.toISOString().split("T")[0];
-        document.getElementById("tillDate").value = "";
-
-    } else {
+        if (FeeForm.editRequestId != null) { return; }
+    }  else {
         customSection.style.display = "none";
         previewRow.style.display = "flex";
-        const day = newTill.getDate();
-        newTill.setDate(1);
-        newTill.setMonth(newTill.getMonth() + 1);
-        const lastDay = new Date(
-            newTill.getFullYear(),
-            newTill.getMonth() + 1,
-            0
-        ).getDate();
-        newTill.setDate(Math.min(day, lastDay));
-        document.getElementById("fromDate").value = newFrom.toISOString().split("T")[0];
-        document.getElementById("tillDate").value = newTill.toISOString().split("T")[0];
         preview.textContent = `${formatDate(newFrom)} to ${formatDate(newTill)}`;
     }
+    document.getElementById("fromDate").value = formatInputDate(newFrom);
+    document.getElementById("tillDate").value = formatInputDate(newTill);
+}
+
+function setMembershipFromToday() {
+    const today = new Date();
+    const tillDate = addOneMonth(today);
+    document.getElementById("fromDate").value = formatInputDate(today);
+    document.getElementById("tillDate").value = formatInputDate(tillDate);
 }
 
 function toggleSeatField() {
@@ -408,14 +497,11 @@ function validateFeeForm() {
     const submittedAmountInput = document.getElementById("submittedAmount");
     const discountInput = document.getElementById("discount");
     const pendingAmountInput = document.getElementById("pendingAmount");
-
+    const cashAmount = Number(document.getElementById("cashAmount").value || 0);
+    const onlineAmount = Number(document.getElementById("onlineAmount").value || 0);
     const paymentMode = document.getElementById("paymentMode").value;
     const transactionId = document.getElementById("transactionId").value.trim();
-    const durationType =
-        document.querySelector(
-            "input[name='durationType']:checked"
-        ).value;
-
+    const durationType = document.querySelector("input[name='durationType']:checked").value;
 
     const payAmount = Number(submittedAmountInput.value);
     const discount = Number(discountInput.value);
@@ -471,16 +557,20 @@ function validateFeeForm() {
     }
 
     // Pay Amount
-    if (submittedAmountInput.value.trim() === "" || payAmount <= 0) {
+    if (payAmount <= 0) {
         errors.push("Please enter a valid Submitted Amount.");
     }
 
-    if (discountInput.value.trim() === "" || discount < 0) {
+    if (discount < 0) {
         errors.push("Please enter a valid Discount Amount.");
     }
 
-    if (pendingAmountInput.value.trim() === "" || pendingAmount < 0) {
+    if (pendingAmount < 0) {
         errors.push("Please enter a valid Pending Amount.");
+    }
+
+    if ((FeeForm.currentPending > 0) && (Number(pendingAmount ?? 0) > 0)) {
+        errors.push("You cannot submit next fees until not clearing the previous pending fees.");
     }
 
 
@@ -497,6 +587,23 @@ function validateFeeForm() {
         errors.push(
             "Please enter Transaction ID for Online payment."
         );
+    }
+    if (paymentMode === "BOTH") {
+        if (cashAmount <= 0) {
+            errors.push("Cash Amount cannot be empty, negative or 0 in case of both payment option.");
+        }
+
+        if (onlineAmount <= 0) {
+            errors.push("Online Amount cannot be empty, negative or 0 in case of both payment option.");
+        }
+
+        if (cashAmount + onlineAmount !== payAmount) {
+            errors.push(`Cash Amount + Online Amount must equal ₹${payAmount}.`);
+        }
+
+        if (!transactionId) {
+            errors.push("Please enter Transaction ID for Online payment.");
+        }
     }
 
     if (errors.length > 0) {
@@ -532,39 +639,6 @@ function clearFormMessage() {
 
     box.style.display = "none";
     box.innerHTML = "";
-}
-
-function confirmFeeUpdate(body) {
-
-    const batchName =
-        document.getElementById("batchId").selectedOptions[0]?.text ?? "-";
-
-    const seatName =
-        document.getElementById("seatContainer").style.display !== "none"
-            ? document.getElementById("seatId").selectedOptions[0]?.text ?? "-"
-            : "Not Applicable";
-
-    const message = `
-Please review the changes before updating.
-Student ID : ${document.getElementById("membershipId").textContent}
-Student Name  : ${document.getElementById("studentName").textContent}
-Batch          : ${batchName}
-Seat           : ${seatName}
-Membership From: ${formatDate(body.fromDate)}
-Membership Till: ${formatDate(body.tillDate)}
-Pay Amount     : ₹${body.submittedAmount}
-Discount       : ₹${body.discount}
-Pending Amount : ₹${body.pendingAmount}
-Payment Mode   : ${body.paymentMode}
-${body.paymentMode === "ONLINE"
-    ? `Transaction ID: ${body.transactionId}`
-    : ""}
-Remark         : ${body.remarks || "-"}
-
-Do you want to continue?
-                `;
-
-    return confirm(message);
 }
 
 function closeFeeModal() {
@@ -624,3 +698,4 @@ async function updateFees(studentId) {
 
     }
 }
+

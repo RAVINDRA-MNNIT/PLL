@@ -14,109 +14,74 @@
 </head>
 <body>
 <div class="card">
-
     <div class="pending-header">
-
         <div class="pending-header-left">
-
             <h2>Pending Approvals</h2>
-
             <p class="pending-subtitle">
                 Review admission and fee update requests.
             </p>
-
         </div>
-
         <div class="finance-summary">
-
             <!-- Collection -->
             <div class="finance-section">
                 <h3>💰 Collection</h3>
-
                 <div class="finance-row">
                     <span>💵 Cash</span>
                     <strong id="cashCollection" class="cash">₹0</strong>
                 </div>
-
                 <div class="finance-row">
                     <span>💳 Online</span>
                     <strong id="onlineCollection" class="online">₹0</strong>
                 </div>
             </div>
-
             <div class="finance-divider"></div>
-
             <!-- Expenses -->
             <div class="finance-section">
                 <h3>💸 Expenses</h3>
-
                 <div class="finance-row">
                     <span>💵 Cash</span>
                     <strong id="cashExpense" class="expense">₹0</strong>
                 </div>
-
                 <div class="finance-row">
                     <span>💳 Online</span>
                     <strong id="onlineExpense" class="expense">₹0</strong>
                 </div>
             </div>
-
             <div class="finance-divider"></div>
-
             <!-- Profit -->
             <div class="finance-section">
                 <h3>💼 In Hand</h3>
-
                 <div class="finance-row">
                     <span>💵 Cash</span>
                     <strong id="cashProfit" class="profit">₹0</strong>
                 </div>
-
                 <div class="finance-row">
                     <span>💳 Online</span>
                     <strong id="onlineProfit" class="profit">₹0</strong>
                 </div>
             </div>
-
         </div>
-
     </div>
 
     <div class="tabs-container">
-
         <div class="tabs">
             <button id="admissionTab" class="tab active">Admission</button>
             <button id="feesTab" class="tab">Fees</button>
             <button id="seatTab" class="tab">Seat</button>
             <button id="detailsTab" class="tab">Details</button>
             <button id="enrollmentTab" class="tab">Enrollment</button>
+            <button id="pending_feesTab" class="tab">Pending Fees</button>
+            <button id="batchTab" class="tab">Batch</button>
             <button id="allTab" class="tab">All Request Status</button>
         </div>
-
-        <!-- <button id="clearAllBtn" class="clear-btn">
-            🗑 Clear All
-        </button> -->
-
     </div>
-
     <div class="search">
-
-        <input
-            id="searchBox"
-            type="text"
-            placeholder="Search pending requests..."
-            aria-label="Search pending requests">
-
+        <input id="searchBox" type="text" placeholder="Search pending requests..." aria-label="Search pending requests">
     </div>
-
     <table id="pendingTable">
-
         <thead id="pendingTableHead"></thead>
-
         <tbody id="pendingRows"></tbody>
-
     </table>
-
 </div>
 <div
     id="admissionModal"

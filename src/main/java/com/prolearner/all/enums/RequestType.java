@@ -8,6 +8,9 @@ public enum RequestType {
     FEES,
     SEAT,
     DETAILS,
+    BATCH,
+    PENDING_FEES,
+    DISCOUNT,
     ENROLLMENT;
 
     public static RequestType from(String value) {

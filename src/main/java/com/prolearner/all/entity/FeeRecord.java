@@ -34,6 +34,12 @@ public class FeeRecord {
     @Column(name = "submitted_amount", precision = 12, scale = 2)
     private BigDecimal submittedAmount;
 
+    @Column(name = "cash_amount", precision = 12, scale = 2)
+    private BigDecimal cashAmount;
+
+    @Column(name = "online_amount", precision = 12, scale = 2)
+    private BigDecimal onlineAmount;
+
     @Column(name = "pending_amount", precision = 12, scale = 2)
     private BigDecimal pendingAmount;
 

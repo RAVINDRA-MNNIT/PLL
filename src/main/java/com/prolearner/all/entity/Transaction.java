@@ -40,6 +40,12 @@ public class Transaction {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "cash_amount", precision = 12, scale = 2)
+    private BigDecimal cashAmount;
+
+    @Column(name = "online_amount", precision = 12, scale = 2)
+    private BigDecimal onlineAmount;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private PaymentMode paymentMode;

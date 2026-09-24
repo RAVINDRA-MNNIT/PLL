@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.prolearner.all.entity.FeeRecord;
@@ -36,4 +37,15 @@ public interface FeeRecordRepository extends JpaRepository<FeeRecord, Long> {
     )
     """, nativeQuery = true)
     void clearFeeRecords();
+
+    @Modifying
+    @Query("""
+        UPDATE FeeRecord f
+        SET f.batchId = :newBatchId
+        WHERE f.batchId = :oldBatchId
+    """)
+    int replaceBatchId(
+            @Param("oldBatchId") Long oldBatchId,
+            @Param("newBatchId") Long newBatchId
+    );
 }

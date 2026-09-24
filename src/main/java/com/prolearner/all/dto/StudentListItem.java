@@ -2,12 +2,13 @@ package com.prolearner.all.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
+
 public record StudentListItem(
 
         Long studentId,
         String fullName,
         String mobileNumber,
+        BigDecimal allowedDiscount,
         Long batchId,
         String batchName,
         Long seatId,

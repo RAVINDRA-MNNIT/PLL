@@ -1,0 +1,98 @@
+<div id="studentIdSection" class="student-id-section">
+
+    <div class="student-id-card">
+
+        <button
+                type="button"
+                class="id-card-close-btn"
+                onclick="StudentIdCard.close()"
+                aria-label="Close ID card">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="id-card-header">
+            <div class="id-library-name" id="idCardLibraryName">
+                Library Name
+            </div>
+
+            <div class="id-card-title">
+                STUDENT ID
+            </div>
+        </div>
+
+        <div class="id-card-body">
+
+            <div class="id-student-name" id="idCardStudentName">
+                -
+            </div>
+
+            <div class="id-student-id">
+                Student ID:
+                <strong id="idCardStudentId">-</strong>
+            </div>
+
+            <div class="id-details">
+
+                <div class="id-detail-row">
+                    <span>Batch</span>
+                    <strong id="idCardBatch">-</strong>
+                </div>
+
+                <div class="id-detail-row">
+                    <span>Seat</span>
+                    <strong id="idCardSeat">-</strong>
+                </div>
+
+                <div class="id-detail-row">
+                    <span>Valid Till</span>
+                    <strong id="idCardTillDate">-</strong>
+                </div>
+
+                <div class="id-detail-row">
+                    <span>Mobile</span>
+                    <strong id="idCardMobile">-</strong>
+                </div>
+
+                <div class="id-detail-row">
+                    <span>Status</span>
+                    <strong id="idCardStatus" class="id-card-status">
+                        -
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="studentIssues" class="student-id-issues">
+
+            <div class="issues-header">
+                <span class="issues-label">
+                    Issues
+                </span>
+
+                <span id="issuesSummary" class="issues-summary good">
+                    <i class="fa-solid fa-circle-check"></i>
+                    All Good
+                </span>
+            </div>
+
+            <div id="studentIssuesList" class="issues-list"></div>
+
+        </div>
+
+        <div id="idCardTimer" class="id-card-timer">
+            <i class="fa-regular fa-clock"></i>
+            <span>Expires in</span>
+            <strong id="idCardTimerValue">10:00</strong>
+        </div>
+
+        <div class="id-card-footer">
+            <span id="idCardLibraryNameFooter">
+                Library Name
+            </span>
+        </div>
+
+    </div>
+
+</div>

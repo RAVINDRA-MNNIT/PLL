@@ -133,6 +133,12 @@ public class ApprovalRequest {
     @Column(name = "submitted_amount", precision = 12, scale = 2)
     private BigDecimal submittedAmount;
 
+    @Column(name = "cash_amount", precision = 12, scale = 2)
+    private BigDecimal cashAmount;
+
+    @Column(name = "online_amount", precision = 12, scale = 2)
+    private BigDecimal onlineAmount;
+
     @Column(name = "discount", precision = 12, scale = 2)
     private BigDecimal discount;
 
@@ -150,7 +156,7 @@ public class ApprovalRequest {
     // REMARKS
     // =========================================================
 
-    @Column(name = "remarks")
+    @Column(columnDefinition = "TEXT")
     private String remarks;
 
 
@@ -260,13 +266,13 @@ public class ApprovalRequest {
         return tillDate;
     }
 
-    public BigDecimal getSubmittedAmount() {
-        return submittedAmount;
-    }
+    public BigDecimal getSubmittedAmount() { return submittedAmount; }
 
-    public BigDecimal getDiscount() {
-        return discount;
-    }
+    public BigDecimal getCashAmount() { return cashAmount; }
+
+    public BigDecimal getOnlineAmount() { return onlineAmount; }
+
+    public BigDecimal getDiscount() { return discount; }
 
     public BigDecimal getPendingAmount() {
         return pendingAmount;
@@ -384,13 +390,13 @@ public class ApprovalRequest {
         this.tillDate = tillDate;
     }
 
-    public void setSubmittedAmount(BigDecimal submittedAmount) {
-        this.submittedAmount = submittedAmount;
-    }
+    public void setSubmittedAmount(BigDecimal submittedAmount) { this.submittedAmount = submittedAmount; }
 
-    public void setDiscount(BigDecimal discount) {
-        this.discount = discount;
-    }
+    public void setCashAmount(BigDecimal cashAmount) { this.cashAmount = cashAmount; }
+
+    public void setOnlineAmount(BigDecimal onlineAmount) { this.onlineAmount = onlineAmount; }
+
+    public void setDiscount(BigDecimal discount) { this.discount = discount; }
 
     public void setPendingAmount(BigDecimal pendingAmount) {
         this.pendingAmount = pendingAmount;

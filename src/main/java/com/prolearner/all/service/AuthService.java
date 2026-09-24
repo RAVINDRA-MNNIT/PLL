@@ -66,7 +66,7 @@ public class AuthService {
     public LoginResponse studentLogin(Long studentId, String password) {
 
         Students student = studentRepository
-                .findById(studentId)
+                .findByStudentId(studentId)
                 .orElse(null);
         if (!configurationService.getStudentLoginEnable()) {
             throw new IllegalArgumentException("Admin has disabled the student login, Please contact admin.");
@@ -93,7 +93,7 @@ public class AuthService {
         String firstTwoLetters = fullName
                 .replaceAll("\\s+", "")
                 .substring(0, 2)
-                .toUpperCase();
+                .toLowerCase();
 
         String lastThreeDigits = mobileNo.substring(mobileNo.length() - 3);
 
@@ -102,7 +102,7 @@ public class AuthService {
         String expectedPassword = firstTwoLetters + lastThreeDigits; //+ year;
 
         // Validate password
-        if (!expectedPassword.equals(password)) {
+        if (!expectedPassword.equals(password.toLowerCase())) {
             throw new IllegalArgumentException("Invalid Password");
         }
 

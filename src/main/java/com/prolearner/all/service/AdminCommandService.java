@@ -83,6 +83,8 @@ public class AdminCommandService {
                 .tillDate(body.getTillDate())
                 .discountAmount(body.getDiscount())
                 .submittedAmount(body.getSubmittedAmount())
+                .cashAmount(body.getCashAmount())
+                .onlineAmount(body.getOnlineAmount())
                 .pendingAmount(body.getPendingAmount())
                 .paymentMode(body.getPaymentMode())
                 .transactionId(body.getTransactionId())
@@ -102,7 +104,15 @@ public class AdminCommandService {
         studentRepo.save(student);
 
         // Update Transaction
-        updateTransaction(studentId, body.getSubmittedAmount(), body.getPaymentMode(), SourceType.FEE, null, adminId);
+        updateTransaction(studentId,
+                body.getSubmittedAmount(),
+                body.getCashAmount(),
+                body.getOnlineAmount(),
+                body.getPaymentMode(),
+                SourceType.FEE,
+                "",
+                null,
+                adminId);
 
     }
 
@@ -137,7 +147,6 @@ public class AdminCommandService {
         r.setReviewedAt(OffsetDateTime.now());
 
         if (RequestType.ADMISSION.equals(r.getRequestType())) {
-
             Students student = Students.builder()
                     .studentId(r.getStudentId())
                     .fullName(r.getFullName())
@@ -169,6 +178,8 @@ public class AdminCommandService {
                     .tillDate(r.getTillDate())
                     .discountAmount(r.getDiscount())
                     .submittedAmount(r.getSubmittedAmount())
+                    .cashAmount(r.getCashAmount())
+                    .onlineAmount(r.getOnlineAmount())
                     .pendingAmount(r.getPendingAmount())
                     .paymentMode(r.getPaymentMode())
                     .transactionId(r.getTransactionId())
@@ -187,13 +198,15 @@ public class AdminCommandService {
                     seatService.updateSeat(null, r.getSeatId(), student.getStudentId());
 
                     // 5. Update transaction
-                    updateTransaction(
-                        student.getStudentId(),
-                        r.getSubmittedAmount(),
-                        r.getPaymentMode(),
-                        SourceType.ADMISSION,
-                        1L,
-                        adminId
+                    updateTransaction(student.getStudentId(),
+                            r.getSubmittedAmount(),
+                            r.getCashAmount(),
+                            r.getOnlineAmount(),
+                            r.getPaymentMode(),
+                            SourceType.ADMISSION,
+                            "",
+                            1L,
+                            adminId
                     );
 
         } else {
@@ -214,6 +227,8 @@ public class AdminCommandService {
                         .tillDate(r.getTillDate())
                         .discountAmount(r.getDiscount())
                         .submittedAmount(r.getSubmittedAmount())
+                        .cashAmount(r.getCashAmount())
+                        .onlineAmount(r.getOnlineAmount())
                         .pendingAmount(r.getPendingAmount())
                         .paymentMode(r.getPaymentMode())
                         .transactionId(r.getTransactionId())
@@ -229,7 +244,15 @@ public class AdminCommandService {
                 }
                 student.setEnrollmentStatus(EnrollmentStatus.ACTIVE.name());
                 // Update Transaction
-                updateTransaction(studentId, r.getSubmittedAmount(), r.getPaymentMode(), SourceType.FEE, 1L, adminId);
+                updateTransaction(studentId,
+                        r.getSubmittedAmount(),
+                        r.getCashAmount(),
+                        r.getOnlineAmount(),
+                        r.getPaymentMode(),
+                        SourceType.FEE,
+                        "",
+                        1L,
+                        adminId);
                 // Update Fee
                 feeRecordRepository.save(fee);
                 student.setLastFee(fee);
@@ -256,6 +279,71 @@ public class AdminCommandService {
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
                 updateEnrollment(student, r.getEnrollmentStatus());
+            }  else if (RequestType.BATCH.equals(r.getRequestType())) {
+                FeeRecord lastFee = student.getLastFee();
+                lastFee.setBatchId(r.getBatchId());
+                lastFee.setSeatId(r.getSeatId());
+                if (r.getTillDate() != null) {
+                    lastFee.setTillDate(r.getTillDate());
+                }
+                BigDecimal submittedAmount = r.getSubmittedAmount() != null ? r.getSubmittedAmount() : BigDecimal.ZERO;
+                BigDecimal existingAmount = lastFee.getSubmittedAmount() != null ? lastFee.getSubmittedAmount() : BigDecimal.ZERO;
+                lastFee.setSubmittedAmount(existingAmount.add(submittedAmount));
+                String transactionId = r.getTransactionId();
+                String remarks = r.getRemarks();
+
+                if (transactionId != null && !transactionId.isEmpty()) {
+                    lastFee.setTransactionId(transactionId);
+                }
+
+                if (remarks != null && !remarks.isEmpty()) {
+                    lastFee.setRemarks(remarks);
+                }
+
+                lastFee.setPaymentMode(r.getPaymentMode());
+                if (r.getBatchId() == 28L || r.getBatchId() == 27L) {
+                    seatService.updateSeat(lastFee.getSeatId(), r.getSeatId(), r.getStudentId());
+                } else {
+                    seatService.removeReservedSeat(r.getSeatId());
+                }
+                // Update Transaction
+
+                if (submittedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    updateTransaction(studentId,
+                            r.getSubmittedAmount(),
+                            null,
+                            null,
+                            r.getPaymentMode(),
+                            SourceType.BATCH_ADJUSTMENT,
+                            r.getTransactionId(),
+                            2L,
+                            2L);
+                }
+                // Update Fee
+                feeRecordRepository.save(lastFee);
+                studentRepo.save(student);
+            } else if (RequestType.PENDING_FEES.equals(r.getRequestType())) {
+                FeeRecord lastFee = student.getLastFee();
+                BigDecimal existingAmount = lastFee.getSubmittedAmount() != null ? lastFee.getSubmittedAmount() : BigDecimal.ZERO;
+                BigDecimal lastPendingAmount = lastFee.getPendingAmount() != null ? lastFee.getPendingAmount() : BigDecimal.ZERO;
+                lastFee.setSubmittedAmount(lastPendingAmount.add(existingAmount));
+                lastFee.setPaymentMode(r.getPaymentMode());
+                lastFee.setPendingAmount(BigDecimal.ZERO);
+                lastFee.setTransactionId(r.getTransactionId());
+                lastFee.setRemarks(r.getRemarks());
+                feeRecordRepository.save(lastFee);
+
+                if (lastPendingAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    updateTransaction(studentId,
+                            lastPendingAmount,
+                            null,
+                            null,
+                            r.getPaymentMode(),
+                            SourceType.FEE,
+                            r.getTransactionId(),
+                            2L,
+                            2L);
+                }
             } else {
                 throw new IllegalStateException("Invalid type request");
             }
@@ -292,6 +380,71 @@ public class AdminCommandService {
                 student.setPermanentAddress(body.getPermanentAddress());
             }
             updateDetail(student, body.getFullName(), body.getMobileNumber(), body.getGuardianNumber());
+        } else if (RequestType.BATCH.name().equals(type)) {
+            FeeRecord lastFee = student.getLastFee();
+            lastFee.setBatchId(body.getBatchId());
+            lastFee.setSeatId(body.getSeatId());
+            if (body.getTillDate() != null) {
+                lastFee.setTillDate(body.getTillDate());
+            }
+            BigDecimal submittedAmount = body.getSubmittedAmount() != null ? body.getSubmittedAmount() : BigDecimal.ZERO;
+            BigDecimal existingAmount = lastFee.getSubmittedAmount() != null ? lastFee.getSubmittedAmount() : BigDecimal.ZERO;
+            lastFee.setSubmittedAmount(existingAmount.add(submittedAmount));
+            String transactionId = body.getTransactionId();
+            if (transactionId != null && !transactionId.isEmpty()) {
+                lastFee.setTransactionId(transactionId);
+            }
+            String remarks = body.getRemarks();
+            if (remarks != null && !remarks.isBlank()) {
+                lastFee.setRemarks(remarks);
+            }
+            lastFee.setPaymentMode(body.getPaymentMode());
+            if (body.getBatchId() == 28L || body.getBatchId() == 27L) {
+                seatService.updateSeat(lastFee.getSeatId(), body.getSeatId(), body.getStudentId());
+            } else {
+                seatService.removeReservedSeat(body.getSeatId());
+            }
+            // Update Transaction
+
+            if (submittedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                updateTransaction(studentId,
+                        body.getSubmittedAmount(),
+                        null,
+                        null,
+                        body.getPaymentMode(),
+                        SourceType.BATCH_ADJUSTMENT,
+                        body.getTransactionId(),
+                        2L,
+                        2L);
+            }
+            // Update Fee
+            feeRecordRepository.save(lastFee);
+            studentRepo.save(student);
+        } else if (RequestType.PENDING_FEES.name().equals(type)) {
+            FeeRecord lastFee = student.getLastFee();
+            BigDecimal existingAmount = lastFee.getSubmittedAmount() != null ? lastFee.getSubmittedAmount() : BigDecimal.ZERO;
+            BigDecimal lastPendingAmount = lastFee.getPendingAmount() != null ? lastFee.getPendingAmount() : BigDecimal.ZERO;
+            lastFee.setSubmittedAmount(lastPendingAmount.add(existingAmount));
+            lastFee.setPaymentMode(body.getPaymentMode());
+            lastFee.setPendingAmount(BigDecimal.ZERO);
+            lastFee.setTransactionId(body.getTransactionId());
+            lastFee.setRemarks(body.getRemarks());
+            feeRecordRepository.save(lastFee);
+
+            if (lastPendingAmount.compareTo(BigDecimal.ZERO) > 0) {
+                updateTransaction(studentId,
+                        lastPendingAmount,
+                        null,
+                        null,
+                        body.getPaymentMode(),
+                        SourceType.FEE,
+                        body.getTransactionId(),
+                        2L,
+                        2L);
+            }
+        } else if (RequestType.DISCOUNT.name().equals(type)) {
+            student.setAllowedDiscount(body.getDiscount());
+            studentRepo.save(student);
         } else {
             throw new IllegalStateException("Invalid type request");
         }
@@ -336,6 +489,8 @@ public class AdminCommandService {
                 .tillDate(body.getTillDate())
                 .discountAmount(body.getDiscount())
                 .submittedAmount(body.getSubmittedAmount())
+                .cashAmount(body.getCashAmount())
+                .onlineAmount(body.getOnlineAmount())
                 .pendingAmount(body.getPendingAmount())
                 .paymentMode(body.getPaymentMode())
                 .transactionId(body.getTransactionId())
@@ -357,8 +512,11 @@ public class AdminCommandService {
         updateTransaction(
                 student.getStudentId(),
                 body.getSubmittedAmount(),
+                body.getCashAmount(),
+                body.getOnlineAmount(),
                 body.getPaymentMode(),
                 SourceType.ADMISSION,
+                null,
                 null,
                 adminId
         );
@@ -414,8 +572,11 @@ public class AdminCommandService {
 
     public void updateTransaction(Long studentId,
                                   BigDecimal amount,
+                                  BigDecimal cashAmount,
+                                  BigDecimal onlineAmount,
                                   String paymentMode,
                                   SourceType sourceType,
+                                  String description,
                                   Long managerId,
                                   Long adminId) {
         Long createdBy = adminId;
@@ -429,9 +590,11 @@ public class AdminCommandService {
                 .sourceType(sourceType)
                 .studentId(studentId)
                 .amount(amount)
+                .cashAmount(cashAmount)
+                .onlineAmount(onlineAmount)
                 .paymentMode(PaymentMode.valueOf(paymentMode))
                 .transactionDate(OffsetDateTime.now())
-                .description("")
+                .description(description)
                 .status(PendingRequestStatus.APPROVED)
                 .createdBy(createdBy)
                 .actionBy(adminId)

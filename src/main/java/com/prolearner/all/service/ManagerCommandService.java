@@ -1,4 +1,5 @@
 package com.prolearner.all.service;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
 import java.time.LocalDate;
@@ -96,6 +97,33 @@ public class ManagerCommandService {
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
         } else if (type == RequestType.FEES) {
             return handleFees(newRequest, body, type, userId, false);
+        } else if (type == RequestType.BATCH) {
+            newRequest.setBatchId(body.getBatchId());
+            newRequest.setSeatId(body.getSeatId());
+            if (body.getTillDate() != null) {
+                newRequest.setTillDate(body.getTillDate());
+            }
+            BigDecimal submittedAmount = body.getSubmittedAmount() != null ? body.getSubmittedAmount() : BigDecimal.ZERO;
+            newRequest.setSubmittedAmount(submittedAmount);
+            if (!body.getTransactionId().isEmpty()) {
+                newRequest.setTransactionId(body.getTransactionId());
+            }
+            if (!body.getRemarks().isEmpty()) {
+                newRequest.setRemarks(body.getRemarks());
+            }
+            newRequest.setPaymentMode(body.getPaymentMode());
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+        } else if (type == RequestType.PENDING_FEES) {
+            Students student = studentRepo.findByStudentId(body.getStudentId())
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+            FeeRecord lastFee = student.getLastFee();
+            BigDecimal lastPendingAmount = lastFee.getPendingAmount() != null ? lastFee.getPendingAmount() : BigDecimal.ZERO;
+            newRequest.setSubmittedAmount(lastPendingAmount);
+            newRequest.setPaymentMode(body.getPaymentMode());
+            newRequest.setPendingAmount(BigDecimal.ZERO);
+            newRequest.setTransactionId(body.getTransactionId());
+            newRequest.setRemarks(body.getRemarks());
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
         }
         else {
             throw new IllegalStateException("Only Admission, Seat, Details and Enrollment update handled");
@@ -205,6 +233,8 @@ public class ManagerCommandService {
         request.setSubmittedAmount(body.getSubmittedAmount());
         request.setDiscount(body.getDiscount());
         request.setPendingAmount(body.getPendingAmount());
+        request.setCashAmount(body.getCashAmount());
+        request.setOnlineAmount(body.getOnlineAmount());
         request.setPaymentMode(body.getPaymentMode());
         request.setTransactionId(body.getTransactionId());
         request.setRemarks(body.getRemarks());
@@ -264,6 +294,8 @@ public class ManagerCommandService {
         request.setDiscount(body.getDiscount());
         request.setPendingAmount(body.getPendingAmount());
         request.setPaymentMode(body.getPaymentMode());
+        request.setCashAmount(body.getCashAmount());
+        request.setOnlineAmount(body.getOnlineAmount());
         request.setTransactionId(body.getTransactionId());
         request.setRemarks(body.getRemarks());
         

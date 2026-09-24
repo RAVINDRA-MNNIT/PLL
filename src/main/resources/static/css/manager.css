@@ -454,27 +454,47 @@ input[type="radio"]:disabled {
     background:#1d4ed8;
 }
 
- .student-filters{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-bottom:18px;
-    flex-wrap:wrap;
+/* Home Filter style */
+/* Filter Container */
+.student-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 24px;
+    flex-wrap: nowrap;
 }
 
-.student-filters select,
-.student-filters input{
-    height:40px;
-    border:1px solid #d1d5db;
-    border-radius:6px;
-    padding:0 12px;
-    font-size:14px;
+/* Search takes remaining space */
+.student-filters #search {
+    flex: 1;
+    min-width: 220px;
 }
 
-.student-filters input{
-    flex:1;
-    min-width:260px;
+/* Fixed width controls */
+.student-filters #searchType {
+    width: 160px;
 }
+
+.student-filters #batchFilter,
+.student-filters #statusFilter {
+    width: 170px;
+}
+
+/* Checkbox */
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* Reset button */
+.student-filters .secondary-btn {
+    white-space: nowrap;
+}
+
+/* Home Filter style end */
 
 .secondary-btn{
     height:40px;
@@ -722,4 +742,576 @@ input[type="radio"]:disabled {
 .pagination-controls button:disabled {
     opacity: .5;
     cursor: not-allowed;
+}
+
+
+
+
+/* ==========================================
+   ADMISSION PAYMENT MODE
+========================================== */
+
+.payment-mode-options {
+    display: flex;
+    gap: 30px;
+    margin-top: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.payment-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500 !important;
+    cursor: pointer;
+}
+
+.payment-mode-option input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+
+/* ==========================================
+   BOTH PAYMENT
+========================================== */
+
+.payment-split-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    width: 100%;
+}
+
+
+/* Cash amount is automatically calculated */
+#cashAmount[readonly] {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* submittedAmount amount is automatically calculated */
+#submittedAmount[readonly] {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* Discount amount is automatically calculated */
+#discount[readonly] {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   RESPONSIVE PAYMENT
+========================================== */
+
+@media (max-width: 800px) {
+
+    .payment-mode-options {
+        gap: 18px;
+    }
+
+    .payment-split-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+
+
+
+
+
+
+/* ========================================
+   UPDATE BATCH MODAL
+======================================== */
+
+.update-batch-modal {
+    width: 100%;
+    max-width: 680px;
+}
+
+
+/* ========================================
+   CURRENT STUDENT SUMMARY
+======================================== */
+
+.student-update-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+
+.student-update-summary .summary-item {
+    padding: 12px 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+
+    background: #f9fafb;
+}
+
+
+.student-update-summary label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    color: #6b7280;
+}
+
+
+.student-update-summary strong {
+    display: block;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+/* Membership duration uses full row */
+
+.student-update-summary
+.membership-duration-item {
+    grid-column: 1 / -1;
+}
+
+
+.current-membership-duration {
+    display: flex !important;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+
+.duration-arrow {
+    color: #6b7280;
+
+    font-weight: 400;
+}
+
+
+.duration-days {
+    color: #6b7280;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+/* ========================================
+   NEW BATCH SECTION
+======================================== */
+
+.update-batch-section {
+    margin-top: 10px;
+}
+
+
+.update-batch-section-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 15px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+/* ========================================
+   NEW BATCH + SEAT GRID
+======================================== */
+
+.update-batch-select-grid {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+
+    width: 100%;
+}
+
+
+/*
+ * Full Day / 24 Hour selected
+ * New Batch + Seat appear in one row
+ */
+
+.update-batch-select-grid.has-seat {
+    grid-template-columns: 1fr 1fr;
+}
+
+
+.update-batch-select-grid .form-group {
+    margin: 0;
+
+    min-width: 0;
+}
+
+
+/* ========================================
+   DATE GRID
+======================================== */
+
+.update-batch-date-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin-top: 15px;
+}
+
+
+.update-batch-date-grid .form-group {
+    margin: 0;
+
+    min-width: 0;
+}
+
+
+/* ========================================
+   FEE / ADJUSTMENT CARD
+======================================== */
+
+.update-batch-fee-card {
+    margin-top: 20px;
+
+    padding: 16px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #f9fafb;
+}
+
+
+.fee-card-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 15px;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+/* ========================================
+   ADJUSTMENT TYPE
+======================================== */
+
+.update-batch-fee-card
+.form-group {
+    margin-bottom: 15px;
+}
+
+
+.update-batch-fee-card
+.form-group label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+/* ========================================
+   ADJUSTMENT CALCULATION GRID
+======================================== */
+
+.update-batch-adjustment-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 12px;
+}
+
+
+.fee-info-item {
+    padding: 12px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    min-width: 0;
+}
+
+
+.fee-info-item label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: #6b7280;
+}
+
+
+.fee-info-item strong {
+    display: block;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    color: #111827;
+
+    word-break: break-word;
+}
+
+
+/* ========================================
+   RESULT CARD
+======================================== */
+
+.update-batch-result-card {
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+}
+
+
+.update-batch-result-card label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    color: #6b7280;
+}
+
+
+.update-batch-result-card strong {
+    display: block;
+
+    margin-bottom: 12px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #111827;
+}
+
+
+.update-batch-result-card strong:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ========================================
+   AMOUNT RESULT COLORS
+======================================== */
+
+/*
+ * Student needs to pay
+ */
+
+.amount-payable {
+    color: #16a34a !important;
+}
+
+
+/*
+ * Remaining amount is greater than
+ * new total fee.
+ */
+
+.amount-refund {
+    color: #dc2626 !important;
+}
+
+
+/* ========================================
+   CURRENT / CALCULATED FEE
+======================================== */
+
+.calculated-fee-item strong {
+    font-size: 18px;
+}
+
+
+/* ========================================
+   MESSAGE
+======================================== */
+
+.update-batch-modal-message {
+    min-height: 20px;
+
+    margin-top: 15px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+}
+
+
+.update-batch-modal-message.error {
+    color: #dc2626;
+}
+
+
+.update-batch-modal-message.success {
+    color: #16a34a;
+}
+
+
+/* ========================================
+   DISABLED BUTTON
+======================================== */
+
+#saveUpdateBatchBtn:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 640px) {
+
+    .update-batch-modal {
+        max-width: 100%;
+    }
+
+
+    /* ------------------------------------
+       Current student details
+    ------------------------------------ */
+
+    .student-update-summary {
+        grid-template-columns: 1fr;
+    }
+
+
+    .student-update-summary
+    .membership-duration-item {
+        grid-column: auto;
+    }
+
+
+    /* ------------------------------------
+       New Batch + Seat
+    ------------------------------------ */
+
+    .update-batch-select-grid,
+    .update-batch-select-grid.has-seat {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* ------------------------------------
+       Dates
+    ------------------------------------ */
+
+    .update-batch-date-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* ------------------------------------
+       Adjustment calculation
+    ------------------------------------ */
+
+    .update-batch-adjustment-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    /* ------------------------------------
+       Membership duration
+    ------------------------------------ */
+
+    .current-membership-duration {
+        gap: 5px;
+    }
+
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 450px) {
+
+    .update-batch-adjustment-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .update-batch-fee-card {
+        padding: 12px;
+    }
+
+
+    .fee-info-item {
+        padding: 10px;
+    }
+
+
+    .update-batch-result-card {
+        padding: 12px;
+    }
+
 }

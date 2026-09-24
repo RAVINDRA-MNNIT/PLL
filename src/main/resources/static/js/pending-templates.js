@@ -12,6 +12,7 @@ window.PendingTemplates = {
                 <th>Batch</th>
                 <th>Admission</th>
                 <th>Submitted</th>
+                <th>Requested At</th>
                 <th>Actions</th>
             </tr>
         `;
@@ -22,11 +23,21 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId}</td>
                 <td>${item.studentId ?? "-"}</td>
-                <td>${item.fullName ?? "-"}</td>
+                <td>${item.fullName?.toUpperCase() ?? "-"}</td>
                 <td>${item.mobileNumber ?? "-"}</td>
                 <td>${item.batchName ?? "-"}</td>
                 <td>${this.formatDate(item.fromDate) ?? "-"}</td>
-                <td>${item.submittedAmount ?? 0}</td>
+                <td>
+                    <strong class="amount-highlight">
+                        ₹${item.submittedAmount ?? 0}
+                    </strong><br>
+                    
+                    ${item.paymentMode ?? "-"}
+                    ${item.paymentMode !== "BOTH" ? "" : (item.cashAmount != null && item.cashAmount !== "" ? `<br>Cash: ₹${item.cashAmount}` : "")}
+                    ${item.paymentMode !== "BOTH" ? "" : (item.onlineAmount != null && item.onlineAmount !== "" ? `<br>Online: ₹${item.onlineAmount}` : "")}
+                    ${item.transactionId ? `<br>${item.transactionId}` : ""}
+                </td>
+                <td>${requestedAt}</td>
                 <td>${actions}</td>
             </tr>
         `;
@@ -45,8 +56,7 @@ window.PendingTemplates = {
                 <th>Submitted</th>
                 <th>Discount</th>
                 <th>Pending</th>
-                <th>Payment Mode</th>
-                <th>Requested By</th>
+                <th>Requested At</th>
                 <th>Requested On</th>
                 <th>Actions</th>
             </tr>
@@ -58,16 +68,23 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId}</td>
                 <td>${item.studentId ?? "-"}</td>
-                <td>${item.lastFullName ?? "-"}</td>
+                <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${item.batchName ?? "-"}</td>
                 <td>
                     <div><strong>From:</strong> ${this.formatDate(item.fromDate) ?? "-"}</div>
                     <div><strong>To:</strong> ${this.formatDate(item.tillDate) ?? "-"}</div>
                 </td>
-                <td>${item.submittedAmount ?? 0}</td>
-                <td>${item.discount ?? 0}</td>
-                <td>${item.pendingAmount ?? 0}</td>
-                <td>${item.paymentMode ?? "-"}</td>
+                <td>
+                    <strong class="amount-highlight">
+                        ₹${item.submittedAmount ?? 0}
+                    </strong><br>
+                    ${item.paymentMode ?? "-"}
+                    ${item.paymentMode !== "BOTH" ? "" : (item.cashAmount != null && item.cashAmount !== "" ? `<br>Cash: ₹${item.cashAmount}` : "")}
+                    ${item.paymentMode !== "BOTH" ? "" : (item.onlineAmount != null && item.onlineAmount !== "" ? `<br>Online: ₹${item.onlineAmount}` : "")}
+                    ${item.transactionId ? `<br>${item.transactionId}` : ""}
+                </td>
+                <td>₹${item.discount ?? 0}</td>
+                <td>₹${item.pendingAmount ?? 0}</td>
                 <td>${item.requestedBy ?? "-"}</td>
                 <td>${requestedAt}</td>
                 <td>${actions}</td>
@@ -97,7 +114,7 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId}</td>
                 <td>${item.studentId ?? "-"}</td>
-                <td>${item.lastFullName ?? "-"}</td>
+                <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${item.lastFeeSeatNumber ?? "-"}</td>
                 <td>${item.seatNumber ?? "-"}</td>
                 <td>${item.requestedBy ?? "-"}</td>
@@ -128,8 +145,8 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId ?? "-"}</td>
                 <td>${item.studentId ?? "-"}</td>
-                <td>${this.formatDetails(item.lastFullName, item.lastMobileNumber, item.lastGuardianNumber)}</td>
-                <td>${this.formatDetails(item.fullName, item.mobileNumber, item.guardianNumber)}</td>
+                <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber)}</td>
+                <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber)}</td>
                 <td>${item.requestedBy ?? "-"}</td>
                 <td>${requestedAt}</td>
                 <td>${actions}</td>
@@ -160,7 +177,7 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId ?? "-"}</td>
                 <td>${item.studentId ?? "-"}</td>
-                <td>${item.lastFullName ?? "-"}</td>
+                <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${this.renderStatus(item.lastEnrollmentStatus)}</td>
                 <td>${this.renderStatus(item.enrollmentStatus)}</td>
                 <td>${this.formatDate(item.lastFeeTillDate)}</td>
@@ -169,6 +186,94 @@ window.PendingTemplates = {
                 <td>${actions}</td>
             </tr>
         `;
+    },
+
+    // ================= PENDING FEES =================
+
+    pendingFeesTableHeader() {
+        return `
+        <tr>
+            <th>Request ID</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Previous Pending</th>
+            <th>Requested By</th>
+            <th>Requested At</th>
+            <th>Remarks</th>
+            <th>Actions</th>
+        </tr>
+    `;
+    },
+
+    pendingFeesRow(item, actions, requestedAt) {
+        return `
+        <tr>
+            <td>${item.requestId ?? "-"}</td>
+            <td>${item.studentId ?? "-"}</td>
+            <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
+            <td>
+                <strong class="amount-highlight">
+                    ₹${item.lastFeePendingAmount ?? 0}
+                </strong><br>
+                ${item.paymentMode ?? "-"}
+                ${item.transactionId ? `<br>${item.transactionId}` : ""}
+            </td>
+            <td>${item.requestedBy ?? "-"}</td>
+            <td>${requestedAt}</td>
+            <td>
+                <div class="remarks">${item.remarks}</div>  
+            </td>
+            <td>${actions}</td>
+        </tr>
+    `;
+    },
+
+    // ================= BATCH =================
+
+    batchTableHeader() {
+        return `
+        <tr>
+            <th>Request ID</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Current Detail</th>
+            <th>New Detail</th>
+            <th>Amount</th>
+            <th>Requested By</th>
+            <th>Requested At</th>
+            <th>Remarks</th>
+            <th>Actions</th>
+        </tr>
+    `;
+    },
+
+    batchRow(item, actions, requestedAt) {
+        return `
+        <tr>
+            <td>${item.requestId ?? "-"}</td>
+            <td>${item.studentId ?? "-"}</td>
+            <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
+            <td>
+                 <div>${this.formatBatchDetails(findBatch(item.lastFeeBatchId).name ?? "-", item.lastFeeSeatNumber ?? "-", item.lastFeeFromDate ?? "-", item.lastFeeTillDate ?? "-")}</div>
+            </td>
+            <td>
+                 <div>${this.formatBatchDetails(item.batchName ?? "-", item.seatNumber ?? "-", item.lastFeeFromDate ?? "-", item.tillDate ?? item.lastFeeTillDate ?? "-")}</div>
+            </td>
+            <td>
+                <strong class="amount-highlight">
+                    ₹${item.submittedAmount ?? 0}
+                </strong><br>
+                ${item.paymentMode ?? "-"}
+                ${item.transactionId ? `<br>${item.transactionId}` : ""}
+            </td>
+            <td>${item.requestedBy ?? "-"}</td>
+            <td>${requestedAt}</td>
+            <td>
+                <div class="remarks">${item.remarks}</div>  
+            </td>      
+            <td>${actions}</td>
+        </tr>
+    `;
     },
 
     // ================= ALL REQUEST STATUS =================
@@ -204,7 +309,9 @@ allRow(item, actions, requestedAt) {
 
             <td>${item.requestType || "-"}</td>
             <td>${requestedAt}</td>
-            <td>${item.remarks ?? "-"}</td>
+            <td>
+                <div class="remarks">${item.remarks}</div>  
+            </td>
             <td>
                 ${this.renderStatus(item.requestStatus || item.status)}
             </td>
@@ -321,6 +428,15 @@ renderStatus(status) {
             <div><strong>Name:</strong> ${name}</div>
             <div><strong>Mobile:</strong> ${mobile}</div>
             <div><strong>Guardian number:</strong> ${guardianNumber}</div>
+        `;
+    },
+
+    formatBatchDetails(batch, seat, fromDate, tillDate) {
+        return `
+            <div><strong>Batch: </strong>${batch}</div>
+            <div><strong>Seat: </strong>${seat}</div>
+            <div><strong>From Date: </strong>${fromDate}</div>
+            <div><strong>Till Date: </strong>${tillDate}</div>
         `;
     },
 

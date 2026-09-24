@@ -1,5 +1,6 @@
 package com.prolearner.all.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,6 +31,8 @@ public record StudentDetailsResponse(
     LocalDate dateOfAdmission,
 
     String enrollmentStatus,
+
+    BigDecimal allowedDiscount,
 
     StudentFeeHistoryResponse lastFee
 ) {}

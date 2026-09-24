@@ -69,35 +69,41 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
     // 🔹 SUM BY PAYMENT MODE (FIXED)
     // ====================================================
     @Query(value = """
-    SELECT
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN ar.payment_mode = 'CASH'
-                    THEN ar.submitted_amount
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS totalCash,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN ar.payment_mode = 'ONLINE'
-                    THEN ar.submitted_amount
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS totalOnline
-
-    FROM library.approval_requests ar
-
-    WHERE ar.status  IN ('PENDING','REJECTED')
-
-      AND ar.request_type IN ('ADMISSION', 'FEES')
-
+        SELECT
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN ar.payment_mode = 'CASH'
+                            THEN ar.submitted_amount
+        
+                        WHEN ar.payment_mode = 'BOTH'
+                            THEN COALESCE(ar.cash_amount, 0)
+        
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS totalCash,
+        
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN ar.payment_mode = 'ONLINE'
+                            THEN ar.submitted_amount
+        
+                        WHEN ar.payment_mode = 'BOTH'
+                            THEN COALESCE(ar.online_amount, 0)
+        
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS totalOnline
+        
+        FROM library.approval_requests ar
+        
+        WHERE ar.status IN ('PENDING')
+          AND ar.request_type IN ('ADMISSION', 'FEES', 'PENDING_FEES', 'BATCH');
 """, nativeQuery = true)
     List<Object[]> sumByPaymentMode(); // ✅ FIXED RETURN TYPE
 
@@ -140,6 +146,7 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
         -- =================================================
 
         s.full_name AS "lastFullName",
+        s.allowed_Discount AS "allowedDiscount",
         ar.full_name AS "fullName",
 
         s.mobile_number AS "lastMobileNumber",
@@ -194,6 +201,8 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
         -- =================================================
 
         ar.submitted_amount AS "submittedAmount",
+        ar.cash_amount AS "cashAmount",
+        ar.online_amount AS "onlineAmount",
         ar.discount AS "discount",
         ar.pending_amount AS "pendingAmount",
         ar.payment_mode AS "paymentMode",

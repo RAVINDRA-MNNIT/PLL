@@ -3,10 +3,11 @@ package com.prolearner.all.entity;
 import jakarta.persistence.*;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "batches")
+@Table(name = "batches", schema = "library")
 @NoArgsConstructor
 public class Batches {
 
@@ -31,6 +32,9 @@ public class Batches {
 
     @Column(name = "room")
     private String room;
+
+    @Column(name = "base_amount")
+    private BigDecimal baseAmount;   // NEW COLUMN
 
     // Getters
 
@@ -62,6 +66,10 @@ public class Batches {
         return room;
     }
 
+    public BigDecimal getBaseAmount() {
+        return baseAmount;
+    }
+
     // Setters
 
     public void setId(Long id) {
@@ -90,5 +98,9 @@ public class Batches {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public void setBaseAmount(BigDecimal baseAmount) {
+        this.baseAmount = baseAmount;
     }
 }

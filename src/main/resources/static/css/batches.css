@@ -1,0 +1,664 @@
+/* =========================================================
+   BATCH MANAGEMENT
+========================================================= */
+
+#batchesView {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+#batchesView .batch-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+#batchesView .batch-page-title {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+#batchesView .batch-page-title > i {
+    color: #2563eb;
+    font-size: 34px;
+}
+
+#batchesView .batch-page-title h1 {
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 30px;
+    font-weight: 700;
+}
+
+#batchesView .batch-page-title p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ADD BUTTON
+========================================================= */
+
+#batchesView .batch-add-btn {
+    min-width: 150px;
+    height: 46px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   EXISTING BATCHES CARD
+========================================================= */
+
+#batchesView .batch-management-card {
+    padding: 30px 38px;
+
+    margin-bottom: 24px;
+
+    border-radius: 18px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+#batchesView .batch-card-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+#batchesView .batch-card-title h2 {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 26px;
+    font-weight: 700;
+}
+
+#batchesView .batch-card-title h2 i {
+    color: #2563eb;
+}
+
+#batchesView .batch-count-text {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+========================================================= */
+
+#batchesView .batch-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+#batchesView .batch-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: auto;
+}
+
+#batchesView .batch-table th {
+    padding: 14px 16px;
+
+    background: #f1f5f9;
+
+    color: #334155;
+
+    text-align: left;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#batchesView .batch-table td {
+    padding: 15px 16px;
+
+    color: #475569;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    border-bottom: 1px solid #edf2f7;
+}
+
+#batchesView .batch-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+#batchesView .batch-empty {
+    height: 80px;
+
+    text-align: center !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 14px !important;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+#batchesView .batch-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 70px;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#batchesView .batch-status.active {
+    background: #dcfce7;
+
+    color: #166534;
+}
+
+#batchesView .batch-status.inactive {
+    background: #f1f5f9;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+#batchesView .batch-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+#batchesView .batch-action-btn {
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            opacity 0.2s ease;
+}
+
+#batchesView .batch-action-btn:hover {
+    transform: translateY(-1px);
+
+    opacity: 0.9;
+}
+
+#batchesView .batch-action-btn.edit {
+    background: #16a34a;
+}
+
+#batchesView .batch-action-btn.delete {
+    color: #dc2626;
+}
+
+#batchesView .batch-action-btn.delete:hover {
+    background: #fee2e2;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+#batchesView .batch-modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10000;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(15, 23, 42, 0.55);
+}
+
+#batchesView .batch-modal.show {
+    display: flex;
+}
+
+
+/* =========================================================
+   MODAL CONTENT
+========================================================= */
+
+#batchesView .batch-modal-content {
+    width: 100%;
+
+    max-width: 850px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.25);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+#batchesView .batch-modal-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 22px 26px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#batchesView .batch-modal-header h2 {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 24px;
+}
+
+#batchesView .batch-modal-header h2 i {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+#batchesView .batch-close-btn {
+    width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    cursor: pointer;
+}
+
+#batchesView .batch-close-btn:hover {
+    background: #e2e8f0;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+#batchesView .batch-form {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 22px 34px;
+
+    padding: 26px;
+}
+
+#batchesView .form-group {
+    min-width: 0;
+}
+
+#batchesView .form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #475569;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+#batchesView .required {
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+#batchesView .form-group input[type="text"],
+#batchesView .form-group input[type="number"],
+#batchesView .form-group select {
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d7dee8;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-size: 15px;
+}
+
+#batchesView .form-group input::placeholder {
+    color: #94a3b8;
+}
+
+#batchesView .form-group input:focus,
+#batchesView .form-group select:focus {
+    outline: none;
+
+    border-color: #2563eb;
+
+    box-shadow:
+            0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================================================
+   RADIO
+========================================================= */
+
+#batchesView .batch-radio-group {
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 28px;
+}
+
+#batchesView .batch-radio {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0 !important;
+
+    color: #334155 !important;
+
+    font-size: 15px !important;
+
+    font-weight: 500 !important;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+#batchesView .batch-radio input {
+    width: 19px;
+    height: 19px;
+
+    margin: 0;
+
+    accent-color: #2563eb;
+
+    cursor: pointer;
+}
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+#batchesView .batch-modal-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding: 18px 26px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #fafafa;
+}
+
+#batchesView .batch-modal-footer button {
+    min-width: 110px;
+
+    height: 44px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    #batchesView .batch-page-header {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+    #batchesView .batch-add-btn {
+        width: 100%;
+    }
+
+    #batchesView .batch-management-card {
+        padding: 20px;
+    }
+
+    #batchesView .batch-card-title {
+        flex-direction: column;
+    }
+
+    #batchesView .batch-form {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+
+        padding: 20px;
+    }
+
+    #batchesView .batch-modal {
+        padding: 10px;
+    }
+
+    #batchesView .batch-modal-content {
+        max-height: 95vh;
+    }
+
+    #batchesView .batch-modal-header {
+        padding: 18px 20px;
+    }
+
+    #batchesView .batch-modal-footer {
+        padding: 16px 20px;
+
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+    #batchesView .batch-modal-footer button {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    #batchesView .batch-page-title h1 {
+        font-size: 24px;
+    }
+
+    #batchesView .batch-page-title > i {
+        font-size: 28px;
+    }
+
+    #batchesView .batch-management-card {
+        padding: 16px;
+    }
+
+    #batchesView .batch-card-title h2 {
+        font-size: 22px;
+    }
+
+}
+
+/* =========================================================
+   Batch Status Filter
+========================================================= */
+
+#batchesView .batch-status-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+#batchesView .batch-status-filter label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#batchesView .batch-status-filter select {
+    min-width: 120px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+}

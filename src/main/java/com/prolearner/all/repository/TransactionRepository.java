@@ -259,32 +259,72 @@ SELECT new com.prolearner.all.dto.MonthlyIncomeSummary(
 COALESCE(SUM(CASE
     WHEN t.sourceType = com.prolearner.all.enums.SourceType.FEE
      AND t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
+
+    WHEN t.sourceType = com.prolearner.all.enums.SourceType.FEE
+     AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.cashAmount
+
+    ELSE 0
+END), 0),
 
 COALESCE(SUM(CASE
     WHEN t.sourceType = com.prolearner.all.enums.SourceType.FEE
      AND t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
+
+    WHEN t.sourceType = com.prolearner.all.enums.SourceType.FEE
+     AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.onlineAmount
+
+    ELSE 0
+END), 0),
 
 COALESCE(SUM(CASE
     WHEN t.sourceType = com.prolearner.all.enums.SourceType.ADMISSION
      AND t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
+
+    WHEN t.sourceType = com.prolearner.all.enums.SourceType.ADMISSION
+     AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.cashAmount
+
+    ELSE 0
+END), 0),
 
 COALESCE(SUM(CASE
     WHEN t.sourceType = com.prolearner.all.enums.SourceType.ADMISSION
      AND t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
+
+    WHEN t.sourceType = com.prolearner.all.enums.SourceType.ADMISSION
+     AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.onlineAmount
+
+    ELSE 0
+END), 0),
 
 COALESCE(SUM(CASE
     WHEN t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
+
+    WHEN t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.cashAmount
+
+    ELSE 0
+END), 0),
 
 COALESCE(SUM(CASE
     WHEN t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-    THEN t.amount ELSE 0 END),0),
+    THEN t.amount
 
-COALESCE(SUM(t.amount),0)
+    WHEN t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+    THEN t.onlineAmount
+
+    ELSE 0
+END), 0),
+
+COALESCE(SUM(t.amount), 0)
 
 )
 FROM Transaction t
@@ -305,12 +345,26 @@ SELECT
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-        THEN t.amount ELSE 0 END),0),
-
+        THEN t.amount
+    
+        WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
+         AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+        THEN t.cashAmount
+    
+        ELSE 0
+    END), 0),
+    
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-        THEN t.amount ELSE 0 END),0),
+        THEN t.amount
+    
+        WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
+         AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+        THEN t.onlineAmount
+    
+        ELSE 0
+    END), 0),
 
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.EXPENSE
@@ -338,22 +392,40 @@ SELECT
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-        THEN t.amount ELSE 0 END),0),
-
+        THEN t.amount
+    
+        WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
+         AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+        THEN t.cashAmount
+    
+        ELSE 0
+    END), 0),
+    
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-        THEN t.amount ELSE 0 END),0),
-
+        THEN t.amount
+    
+        WHEN t.transactionType = com.prolearner.all.enums.TransactionType.INCOME
+         AND t.paymentMode = com.prolearner.all.enums.PaymentMode.BOTH
+        THEN t.onlineAmount
+    
+        ELSE 0
+    END), 0),
+    
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.EXPENSE
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.CASH
-        THEN t.amount ELSE 0 END),0),
-
+        THEN t.amount
+        ELSE 0
+    END), 0),
+    
     COALESCE(SUM(CASE
         WHEN t.transactionType = com.prolearner.all.enums.TransactionType.EXPENSE
          AND t.paymentMode = com.prolearner.all.enums.PaymentMode.ONLINE
-        THEN t.amount ELSE 0 END),0)
+        THEN t.amount
+        ELSE 0
+    END), 0)
 
 FROM Transaction t
 WHERE t.status IN :statuses

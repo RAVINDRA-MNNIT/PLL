@@ -27,15 +27,18 @@ public class StudentController {
             @RequestParam(required = false) String searchKey,
             @RequestParam(required = false) Long batchId,
             @RequestParam(defaultValue = "all") String enrollmentStatus,
+            @RequestParam(defaultValue = "false") boolean pendingFees,
+            @RequestParam(defaultValue = "false") boolean discount,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-
         Pageable pageable = PageRequest.of(page - 1, size);
         return studentService.getStudents(
                 searchBy,
                 searchKey,
                 batchId,
                 enrollmentStatus,
+                pendingFees,
+                discount,
                 pageable
         );
     }

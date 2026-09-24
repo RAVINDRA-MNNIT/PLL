@@ -9,7 +9,16 @@ window.Endpoints = {
 
     // ================= STUDENTS =================
     students: {
-        list(searchBy, searchKey, batch, enrollmentStatus, page = 0, size = 20) {
+        list(
+            searchBy,
+            searchKey,
+            batch,
+            enrollmentStatus,
+            pendingFees = false,
+            discount = false,
+            page = 0,
+            size = 20
+        ) {
             const params = new URLSearchParams();
             if (searchBy) {
                 params.append("searchBy", searchBy);
@@ -22,6 +31,12 @@ window.Endpoints = {
             }
             if (enrollmentStatus) {
                 params.append("enrollmentStatus", enrollmentStatus);
+            }
+            if (pendingFees) {
+                params.append("pendingFees", "true");
+            }
+            if (discount) {
+                params.append("discount", "true");
             }
             params.append("page", page);
             params.append("size", size);
@@ -67,9 +82,14 @@ window.Endpoints = {
     admin: {
         admissionRequest: `/api/admin/admission`,
         updateFeeRequest: `/api/admin/updatefee`,
+
         updateStudent: `/api/admin/updatestudent/DETAILS`,
         updateSeat: `/api/admin/updatestudent/SEAT`,
         updateEnrollmentStatus: `/api/admin/updatestudent/ENROLLMENT`,
+        updateStudentBatch: `/api/admin/updatestudent/BATCH`,
+        clearPendingRequest: `/api/admin/updatestudent/PENDING_FEES`,
+        updateStudentDiscount: `/api/admin/updatestudent/DISCOUNT`,
+
         rejectRequest: `/api/admin/pending/reject`,
         approveRequest: `/api/admin/pending/approve`,
         saveExpense: `/api/admin/expense/save`,
@@ -108,6 +128,14 @@ window.Endpoints = {
         clearTransactions(beforeDate) {
             return `/api/admin/transactions/cleanup?beforeDate=${beforeDate}`;
         },
+        createBatch: `/api/admin/batch/create`,
+        deleteBatch(id, replaceWithBatchId) {
+            return `/api/admin/batch/delete/${id}?replaceWithBatchId=${encodeURIComponent(replaceWithBatchId)}`;
+        },
+        updateBatch(id) {
+            return `/api/admin/batch/update/${id}`;
+        },
+
     },
 
     manager: {

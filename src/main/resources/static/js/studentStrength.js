@@ -357,7 +357,7 @@ const Strength = {
         data.students.forEach(student => {
 
             const occupied = student.studentId != null;
-
+            const diff = occupied ? (student.status !== "ACTIVE" ? getDateDifferenceInDays(student.tillDate, Date()) :  "-") : "-"
             tbody.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -367,6 +367,7 @@ const Strength = {
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
+                <td>${diff}</td>
                 <td>
                     ${
                     occupied
@@ -428,7 +429,7 @@ const Strength = {
         data.students.forEach(student => {
 
             const occupied = student.studentId != null;
-
+            const diff = occupied ? (student.status !== "ACTIVE" ? getDateDifferenceInDays(student.tillDate, Date()) :  "-") : "-"
             tbody.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -438,6 +439,7 @@ const Strength = {
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
+                <td>${diff}</td>
                 <td>
                     ${
                     occupied

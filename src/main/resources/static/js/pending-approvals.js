@@ -16,6 +16,8 @@ window.PendingApprovals = {
         SEAT: "SEAT",
         DETAILS: "DETAILS",
         ENROLLMENT: "ENROLLMENT",
+        PENDING_FEES: "PENDING_FEES",
+        BATCH: "BATCH",
         ALL: "ALL"
     },
 
@@ -93,71 +95,6 @@ async loadData() {
         || [];
 
     this.pendingRowsData = list//.map(x => this.mapResponse(x));
-},
-    // ================= MAPPING =================
-
-mapResponse(item) {
-    // ✅ unified field resolver (snake_case + camelCase fallback)
-    const pick = (...keys) => {
-        for (const k of keys) {
-            if (k !== undefined && k !== null) return k;
-        }
-        return null;
-    };
-    
-    return {
-        // 🔑 identifiers
-        requestId: item.requestId,
-        requestType: item.requestType,
-
-        // 👤 student
-        studentId: item.studentId,
-        fullName: item.fullName,
-        mobile: item.mobileNumber,
-        guardianNumber: item.guardianNumber,
-        dateOfBirth: item.dateOfBirth,
-        fatherName: item.fatherName,
-        localAddress: item.localAddress,
-        permanentAddress: item.permanentAddress,
-        aadhaarNumber: item.aadhaarNumber,
-        qualification: item.qualification,
-        preparationFor: item.preparationFor,
-
-        dateOfAdmission: item.dateOfAdmission,
-        enrollmentStatus: item.enrollmentStatus,
-        requestedStatus: item.newEnrollmentStatus,
-
-        requestedFullName: item.newfullName,
-        requestedMobile: item.newMobileNumber,
-        requestedGuardian: item.newGuardianNumber,
-
-        // 🪑 batch / seat
-        batchId: item.batchId,
-        seatId: item.batchId,
-        batchName: item.batchName,
-        seatNumber: item.seatNumber,
-        requestSeatId: item.newSeatId,
-        requestSeatNumber: item.newSeatNumber,
-
-        // 📅 membership
-        fromDate: item.fromDate,
-        tillDate: item.tillDate,
-        tillDate: item.tillDate,
-
-        // 💰 payment
-        submittedAmount: pick(item.submittedAmount, 0),
-        discount: pick(item.discount, 0),
-        pendingAmount: pick(item.pendingAmount, 0),
-        paymentMode: item.paymentMode,
-        remarks: item.remarks,
-        transactionId: item.transactionId,
-
-        // 🧾 metadata
-        requestedBy: item.requestedBy,
-        requestedAt: item.requestedAt,
-        remarks: item.remarks,
-        status: item.status,
-    };
 },
 
     async refresh() {
@@ -242,6 +179,8 @@ mapResponse(item) {
             SEAT: PendingTemplates.seatTableHeader(),
             DETAILS: PendingTemplates.detailTableHeader(),
             ENROLLMENT: PendingTemplates.enrollmentTableHeader(),
+            PENDING_FEES: PendingTemplates.pendingFeesTableHeader(),
+            BATCH: PendingTemplates.batchTableHeader(),
             ALL: PendingTemplates.allTableHeader()
         };
 
@@ -265,6 +204,10 @@ mapResponse(item) {
                 return PendingTemplates.detailRow(item, this.renderActions(item), requestedAt);
             case this.TABS.ENROLLMENT:
                 return PendingTemplates.enrollmentRow(item, this.renderActions(item), requestedAt);
+            case this.TABS.PENDING_FEES:
+                return PendingTemplates.pendingFeesRow(item, this.renderActions(item), requestedAt);
+            case this.TABS.BATCH:
+                return PendingTemplates.batchRow(item, this.renderActions(item), requestedAt);
             case this.TABS.ALL:
                 return PendingTemplates.allRow(item, this.renderActions(item), requestedAt);
             default:
@@ -276,7 +219,9 @@ mapResponse(item) {
         const shouldShowEdit = ![
             this.TABS.DETAILS,
             this.TABS.SEAT,
-            this.TABS.ENROLLMENT
+            this.TABS.ENROLLMENT,
+            this.TABS.BATCH,
+            this.TABS.PENDING_FEES
         ].includes(this.current);
 
 
@@ -357,18 +302,43 @@ async viewEdit(requestId) {
         if (!pendingRow) {
             console.error("Pending row not found");
         }
+        const from = new Date(pendingRow.fromDate);
+        const till = new Date(pendingRow.tillDate);
+        const diffInDays = Math.floor((till - from) / (1000 * 60 * 60 * 24));
+
+        const warnings = [];
+
+        if (pendingRow.lastFeeTillDate !== pendingRow.fromDate) {
+            warnings.push(
+                `• Membership gap detected.\n  Last membership till: ${pendingRow.lastFeeTillDate}\n  New membership from: ${pendingRow.fromDate}`
+            );
+        }
+
+        if (diffInDays > 31) {
+            warnings.push(
+                `• You are updating fees for more than one month (${diffInDays} days).`
+            );
+        }
+
         if (pendingRow.pendingAmount > 0) {
-            if (!confirm(`Current pending amount of this student is ₹${pendingRow.pendingAmount}.\n\n Make sure you have received the amount!`)) {
-                return
-            }
+            warnings.push(
+                `• Current pending amount: ₹${pendingRow.pendingAmount}.`
+            );
         }
 
         if (pendingRow.lastFeePendingAmount > 0) {
-            if (!confirm(`In Last fee record, pending amount of this student is ₹${pendingRow.lastFeePendingAmount}.\n\n Make sure you have received the amount!`)) {
-                return
-            }
+            warnings.push(
+                `• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
+            );
         }
 
+        if (warnings.length > 0) {
+            const message =
+                `Please review the following before continuing:\n ${warnings.join("\n\n")} Are you sure you want to continue?`;
+            if (!confirm(message)) {
+                return;
+            }
+        }
 
         if (!confirm("Approve this request?")) return;
         try {
@@ -422,7 +392,6 @@ async viewEdit(requestId) {
 
     filterTable() {
         const s = this.get("searchBox")?.value.toLowerCase() || "";
-
         document.querySelectorAll("#pendingRows tr").forEach(r => {
             r.style.display = r.innerText.toLowerCase().includes(s) ? "" : "none";
         });

@@ -291,3 +291,27 @@
     background: #dcfce7;
     color: #166534;
 }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-actions .secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+@media (max-width: 800px) {
+    .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .header-actions .secondary-btn {
+        flex: 1;
+    }
+}

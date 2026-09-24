@@ -1,159 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Library - Admin Dashboard</title>
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <link
-        rel="stylesheet"
-        href="/css/manager.css">
-
-    <link
-            rel="stylesheet"
-            href="/css/transaction.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/manager.css">
+    <link rel="stylesheet" href="/css/transaction.css">
+    <link rel="stylesheet" href="/css/batches.css">
+    <link rel="stylesheet" href="/css/verifyStudent.css">
+    <link rel="stylesheet" href="/css/student-id-card.css">
 </head>
-
 <body>
-
 <div id="pageLoading">
-
     Loading Admin Dashboard...
-
 </div>
-
 <div id="dashboard">
-
     <aside class="sidebar">
-
         <h2 id="adminLibraryName">
             📚 Pro Learner's Digital Library
         </h2>
-        <div
-            class="nav-item active"
-            onclick="switchView('fees')">
-
+        <div class="nav-item active" onclick="switchView('fees')">
             Students
-
         </div>
-
-        <div
-            class="nav-item"
-            onclick="switchView('add')">
-
+        <div class="nav-item" onclick="switchView('add')">
             Add New Student
-
         </div>
-
-        <div
-            class="nav-item"
-            onclick="switchView('pending')">
-
+        <div class="nav-item" onclick="switchView('pending')">
             Pending Approvals
-
         </div>
-
-        <div
-                class="nav-item"
-                onclick="switchView('transactions')">
-
+        <div class="nav-item" onclick="switchView('transactions')">
             Transactions
-
         </div>
-
-        <div
-                class="nav-item"
-                onclick="switchView('strength')">
+        <div class="nav-item" onclick="switchView('strength')">
             Strength
         </div>
-
-        <div
-                id="configurationsNav"
-                class="nav-item"
-                onclick="switchView('configurations')">
+        <div class="nav-item" onclick="switchView('verifyStudent')">
+            Verify Student
+        </div>
+        <div class="nav-item" onclick="switchView('batches')">
+            Manage Batches
+        </div>
+        <div class="nav-item" onclick="switchView('configurations')">
             Configurations
         </div>
-
     </aside>
-
     <main class="main">
-
         <div class="header">
-
             <h1>Admin Dashboard</h1>
-
             <div class="user-area">
-
                 <span class="welcome">
-
                     Welcome,
-
                     <strong id="adminName">
-
                         Loading...
-
                     </strong>
-
                 </span>
-
-                <button
-                    type="button"
-                    class="logout-btn"
-                    onclick="Session.logout()">
-
+                <button type="button" class="logout-btn" onclick="Session.logout()">
                     Logout
-
                 </button>
-
             </div>
-
         </div>
 
         <!-- Fees -->
-
         <div id="feesView">
-
             <div class="stats">
-
                 <div class="stat">
                     <h4>Total Students</h4>
                     <div class="value" id="total">0</div>
                 </div>
-
                 <div class="stat">
                     <h4>Active Memberships</h4>
                     <div class="value" id="activeCount">0</div>
                 </div>
-
                 <div class="stat">
                     <h4>Expired Memberships</h4>
                     <div class="value" id="expiredCount">0</div>
                 </div>
-
                 <div class="stat">
                     <h4>Pending Admin Approval</h4>
                     <div class="value" id="pendingCount">0</div>
                 </div>
-
             </div>
-
             <section class="card">
-
                 <h2>Student Fee Records</h2>
-
                 <div class="student-filters">
-
                     <select id="searchType">
                         <option value="all">All</option>
                         <option value="id">Student ID</option>
@@ -161,16 +91,10 @@
                         <option value="mobile">Mobile Number</option>
                         <option value="seat">Seat Number</option>
                     </select>
-
-                    <input
-                        id="search"
-                        type="text"
-                        placeholder="Search students...">
-
+                    <input id="search" type="text" placeholder="Search students...">
                     <select id="batchFilter">
                         <option value="">All Batches</option>
                     </select>
-
                     <select id="statusFilter">
                         <option value="">All Status</option>
                         <option value="ACTIVE">Active</option>
@@ -178,31 +102,19 @@
                         <option value="DISCONTINUED">Discontinued</option>
                         <option value="TERMINATED">Terminated</option>
                     </select>
-
-                    <button
-                        type="button"
-                        class="secondary-btn"
-                        onclick="resetFilters()">
-
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="pendingFeesFilter">
+                        <span>Pending Fees</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="discountFilter">
+                        <span>Discount</span>
+                    </label>
+                    <button type="button" class="secondary-btn" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
-
                         Reset
-
                     </button>
-
                 </div>
-
-
-
-
-
-
-
-
-
-
-
-
                 <div class="table-wrapper">
                     <table>
                         <thead>
@@ -225,208 +137,126 @@
 
                 <!-- Pagination -->
                 <div class="pagination-container">
-
-                    <button
-                            type="button"
-                            class="secondary-btn"
-                            id="firstPageBtn">
+                    <button type="button" class="secondary-btn" id="firstPageBtn">
                         <i class="fa-solid fa-angles-left"></i>
                     </button>
-
-                    <button
-                            type="button"
-                            class="secondary-btn"
-                            id="prevPageBtn">
+                    <button type="button" class="secondary-btn" id="prevPageBtn">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-
                     <span class="page-number">
                     Page
                     <span id="currentPage">1</span>
                     /
                     <span id="totalPages">1</span>
                 </span>
-
-                    <button
-                            type="button"
-                            class="secondary-btn"
-                            id="nextPageBtn">
+                    <button type="button" class="secondary-btn" id="nextPageBtn">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
-
-                    <button
-                            type="button"
-                            class="secondary-btn"
-                            id="lastPageBtn">
+                    <button type="button" class="secondary-btn" id="lastPageBtn">
                         <i class="fa-solid fa-angles-right"></i>
                     </button>
-
                 </div>
-
-
-
-
-
-
-
-
-
-
-
             </section>
-
         </div>
 
         <!-- Admission -->
-
-        <div
-            id="addView"
-            style="display:none">
-
+        <div id="addView" style="display:none">
             <div id="newAdmissionContainer">
-
                 <section class="card">
-
                     <p style="color:var(--muted)">
-
                         Loading New Admission...
-
                     </p>
-
                 </section>
-
             </div>
-
         </div>
 
         <!-- Pending -->
-
-        <div
-            id="pendingView"
-            style="display:none">
-
+        <div id="pendingView" style="display:none">
             <div id="pendingApprovalContainer">
-
                 <section class="card">
-
                     <p style="color:var(--muted)">
-
                         Loading Pending Approvals...
-
                     </p>
-
                 </section>
-
             </div>
-
         </div>
 
         <!-- Transactions -->
-
-        <div
-                id="transactionsView"
-                style="display:none">
-
+        <div id="transactionsView" style="display:none">
             <div id="transactionContainer">
-
                 <section class="card">
-
                     <p style="color:var(--muted)">
                         Loading Transactions...
                     </p>
-
                 </section>
-
             </div>
-
         </div>
 
         <!-- Strength -->
-
-        <div
-                id="strengthView"
-                style="display:none">
-
+        <div id="strengthView" style="display:none">
             <div id="strengthContainer">
-
                 <section class="card">
-
                     <p style="color:var(--muted)">
                         Loading Strength...
                     </p>
-
                 </section>
-
             </div>
-
         </div>
 
         <!-- Configuration -->
-
-        <div
-                id="configurationsView"
-                style="display:none">
-
+        <div id="configurationsView" style="display:none">
             <div id="configurationsContainer">
-
                 <section class="card">
-
                     <p style="color:var(--muted)">
                         Loading Configurations...
                     </p>
-
                 </section>
-
             </div>
-
         </div>
 
-    </main>
+        <!-- Batches -->
+        <div id="batchesView" style="display:none">
+            <div id="batchesContainer">
+                <section class="card">
+                    <p style="color:var(--muted)">
+                        Loading Batches...
+                    </p>
+                </section>
+            </div>
+        </div>
 
+        <!-- Verifiy Student -->
+        <div id="verifyStudentView" style="display:none">
+            <div id="verifyStudentContainer">
+                <section class="card">
+                    <p style="color:var(--muted)">
+                        Loading Verify Student...
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
 </div>
 
 <!-- Fee Modal -->
-
-<div
-    id="feeModal"
-    class="modal">
-
-    <div
-        class="modal-content"
-        style="max-width:900px">
-
+<div id="feeModal" class="modal">
+    <div class="modal-content" style="max-width:900px">
         <div class="modal-header">
-
             <h2>
-
                 Update Fees
-
             </h2>
-
-            <button
-                type="button"
-                onclick="closeFeeModal()">
-
+            <button type="button" onclick="closeFeeModal()">
                 ✕
-
             </button>
-
         </div>
-
         <div id="feeModalBody">
-
             Loading...
-
         </div>
-
     </div>
-
     <div id="global-loader">
     <div class="loader-spinner"></div>
 </div>
-
 </div>
-
 <!-- JavaScript -->
 <!-- 🔹 CORE (must come first) -->
 <script src="/js/api.js"></script>
@@ -452,10 +282,11 @@
 <script src="/js/transaction.js"></script>
 <script src="/js/configurations.js"></script>
 <script src="/js/studentStrength.js"></script>
+<script src="/js/batches.js"></script>
+<script src="/js/verifyStudent.js"></script>
+<script src="/js/student-id-card.js"></script>
 <!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/admin.js"></script>
-
 </body>
-
 </html>
 

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -82,4 +83,7 @@ public class Students {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_fee_id")
     private FeeRecord lastFee;
+
+    @Column(name = "allowed_discount", precision = 12, scale = 2, nullable = false)
+    private BigDecimal allowedDiscount = BigDecimal.ZERO;
 }
