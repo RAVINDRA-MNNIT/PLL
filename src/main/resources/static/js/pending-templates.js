@@ -37,8 +37,8 @@ window.PendingTemplates = {
                     ${item.paymentMode !== "BOTH" ? "" : (item.onlineAmount != null && item.onlineAmount !== "" ? `<br>Online: ₹${item.onlineAmount}` : "")}
                     ${item.transactionId ? `<br>${item.transactionId}` : ""}
                 </td>
-                <td>${requestedAt}</td>
-                <td>${actions}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
+            <td>${actions}</td>
             </tr>
         `;
     },
@@ -63,7 +63,9 @@ window.PendingTemplates = {
         `;
     },
 
-    feeRow(item, actions, requestedAt) {
+    feeRow(item, actions)
+
+ {
         return `
             <tr>
                 <td>${item.requestId}</td>
@@ -86,8 +88,8 @@ window.PendingTemplates = {
                 <td>₹${item.discount ?? 0}</td>
                 <td>₹${item.pendingAmount ?? 0}</td>
                 <td>${item.requestedBy ?? "-"}</td>
-                <td>${requestedAt}</td>
-                <td>${actions}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
+            <td>${actions}</td>
             </tr>
         `;
     },
@@ -109,7 +111,9 @@ window.PendingTemplates = {
         `;
     },
 
-    seatRow(item, actions, requestedAt) {
+    seatRow(item, actions)
+
+ {
         return `
             <tr>
                 <td>${item.requestId}</td>
@@ -118,8 +122,8 @@ window.PendingTemplates = {
                 <td>${item.lastFeeSeatNumber ?? "-"}</td>
                 <td>${item.seatNumber ?? "-"}</td>
                 <td>${item.requestedBy ?? "-"}</td>
-                <td>${requestedAt}</td>
-                <td>${actions}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
+            <td>${actions}</td>
             </tr>
         `;
     },
@@ -140,7 +144,9 @@ window.PendingTemplates = {
         `;
     },
 
-    detailRow(item, actions, requestedAt) {
+    detailRow(item, actions)
+
+ {
         return `
             <tr>
                 <td>${item.requestId ?? "-"}</td>
@@ -148,8 +154,8 @@ window.PendingTemplates = {
                 <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber)}</td>
                 <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber)}</td>
                 <td>${item.requestedBy ?? "-"}</td>
-                <td>${requestedAt}</td>
-                <td>${actions}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>=
+            <td>${actions}</td>
             </tr>
         `;
     },
@@ -172,7 +178,9 @@ window.PendingTemplates = {
         `;
     },
 
-    enrollmentRow(item, actions, requestedAt) {
+    enrollmentRow(item, actions)
+
+ {
         return `
             <tr>
                 <td>${item.requestId ?? "-"}</td>
@@ -182,7 +190,7 @@ window.PendingTemplates = {
                 <td>${this.renderStatus(item.enrollmentStatus)}</td>
                 <td>${this.formatDate(item.lastFeeTillDate)}</td>
                 <td>${item.requestedBy ?? "-"}</td>
-                <td>${requestedAt}</td>
+                <td>${renderRequestedAt(item.requestedAt)}</td>
                 <td>${actions}</td>
             </tr>
         `;
@@ -205,7 +213,8 @@ window.PendingTemplates = {
     `;
     },
 
-    pendingFeesRow(item, actions, requestedAt) {
+    pendingFeesRow(item, actions)
+    {
         return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
@@ -219,9 +228,9 @@ window.PendingTemplates = {
                 ${item.transactionId ? `<br>${item.transactionId}` : ""}
             </td>
             <td>${item.requestedBy ?? "-"}</td>
-            <td>${requestedAt}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
-                <div class="remarks">${item.remarks}</div>  
+                <div class="remarks">${item.remarks ?? "-"}</div>  
             </td>
             <td>${actions}</td>
         </tr>
@@ -247,7 +256,9 @@ window.PendingTemplates = {
     `;
     },
 
-    batchRow(item, actions, requestedAt) {
+    batchRow(item, actions)
+
+ {
         return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
@@ -267,9 +278,9 @@ window.PendingTemplates = {
                 ${item.transactionId ? `<br>${item.transactionId}` : ""}
             </td>
             <td>${item.requestedBy ?? "-"}</td>
-            <td>${requestedAt}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
-                <div class="remarks">${item.remarks}</div>  
+                <div class="remarks">${item.remarks ?? "-"}</div>  
             </td>      
             <td>${actions}</td>
         </tr>
@@ -292,7 +303,9 @@ window.PendingTemplates = {
         `;
     },
 
-allRow(item, actions, requestedAt) {
+allRow(item, actions)
+
+ {
     return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
@@ -308,9 +321,9 @@ allRow(item, actions, requestedAt) {
             </td>
 
             <td>${item.requestType || "-"}</td>
-            <td>${requestedAt}</td>
+            <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
-                <div class="remarks">${item.remarks}</div>  
+                <div class="remarks">${item.remarks ?? "-"}</div>  
             </td>
             <td>
                 ${this.renderStatus(item.requestStatus || item.status)}

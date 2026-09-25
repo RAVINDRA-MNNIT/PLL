@@ -7,7 +7,7 @@ window.FeeForm = {
     prevPending: null,
     allowedDiscount: null,
     currentBatchId: null,
-
+    requestedBy: null,
 
     setStudent(id) {
         this.studentId = id;
@@ -106,8 +106,9 @@ window.FeeForm = {
     },
 
   populate(data) {
-      this.currentPending = Number(data.pendingAmount ?? 0)
-      this.prevPending = Number(data.lastFeePendingAmount ?? 0)
+      this.requestedBy = data.requestedBy;
+      this.currentPending = Number(data.pendingAmount ?? 0);
+      this.prevPending = Number(data.lastFeePendingAmount ?? 0);
       document.getElementById("pendingAmount")?.addEventListener("input", this.calculateFeeSubmittedAmount);
       document.getElementById("discount")?.addEventListener("input", this.calculateFeeSubmittedAmount);
       document.getElementById("onlineAmount")?.addEventListener("input", FeeForm.calculateSplitPayment);
@@ -149,7 +150,7 @@ window.FeeForm = {
     // -------------------------
     // Fee Details
     // -------------------------
-      if (this.isEdit()) {
+      if (data.lastFeePendingAmount > 0) {
           document.getElementById("pendingAmountGroup").style.display = "none";
       }
     document.getElementById("pendingAmount").value = data.pendingAmount ?? "";
@@ -272,7 +273,7 @@ window.FeeForm = {
             onlineAmount: (paymentMode === "BOTH") ? Number(document.getElementById("onlineAmount").value || 0) : 0,
             transactionId: document.getElementById("transactionId")?.value.trim() || null,
             remarks: document.getElementById("paymentRemarks")?.value.trim() || null,
-            requestedBy: Session.getUserId()
+            requestedBy: this.isEdit() ? this.requestedBy : Session.getUserId()
         };
         if (this.currentPending > 0) {
             if (!confirm(`Current pending amount of this student is ₹${this.currentPending}.\n\n Make sure you have received the amount!`)) {
@@ -280,11 +281,6 @@ window.FeeForm = {
                 return;
             }
         }
-
-        // if (!confirmFeeUpdate(body)) {
-        //     return;
-        // }
-
         if (!confirm(printPayload(body))) {
             return
         }
@@ -359,10 +355,9 @@ window.FeeForm = {
             FeeForm.calculateSplitPayment();
             return;
         }
-        const prevPending = FeeForm.isEdit() ?  FeeForm.prevPending : 0
-        const totalFee = (calculateTotalFee(baseAmount, membershipDays) + (FeeForm.currentPending ?? 0) + prevPending);
-        console.log(FeeForm.currentPending)
-        console.log(totalFee)
+        const prevPending = FeeForm.isEdit() ?  FeeForm.prevPending : 0;
+        const currentPendingAmount = (FeeForm.isEdit() && Number(FeeForm.prevPending ?? 0) === 0) ? 0 : (FeeForm.currentPending ?? 0);
+        const totalFee = (calculateTotalFee(baseAmount, membershipDays) + currentPendingAmount + prevPending);
         const finalAmount = Math.max(0, (totalFee - (discount + pending)));
         submittedAmount.value = Math.round(finalAmount);
         FeeForm.calculateSplitPayment();

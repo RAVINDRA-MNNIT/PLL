@@ -178,7 +178,6 @@ function createStudentRow(student) {
         badgeClassMap[student.enrollmentStatus?.toUpperCase()] || "";
     let isTerminated = true;
     let buttonMsg = null;
-    // console.log("diff" + diffDays);
     if (student.enrollmentStatus === "TERMINATED") {
         buttonMsg = `Student is terminated`;
     } else if (diffDays > DAYS_BEFORE_NEXT_FEE_SUBMIT) {

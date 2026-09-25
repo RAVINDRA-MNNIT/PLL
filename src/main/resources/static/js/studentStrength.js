@@ -701,15 +701,12 @@ const Strength = {
 };
 
 Strength.sortCurrentTab = function(sortBy) {
-    console.log(this.activeTab);
     switch (this.activeTab) {
         case "fullday":
-            console.log("fullDay");
             this.renderFullDay(this.sort(this.fullDayData, sortBy));
             break;
 
         case "room1":
-            console.log("room1");
             this.renderRoom1(this.sort(this.room1Data, sortBy));
             break;
     }

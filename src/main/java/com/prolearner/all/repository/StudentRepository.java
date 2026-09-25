@@ -119,7 +119,6 @@ AND (
 )
 AND (
     :discount = false
-    OR COALESCE(fr.discountAmount, 0) > 0
     OR COALESCE(s.allowedDiscount, 0) > 0
 )
 ORDER BY s.studentId DESC

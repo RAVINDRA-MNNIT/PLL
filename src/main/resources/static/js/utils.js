@@ -577,3 +577,20 @@ function formatInputDate(date) {
 
     return `${year}-${month}-${day}`;
 }
+
+function renderRequestedAt(value) {
+    if (!value) return "-";
+
+    const d = new Date(value);
+
+    return `
+            <div>${d.toLocaleDateString("en-IN")}</div>
+            <div style="font-size:12px;color:#666;">
+                ${d.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    })}
+            </div>
+        `;
+}

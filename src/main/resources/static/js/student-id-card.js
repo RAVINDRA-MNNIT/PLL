@@ -49,8 +49,6 @@ const StudentIdCard = {
 
             const html = await response.text();
 
-            console.log("Student ID card HTML:", html);
-
             if (!html.trim()) {
                 console.error("student-id-card.html is empty.");
                 return false;

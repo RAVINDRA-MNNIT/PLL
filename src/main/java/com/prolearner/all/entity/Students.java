@@ -77,7 +77,7 @@ public class Students {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @Column(name = "student_id", nullable = false)
+    @Column(name = "student_id", nullable = false, unique = true)
     private Long studentId;
 
     @OneToOne(fetch = FetchType.LAZY)

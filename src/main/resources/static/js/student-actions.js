@@ -34,11 +34,7 @@ window.StudentActionsUI = {
     },
 
     getConfigurations() {
-        const configurations = JSON.parse(
-            sessionStorage.getItem("configurations")
-        );
-        console.log(configurations)
-        return configurations;
+        return JSON.parse(sessionStorage.getItem("configurations"));
     },
 
     render() {
@@ -462,7 +458,6 @@ showUpdateStatus(currentStatus) {
     //     const student = this.student;
 
    async showUpdateBatch() {
-        debugger;
        const student = this.student;
        const lastFee = student.lastFee;
        if (Number(lastFee?.pendingAmount) > 0) {
@@ -780,7 +775,6 @@ showUpdateStatus(currentStatus) {
     },
 
     calculateBatchAdjustment() {
-        debugger;
         const student = this.student;
         const lastFee = student?.lastFee;
         const allowedDiscount = student.allowedDiscount ?? 0;
@@ -958,6 +952,7 @@ showUpdateStatus(currentStatus) {
     },
 
     async showFeeUpdate() {
+        await getUpdatedBatch();
         if (!confirm("As a student you cannot change anything like batch, seat, amount everything will be same as your previous fee record \n and only one month fees you can update. \n\n Do you want to want to continue?")) {
             return;
         }
@@ -972,13 +967,11 @@ showUpdateStatus(currentStatus) {
         }
 
         const last = this.student?.lastFee;
-        const batch = window.libraryLookups.batches.find(b => Number(b.id) === last.batchId);
-        const baseAmount = Number(batch.baseAmount ?? batch.base_amount ?? 0);
+        const batch = findBatch(last.batchId);
+        const baseAmount = Number(batch.baseAmount ?? 0);
         const newTill = addOneMonth(last.tillDate);
-        const membershipDays = calculateMembershipDays(last.tillDate, newTill);
         const allowedDiscount = this.student?.allowedDiscount ?? 0;
-        const totalFee = ((calculateTotalFee(baseAmount, membershipDays) + (last.pendingAmount ?? 0)) - allowedDiscount);
-
+        const totalFee = ((calculateTotalFee(baseAmount, 30) + (last.pendingAmount ?? 0)) - allowedDiscount);
 
         const payload = {
             studentId: this.studentId ,
@@ -988,15 +981,11 @@ showUpdateStatus(currentStatus) {
             tillDate: newTill.toISOString().split("T")[0],
             submittedAmount: totalFee,
             pendingAmount: 0,
-            discount: last.allowedDiscount ?? 0,
+            discount: allowedDiscount ?? 0,
             paymentMode: "ONLINE",
             transactionId: transactionId,
             requestedBy: Session.getUserId()
         };
-
-        if (!confirm(printPayload(payload))) {
-            return
-        }
 
         try {
             await Api.post(Endpoints.manager.createRequest("FEES"), payload);
@@ -1024,13 +1013,9 @@ showUpdateStatus(currentStatus) {
                 return;
             }
         }
-        debugger;
-
-
         const remarks = `Clear Pending:
                                 Removed Pending Amount: ${pendingAmount ?? "-"}
                                 PaymentMode: ${paymentMode}`;
-
         const payload = {
             studentId: this.studentId ,
             pendingAmount: 0,
@@ -1071,18 +1056,17 @@ showUpdateStatus(currentStatus) {
 
     confirmFeeUpdate() {
         const last = this.student?.lastFee;
-        const batch = window.libraryLookups.batches.find(b => Number(b.id) === last.batchId);
-        const baseAmount = Number(batch.baseAmount ?? batch.base_amount ?? 0);
+        const batch = findBatch(last.batchId);
+        const baseAmount = Number(batch.baseAmount ?? 0);
         const newTill = addOneMonth(last.tillDate);
-        const membershipDays = calculateMembershipDays(last.tillDate, newTill);
         const allowedDiscount = this.student?.allowedDiscount ?? 0;
-        const totalFee = ((calculateTotalFee(baseAmount, membershipDays) + (last.pendingAmount ?? 0)) - allowedDiscount);
+        const totalFee = ((calculateTotalFee(baseAmount, 30) + (last.pendingAmount ?? 0)) - allowedDiscount);
 
         const message = `
         Please review before request.
         Student ID : ${this.studentId}
         Student Name  : ${this.student.fullName}
-        Batch          : ${batch.batchName}
+        Batch          : ${batch.name}
         Seat           : ${last.seatNumber}
         Next From Date: ${formatDate(last.tillDate)}
         Next Till Date: ${formatDate(newTill)}
@@ -1276,7 +1260,6 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveUpdateBatch() {
-        debugger;
         const student = this.student;
         const batchSelect = document.getElementById("updateBatchSelect");
         const seatSelect = document.getElementById("updateBatchSeat");
@@ -1430,7 +1413,6 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveDiscountChange() {
-        debugger;
         const student = this.student;
 
         if (!student) {

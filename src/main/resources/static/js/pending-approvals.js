@@ -192,24 +192,23 @@ async loadData() {
     },
 
     renderRow(item) { 
-        const requestedAt = this.renderRequestedAt(item.requestedAt);
         switch (this.current) {
             case this.TABS.ADMISSION:
                 return PendingTemplates.admissionRow(item, this.renderActions(item));
             case this.TABS.FEES:
-                return PendingTemplates.feeRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.feeRow(item, this.renderActions(item));
             case this.TABS.SEAT:
-                return PendingTemplates.seatRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.seatRow(item, this.renderActions(item));
             case this.TABS.DETAILS:
-                return PendingTemplates.detailRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.detailRow(item, this.renderActions(item));
             case this.TABS.ENROLLMENT:
-                return PendingTemplates.enrollmentRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.enrollmentRow(item, this.renderActions(item));
             case this.TABS.PENDING_FEES:
-                return PendingTemplates.pendingFeesRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.pendingFeesRow(item, this.renderActions(item));
             case this.TABS.BATCH:
-                return PendingTemplates.batchRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.batchRow(item, this.renderActions(item));
             case this.TABS.ALL:
-                return PendingTemplates.allRow(item, this.renderActions(item), requestedAt);
+                return PendingTemplates.allRow(item, this.renderActions(item));
             default:
                 return "";
         }
@@ -237,23 +236,6 @@ async loadData() {
             comment,
             shouldShowEdit
         );
-    },
-    
-    renderRequestedAt(value) {
-        if (!value) return "-";
-
-        const d = new Date(value);
-
-        return `
-            <div>${d.toLocaleDateString("en-IN")}</div>
-            <div style="font-size:12px;color:#666;">
-                ${d.toLocaleTimeString("en-IN", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true
-                })}
-            </div>
-        `;
     },
 
     // ================= ACTIONS =================
@@ -307,28 +289,29 @@ async viewEdit(requestId) {
         const diffInDays = Math.floor((till - from) / (1000 * 60 * 60 * 24));
 
         const warnings = [];
+        if (pendingRow.requestType == "FEES") {
+            if (pendingRow.lastFeeTillDate !== pendingRow.fromDate) {
+                warnings.push(
+                    `• Membership gap detected.\n  Last membership till: ${pendingRow.lastFeeTillDate}\n  New membership from: ${pendingRow.fromDate}`
+                );
+            }
 
-        if (pendingRow.lastFeeTillDate !== pendingRow.fromDate) {
-            warnings.push(
-                `• Membership gap detected.\n  Last membership till: ${pendingRow.lastFeeTillDate}\n  New membership from: ${pendingRow.fromDate}`
-            );
-        }
+            if (diffInDays > 31) {
+                warnings.push(
+                    `• You are updating fees for more than one month (${diffInDays} days).`
+                );
+            }
 
-        if (diffInDays > 31) {
-            warnings.push(
-                `• You are updating fees for more than one month (${diffInDays} days).`
-            );
+            if (pendingRow.lastFeePendingAmount > 0) {
+                warnings.push(
+                    `• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
+                );
+            }
         }
 
         if (pendingRow.pendingAmount > 0) {
             warnings.push(
                 `• Current pending amount: ₹${pendingRow.pendingAmount}.`
-            );
-        }
-
-        if (pendingRow.lastFeePendingAmount > 0) {
-            warnings.push(
-                `• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
             );
         }
 

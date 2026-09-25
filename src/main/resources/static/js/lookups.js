@@ -80,10 +80,8 @@ async function loadConfiguration() {
  */
 async function reloadSeats() {
     try {
-        console.log("Reloading seats...");
         const seats = await fetchLookup(Endpoints.lookups.seats);
         window.libraryLookups.seats = seats || [];
-        console.log("Seats updated ✅");
     } catch (e) {
         console.error("Failed to reload seats ❌", e);
     }

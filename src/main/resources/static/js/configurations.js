@@ -538,8 +538,6 @@ const Configurations = {
         document.getElementById("editUserPassword").value = "";
         document.getElementById("editUserActive").checked = user.active;
         document.getElementById("editSuperAdmin").checked = user.superAdmin;
-        console.log(user);
-        console.log(user.superAdmin);
         const activeGroup = document.getElementById("editUserActive")
             .closest(".form-group");
         const superAdminGroup = document.getElementById("editSuperAdmin")

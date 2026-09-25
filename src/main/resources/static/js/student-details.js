@@ -16,7 +16,7 @@ init() {
 },
 
 initialize() {
-    document.getElementById("detailLibraryName").text = `${getConfigurations().LIBRARY_NAME}`;
+    document.getElementById("detailLibraryName").textContent = `${this.getConfigurations().LIBRARY_NAME}`;
     try {
         // ✅ GET ID FROM URL (CORRECT FLOW)
         const params = new URLSearchParams(window.location.search);
@@ -57,6 +57,10 @@ initialize() {
         } finally {
             this.render();
         }
+    },
+
+    getConfigurations() {
+        return JSON.parse(sessionStorage.getItem("configurations"));
     },
 
     // ================= RENDER =================
