@@ -3,6 +3,9 @@ package com.prolearner.all.controller;
 import java.util.List;
 
 import com.prolearner.all.dto.*;
+import com.prolearner.all.entity.StudentComplaint;
+import com.prolearner.all.entity.StudentWarning;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -79,5 +82,72 @@ public class StudentController {
     @GetMapping("/strength/room3")
     public ShiftStrengthResponse getRoom3Strength() {
         return studentService.getRoom3Strength();
+    }
+
+    @PostMapping("/addwarning")
+    public void addWarning(@RequestBody AddWarningRequest request) {
+        studentService.addWarning(request);
+    }
+
+    @PostMapping("/addcomplaint")
+    public void addComplaint(@RequestBody AddComplaintRequest request) {
+        studentService.addComplaint(request);
+    }
+
+    @GetMapping("/getwarnings/{studentId}")
+    public List<StudentWarning> getStudentWarnings(
+            @PathVariable Long studentId) {
+        return studentService.getStudentWarnings(studentId);
+    }
+
+    @GetMapping("/getcomplaints/{studentId}")
+    public List<StudentComplaint> getStudentComplaints(
+            @PathVariable Long studentId) {
+        return studentService.getStudentComplaints(studentId);
+    }
+
+    @DeleteMapping("/deletewarning/{warningId}")
+    public void deleteWarning(
+            @PathVariable Long warningId) {
+        studentService.deleteWarning(warningId);
+    }
+
+    @DeleteMapping("/deletecomplaint/{complaintId}")
+    public void deleteComplaint(
+            @PathVariable Long complaintId) {
+        studentService.deleteComplaint(complaintId);
+    }
+
+    @GetMapping("/getallcomplaints")
+    public Page<StudentComplaintResponse> getAllComplaints(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search
+    ) {
+        return studentService.getAllComplaints(
+                page,
+                size,
+                search
+        );
+    }
+
+    @GetMapping("/getallwarnings")
+    public Page<StudentWarningResponse> getAllWarnings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search
+    ) {
+        return studentService.getAllWarnings(
+                page,
+                size,
+                search
+        );
+    }
+
+    @PutMapping("/resolvecomplaint/{complaintId}")
+    public void resolveComplaint(
+            @PathVariable Long complaintId) {
+
+        studentService.resolveComplaint(complaintId);
     }
 }

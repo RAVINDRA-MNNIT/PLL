@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link
+            rel="stylesheet"
+            href="/css/student-issues.css">
+
+</head>
+
+<body>
+
+<div class="card student-issues-card">
+
+    <!-- HEADER -->
+    <div class="issues-header">
+
+        <div class="issues-header-left">
+
+            <h2>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Student Issues
+            </h2>
+
+            <p class="issues-subtitle">
+                View and manage student complaints and warnings.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABS -->
+    <div class="tabs-container">
+
+        <div class="tabs">
+
+            <button
+                    id="complaintsTab"
+                    class="tab active"
+                    type="button">
+
+                <i class="fa-solid fa-comment-dots"></i>
+
+                Complaints
+
+                <span
+                        id="complaintsCount"
+                        class="tab-count">
+                    0
+                </span>
+
+            </button>
+
+
+            <button
+                    id="warningsTab"
+                    class="tab"
+                    type="button">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                Warnings
+
+                <span
+                        id="warningsCount"
+                        class="tab-count">
+                    0
+                </span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH -->
+    <div class="search">
+
+        <input
+                id="issuesSearchBox"
+                type="text"
+                placeholder="Search student issues..."
+                aria-label="Search student issues">
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="table-container">
+
+        <table id="issuesTable">
+
+            <thead id="issuesTableHead"></thead>
+
+            <tbody id="issuesRows"></tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+    <div class="pagination-container">
+
+        <button
+                type="button"
+                class="secondary-btn"
+                id="firstPageBtn"
+                title="First Page">
+
+            <i class="fa-solid fa-angles-left"></i>
+
+        </button>
+
+
+        <button
+                type="button"
+                class="secondary-btn"
+                id="prevPageBtn"
+                title="Previous Page">
+
+            <i class="fa-solid fa-chevron-left"></i>
+
+        </button>
+
+
+        <span class="page-number">
+
+            Page
+
+            <span id="currentPage">
+                1
+            </span>
+
+            /
+
+            <span id="totalPages">
+                1
+            </span>
+
+        </span>
+
+
+        <button
+                type="button"
+                class="secondary-btn"
+                id="nextPageBtn"
+                title="Next Page">
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        </button>
+
+
+        <button
+                type="button"
+                class="secondary-btn"
+                id="lastPageBtn"
+                title="Last Page">
+
+            <i class="fa-solid fa-angles-right"></i>
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="/js/api.js"></script>
+<script src="/js/endpoints.js"></script>
+<script src="/js/session.js"></script>
+
+<script src="/js/student-issues.js"></script>
+
+</body>
+</html>

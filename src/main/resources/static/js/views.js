@@ -25,6 +25,7 @@ async function switchView(view) {
     document.getElementById("configurationsView")?.style.setProperty("display", "none");
     document.getElementById("batchesView")?.style.setProperty("display", "none");
     document.getElementById("verifyStudentView")?.style.setProperty("display", "none");
+    document.getElementById("complaintsView")?.style.setProperty("display", "none");
 
     // Remove active class
     document.querySelectorAll(".nav-item")
@@ -66,20 +67,25 @@ async function switchView(view) {
             document.querySelectorAll(".nav-item")[5].classList.add("active");
             VerifyStudent.load();
             break;
+        case "complaints":
+            document.getElementById("complaintsView").style.display = "block";
+            document.querySelectorAll(".nav-item")[6].classList.add("active");
+            StudentIssues.load();
+            break;
         case "batches":
             document.getElementById("batchesView").style.display = "block";
-            document.querySelectorAll(".nav-item")[6].classList.add("active");
+            document.querySelectorAll(".nav-item")[7].classList.add("active");
             BatchManager.load();
             break;
         case "configurations":
             document.getElementById("configurationsView").style.display = "block";
-            document.querySelectorAll(".nav-item")[7].classList.add("active");
+            document.querySelectorAll(".nav-item")[8].classList.add("active");
             Configurations.load();
             break;
         default:
             console.warn("Unknown view:", view);
             document.getElementById("feesView").style.display = "block";
-            document.querySelectorAll(".nav-item")[0].classList.add("active");
+            document.querySelectorAll(".nav-item")[9].classList.add("active");
     }
 }
 

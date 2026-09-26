@@ -5,6 +5,8 @@
 window.StudentDetailsPage = {
 
     currentStudent: null,
+    studentWarnings: [],
+    studentComplaints: [],
 
     // ================= INIT =================
 init() {
@@ -47,15 +49,17 @@ initialize() {
             }
         }
         try {
-            this.currentStudent = await Api.get(
-                Endpoints.students.details(studentId)
-            );
+            this.currentStudent = await Api.get(Endpoints.students.details(studentId));
+            this.studentWarnings = await this.getStudentWarnings(studentId);
+            this.studentComplaints = await this.getStudentComplaints(studentId);
         } catch (error) {
             console.error(error);
             alert(error.message || "Something went wrong.");
             this.currentStudent = null;
         } finally {
+
             this.render();
+            this.showWarningNotice();
         }
     },
 
@@ -129,7 +133,40 @@ initialize() {
         const enrollmentStatus = student.enrollmentStatus;
         this.setValue("membershipTitle", enrollmentStatus === "ACTIVE" ? "Current Membership" : "Last Membership (Outdated)");
         this.updateEnrollmentStatus(enrollmentStatus);
-        StudentActionsUI.init("studentActions", student);
+        StudentActionsUI.init("studentActions", student, this.studentWarnings, this.studentComplaints);
+    },
+
+    showWarningNotice() {
+        const warningCount = this.studentWarnings.length ?? 0;
+        const isStudent = Session.isStudent();
+        const notice =
+            document.getElementById("studentWarningNotice");
+
+        if (!notice) {
+            return;
+        }
+
+        if (!warningCount || warningCount <= 0) {
+            notice.style.display = "none";
+            notice.textContent = "";
+            return;
+        }
+
+        if (isStudent) {
+            if (this.currentStudent.enrollmentStatus.toUpperCase() === "TERMINATED") {
+                notice.textContent = `You are terminated.`;
+            } else {
+                notice.textContent = `You have ${warningCount} warning(s), only three warnings will be tolerated after that you will get terminated so don't make mistakes.`;
+            }
+        } else {
+            if (this.currentStudent.enrollmentStatus.toUpperCase() === "TERMINATED") {
+                notice.textContent = `This student is terminated.`;
+            } else {
+                notice.textContent = `This student has ${warningCount} warning(s).`;
+            }
+        }
+
+        notice.style.display = "block";
     },
 
     // ================= HELPERS =================
@@ -183,6 +220,28 @@ initialize() {
             `;
         });
         StudentDetailsModal.changeSeat(options);
+    },
+
+    // ================= API =================
+
+    async getStudentWarnings(studentId) {
+        try {
+            return await Api.get(
+                Endpoints.students.getStudentWarnings(studentId)
+            );
+        } catch (error) {
+            return [];
+        }
+    },
+
+    async getStudentComplaints(studentId) {
+        try {
+            return await Api.get(
+                Endpoints.students.getStudentComplaints(studentId)
+            );
+        } catch (error) {
+            return [];
+        }
     },
 };
 // ✅ INIT

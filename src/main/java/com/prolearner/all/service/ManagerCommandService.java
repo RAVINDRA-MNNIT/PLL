@@ -94,6 +94,7 @@ public class ManagerCommandService {
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
         } else if (type == RequestType.ENROLLMENT) {
             newRequest.setEnrollmentStatus(body.getEnrollmentStatus());
+            newRequest.setRemarks(body.getRemarks());
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
         } else if (type == RequestType.FEES) {
             return handleFees(newRequest, body, type, userId, false);

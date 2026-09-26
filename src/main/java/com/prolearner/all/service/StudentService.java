@@ -1,20 +1,23 @@
 package com.prolearner.all.service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.FeeRecord;
+import com.prolearner.all.entity.StudentComplaint;
+import com.prolearner.all.entity.StudentWarning;
 import com.prolearner.all.entity.Students;
 import com.prolearner.all.enums.EnrollmentStatus;
-import com.prolearner.all.repository.FeeRecordRepository;
-import com.prolearner.all.repository.SeatRepository;
-import com.prolearner.all.repository.StudentRepository;
+import com.prolearner.all.repository.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -25,15 +28,21 @@ public class StudentService {
     private final FeeRecordRepository feeRecordRepo;
     private final ConfigurationService configurationService;
     private final SeatRepository seatRepo;
+    private final StudentWarningRepository studentWarningRepo;
+    private final StudentComplaintRepository studentComplaintRepo;
+    private final SeatService seatService;
 
 
     public StudentService(StudentRepository studentRepo,
                           FeeRecordRepository feeRecordRepo,
-                          ConfigurationService configurationService, SeatRepository seatRepo) {
+                          ConfigurationService configurationService, SeatRepository seatRepo, StudentWarningRepository studentWarningRepo, StudentComplaintRepository studentComplaintRepo, SeatService seatService) {
         this.studentRepo = studentRepo;
         this.feeRecordRepo = feeRecordRepo;
         this.configurationService = configurationService;
         this.seatRepo = seatRepo;
+        this.studentWarningRepo = studentWarningRepo;
+        this.studentComplaintRepo = studentComplaintRepo;
+        this.seatService = seatService;
     }
 
     public StudentListResponse getStudents(
@@ -427,6 +436,129 @@ public class StudentService {
                 thirdShift,
                 fourthShift
         );
+    }
+
+    public void addWarning(AddWarningRequest request) {
+        StudentWarning warning = StudentWarning.builder()
+                .studentId(request.getStudentId())
+                .warningLevel(request.getWarningLevel())
+                .category(request.getCategory())
+                .description(request.getDescription())
+                .actionTaken(request.getActionTaken())
+                .issuedBy(request.getIssuedBy())
+                .issuedByName(request.getIssuedByName())
+                .issuedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        if ("TERMINATE".equals(request.getWarningLevel())) {
+            Students student = studentRepo.findByStudentId(request.getStudentId()).orElseThrow(() -> new RuntimeException("Student not found"));
+            student.setEnrollmentStatus(EnrollmentStatus.TERMINATED.name());
+            FeeRecord lastFee = student.getLastFee();
+            if (lastFee != null) {
+                Long seatId = lastFee.getSeatId();
+                seatService.removeReservedSeat(seatId);
+                LocalDate today = LocalDate.now();
+                if (lastFee.getTillDate() == null || lastFee.getTillDate().isAfter(today)) {
+                    lastFee.setTillDate(today);
+                    feeRecordRepo.save(lastFee);
+                }
+            }
+            studentRepo.save(student);
+        }
+        studentWarningRepo.save(warning);
+    }
+
+    public void addComplaint(AddComplaintRequest request) {
+
+        OffsetDateTime now = OffsetDateTime.now();
+
+        StudentComplaint complaint = StudentComplaint.builder()
+                .studentId(request.getStudentId())
+                .category(request.getCategory())
+                .description(request.getDescription())
+                .status("OPEN")
+                .submittedAt(now)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        studentComplaintRepo.save(complaint);
+    }
+
+    public List<StudentWarning> getStudentWarnings(Long studentId) {
+        return studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
+    }
+
+    public List<StudentComplaint> getStudentComplaints(Long studentId) {
+        return studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
+    }
+
+    public void deleteWarning(Long warningId) {
+        if (!studentWarningRepo.existsById(warningId)) {
+            throw new RuntimeException("Warning not found");
+        }
+        studentWarningRepo.deleteById(warningId);
+    }
+
+    public void deleteComplaint(Long complaintId) {
+
+        if (!studentComplaintRepo.existsById(complaintId)) {
+            throw new RuntimeException("Complaint not found");
+        }
+
+        studentComplaintRepo.deleteById(complaintId);
+    }
+
+    public Page<StudentComplaintResponse> getAllComplaints(
+            int page,
+            int size,
+            String search) {
+
+        Pageable pageable =
+                PageRequest.of(page, size);
+
+        return studentComplaintRepo.searchComplaints(
+                search,
+                pageable
+        );
+    }
+
+
+    public Page<StudentWarningResponse> getAllWarnings(
+            int page,
+            int size,
+            String search) {
+
+        Pageable pageable =
+                PageRequest.of(page, size);
+
+        return studentWarningRepo.searchWarnings(
+                search,
+                pageable
+        );
+    }
+
+    @Transactional
+    public void resolveComplaint(Long complaintId) {
+
+        StudentComplaint complaint =
+                studentComplaintRepo.findById(complaintId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Complaint not found"
+                                )
+                        );
+
+        OffsetDateTime now =
+                OffsetDateTime.now();
+
+        complaint.setStatus("RESOLVED");
+        complaint.setResolvedAt(now);
+        complaint.setUpdatedAt(now);
+
+        studentComplaintRepo.save(complaint);
     }
 }
 

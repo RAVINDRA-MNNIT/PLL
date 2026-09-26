@@ -594,3 +594,29 @@ function renderRequestedAt(value) {
             </div>
         `;
 }
+
+function formatWarningLevel(level) {
+    const map = {
+        FIRST_WARNING: "First Warning",
+        SECOND_WARNING: "Second Warning",
+        FINAL_WARNING: "Final Warning"
+    };
+
+    return map[level] ?? level ?? "-";
+}
+
+function formatWarningCategory(category) {
+    const map = {
+        DISCIPLINE: "Discipline",
+        TIMING: "Timing",
+        ATTENDANCE: "Attendance",
+        NOISE: "Noise",
+        MISCONDUCT: "Misconduct",
+        PROPERTY: "Property",
+        SEAT: "Seat",
+        LIBRARY_RULE: "Library Rule",
+        OTHER: "Other"
+    };
+
+    return map[category] ?? category ?? "-";
+}

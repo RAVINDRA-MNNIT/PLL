@@ -4,24 +4,17 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
-import com.prolearner.all.entity.Transaction;
+import com.prolearner.all.entity.*;
 import com.prolearner.all.enums.*;
-import com.prolearner.all.repository.TransactionRepository;
+import com.prolearner.all.repository.*;
 import lombok.AllArgsConstructor;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.prolearner.all.entity.ApprovalRequest;
-import com.prolearner.all.entity.Students;
-import com.prolearner.all.entity.FeeRecord;
-
-import com.prolearner.all.repository.ApprovalRequestRepository;
-import com.prolearner.all.repository.StudentRepository;
-import com.prolearner.all.repository.FeeRecordRepository;
 
 import com.prolearner.all.dto.PendingRequestDTO;
 import com.prolearner.all.dto.StudentIdAllocation;
@@ -39,7 +32,8 @@ public class AdminCommandService {
     private final StudentIdService studentIdService;
     private final TransactionRepository transactionRepository;
     private final ConfigurationService configurationService;
-
+    private final StudentWarningRepository studentWarningRepo;
+    private final UserRepository userRepo;
 
     // ====================================================
     // 🔹 Admission
@@ -278,7 +272,7 @@ public class AdminCommandService {
                 }
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
-                updateEnrollment(student, r.getEnrollmentStatus());
+                updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedBy());
             }  else if (RequestType.BATCH.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
                 lastFee.setBatchId(r.getBatchId());
@@ -360,7 +354,7 @@ public class AdminCommandService {
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         if (RequestType.ENROLLMENT.name().equals(type)) {
-            updateEnrollment(student, body.getEnrollmentStatus());
+            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), 2L);
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
         } else if (RequestType.DETAILS.name().equals(type)) {
@@ -554,7 +548,7 @@ public class AdminCommandService {
     // ENROLLMENT UPDATE REQUEST
     // =========================================================
     public void updateEnrollment(Students student,
-                                 String status) {
+                                 String status, String remarks, Long userId) {
         student.setEnrollmentStatus(status);
         FeeRecord lastFee = student.getLastFee();
         if (EnrollmentStatus.DISCONTINUED.name().equals(status) || EnrollmentStatus.TERMINATED.name().equals(status)) {
@@ -567,7 +561,39 @@ public class AdminCommandService {
                 feeRecordRepository.save(lastFee);
             }
         }
+        if (EnrollmentStatus.TERMINATED.name().equals(status)) {
+            if (userId == null) {
+                throw new IllegalStateException("Cannot create termination warning: userId is missing.");
+            }
+            String issuedByName = userRepo.findById(userId).map(User::getFullName).orElse("Unknown User");
+            String description = remarks != null && !remarks.isBlank() ? remarks : "Student has been terminated.";
+            OffsetDateTime now = OffsetDateTime.now();
+            StudentWarning warning = StudentWarning.builder()
+                    .studentId(student.getStudentId())
+                    .warningLevel("TERMINATE")
+                    .category("LIBRARY_RULE")
+                    .description(description)
+                    .actionTaken("Student has been terminated.")
+                    .issuedBy(userId)
+                    .issuedByName(issuedByName)
+                    .issuedAt(now)
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
+
+            studentWarningRepo.save(warning);
+        }
+        if (EnrollmentStatus.ACTIVE.name().equals(status)) {
+            deleteTerminateWarning(student.getStudentId());
+        }
         studentRepo.save(student);
+    }
+
+    public void deleteTerminateWarning(Long studentId) {
+        List<StudentWarning> warnings = studentWarningRepo.findByStudentIdAndWarningLevel(studentId, "TERMINATE");
+        if (!warnings.isEmpty()) {
+            studentWarningRepo.deleteAll(warnings);
+        }
     }
 
     public void updateTransaction(Long studentId,

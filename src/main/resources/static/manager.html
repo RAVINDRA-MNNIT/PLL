@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/manager.css">
     <link rel="stylesheet" href="/css/verifyStudent.css">
     <link rel="stylesheet" href="/css/student-id-card.css">
-
+    <link rel="stylesheet" href="/css/student-issues.css">
 </head>
 <body>
 <div id="pageLoading">
@@ -36,6 +36,9 @@
         </div>
         <div class="nav-item" onclick="switchView('verifyStudent')">
             Verify Student
+        </div>
+        <div class="nav-item" onclick="switchView('complaints')">
+            Complaints & Warnings
         </div>
     </aside>
     <main class="main">
@@ -191,6 +194,16 @@
                 </section>
             </div>
         </div>
+        <!-- Complaints and Warnings -->
+        <div id="complaintsView" style="display:none">
+            <div id="complaintsViewContainer">
+                <section class="card">
+                    <p style="color:var(--muted)">
+                        Loading Complaints and Warnings...
+                    </p>
+                </section>
+            </div>
+        </div>
     </main>
 </div>
 
@@ -239,7 +252,7 @@
 <script src="/js/studentStrength.js"></script>
 <script src="/js/verifyStudent.js"></script>
 <script src="/js/student-id-card.js"></script>
-
+<script src="/js/student-issues.js"></script>
 <!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/manager.js"></script>
 </body>

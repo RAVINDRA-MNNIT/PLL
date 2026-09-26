@@ -1,0 +1,494 @@
+/* =========================================================
+   STUDENT ISSUES
+   ========================================================= */
+
+.student-issues-card {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.issues-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 18px;
+}
+
+.issues-header-left h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.issues-header-left h2 i {
+    font-size: 20px;
+}
+
+.issues-subtitle {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.tabs-container {
+    width: 100%;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.tab {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-bottom: 3px solid transparent;
+
+    background: transparent;
+
+    color: #6b7280;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+            color 0.2s ease,
+            background 0.2s ease,
+            border-color 0.2s ease;
+}
+
+.tab:hover {
+    color: #2563eb;
+    background: #f8fafc;
+}
+
+.tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+}
+
+.tab i {
+    font-size: 14px;
+}
+
+.tab-count {
+    min-width: 22px;
+    height: 22px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 6px;
+
+    border-radius: 11px;
+
+    background: #e5e7eb;
+    color: #374151;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tab.active .tab-count {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.search input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 11px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+
+    background: #fff;
+
+    color: #111827;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.search input::placeholder {
+    color: #9ca3af;
+}
+
+.search input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+            0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+   ========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+#issuesTable {
+    width: 100%;
+    min-width: 1050px;
+
+    border-collapse: collapse;
+
+    background: #fff;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+#issuesTable thead {
+    background: #f8fafc;
+}
+
+#issuesTable th {
+    padding: 11px 12px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #374151;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+#issuesTable td {
+    padding: 10px 12px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #374151;
+
+    vertical-align: middle;
+}
+
+#issuesTable tbody tr {
+    transition: background 0.15s ease;
+}
+
+#issuesTable tbody tr:hover {
+    background: #f8fafc;
+}
+
+#issuesTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#issuesTable td strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.description-cell {
+    max-width: 280px;
+
+    white-space: normal;
+    word-break: break-word;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.status-open {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-resolved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-closed {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+
+/* =========================================================
+   WARNING LEVEL
+   ========================================================= */
+
+.warning-level-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    background: #fee2e2;
+    color: #b91c1c;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.delete-btn {
+    width: 30px;
+    height: 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 5px;
+
+    background: #fee2e2;
+    color: #dc2626;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.15s ease;
+}
+
+.delete-btn:hover {
+    background: #fecaca;
+    color: #b91c1c;
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+.delete-btn i {
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   NO DATA / LOADING
+   ========================================================= */
+
+.no-data,
+.loading {
+    height: 120px;
+
+    text-align: center !important;
+    vertical-align: middle !important;
+
+    color: #6b7280 !important;
+
+    font-size: 14px;
+}
+
+.no-data i,
+.loading i {
+    margin-right: 7px;
+}
+
+.no-data.error {
+    color: #dc2626 !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .student-issues-card {
+        padding: 15px;
+    }
+
+    .issues-header {
+        align-items: flex-start;
+    }
+
+    .issues-header-left h2 {
+        font-size: 19px;
+    }
+
+    .issues-subtitle {
+        font-size: 13px;
+    }
+
+    .tab {
+        padding: 9px 13px;
+        font-size: 13px;
+    }
+
+    #issuesTable {
+        min-width: 950px;
+    }
+}
+
+
+@media (max-width: 640px) {
+
+    .student-issues-card {
+        padding: 10px;
+    }
+
+    .issues-header-left h2 {
+        font-size: 18px;
+    }
+
+    .issues-subtitle {
+        font-size: 12px;
+    }
+
+    .tabs-container {
+        margin-bottom: 12px;
+    }
+
+    .tabs {
+        gap: 0;
+    }
+
+    .tab {
+        padding: 9px 11px;
+        font-size: 12px;
+    }
+
+    .tab-count {
+        min-width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+
+    .search input {
+        padding: 10px 12px;
+    }
+
+    #issuesTable {
+        min-width: 900px;
+        font-size: 12px;
+    }
+
+    #issuesTable th,
+    #issuesTable td {
+        padding: 9px 10px;
+    }
+}

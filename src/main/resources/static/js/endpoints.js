@@ -50,6 +50,26 @@ window.Endpoints = {
         feeHistory(studentId) {
             return `/api/students/feeHistory/${studentId}`;
         },
+        addWarning: "/api/students/addwarning",
+        addComplaint: "/api/students/addcomplaint",
+        getStudentWarnings(studentId) {
+            return `/api/students/getwarnings/${studentId}`;
+        },
+        deleteStudentWarning(warningId) {
+            return `/api/students/deletewarning/${warningId}`;
+        },
+        getStudentComplaints(studentId) {
+            return `/api/students/getcomplaints/${studentId}`;
+        },
+        deleteStudentComplaint(complaintId) {
+            return `/api/students/deletecomplaint/${complaintId}`;
+        },
+        getAllComplaints: "/api/students/getallcomplaints",
+
+        getAllWarnings: "/api/students/getallwarnings",
+        resolvecomplaint(complaintId) {
+            return `/api/students/resolvecomplaint/${complaintId}`;
+        },
     },
 
     // ================= PENDING (UNIFIED SYSTEM) =================

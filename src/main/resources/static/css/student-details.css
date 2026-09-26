@@ -315,3 +315,737 @@
         flex: 1;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+  WARNINGS MODAL
+  ========================================================= */
+
+.student-warning-modal {
+    width: 780px !important;
+    max-width: 94vw !important;
+    max-height: 90vh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.student-warning-modal .modal-body {
+    overflow-y: auto !important;
+
+    padding: 16px 20px !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   STUDENT SUMMARY
+   ========================================================= */
+
+.student-warning-modal .student-update-summary {
+    display: grid !important;
+
+    grid-template-columns: repeat(3, 1fr) !important;
+
+    gap: 10px !important;
+
+    margin: 0 0 14px 0 !important;
+    padding: 0 !important;
+}
+
+
+.student-warning-modal .summary-item {
+    background: #f8fafc !important;
+
+    border: 1px solid #e2e8f0 !important;
+
+    border-radius: 7px !important;
+
+    padding: 9px 12px !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+.student-warning-modal .summary-item label {
+    display: block !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    margin: 0 0 3px 0 !important;
+    padding: 0 !important;
+
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+
+    font-weight: 400 !important;
+
+    color: #64748b !important;
+}
+
+
+.student-warning-modal .summary-item strong {
+    display: block !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+
+    font-weight: 600 !important;
+
+    color: #1e293b !important;
+}
+
+
+/* =========================================================
+   WARNING LIST
+   ========================================================= */
+
+.student-warning-list {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 8px !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* =========================================================
+   WARNING CARD
+   ========================================================= */
+
+.student-warning-card {
+    display: block !important;
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dbe3ec !important;
+
+    border-radius: 8px !important;
+
+    overflow: hidden !important;
+}
+
+
+/* =========================================================
+   WARNING HEADER
+   ========================================================= */
+
+.student-warning-card-header {
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    justify-content: space-between !important;
+
+    width: 100% !important;
+
+    min-height: 0 !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+
+    padding: 8px 12px !important;
+
+    background: #f8fafc !important;
+
+    border-bottom: 1px solid #e2e8f0 !important;
+
+    gap: 10px !important;
+}
+
+
+/* =========================================================
+   WARNING TITLE
+   ========================================================= */
+
+.student-warning-title {
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    width: auto !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    gap: 8px !important;
+}
+
+
+.student-warning-number {
+    display: inline !important;
+
+    width: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.3 !important;
+
+    font-weight: 600 !important;
+
+    color: #1e293b !important;
+
+    white-space: nowrap !important;
+}
+
+
+.student-warning-level {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    width: auto !important;
+
+    margin: 0 !important;
+
+    padding: 3px 7px !important;
+
+    border-radius: 5px !important;
+
+    background: #fef3c7 !important;
+
+    color: #92400e !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   WARNING DATE
+   ========================================================= */
+
+.student-warning-date {
+    display: block !important;
+
+    width: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.3 !important;
+
+    color: #64748b !important;
+
+    white-space: nowrap !important;
+
+    text-align: right !important;
+}
+
+
+/* =========================================================
+   WARNING BODY
+   ========================================================= */
+
+.student-warning-card-body {
+    display: block !important;
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+
+    padding: 7px 12px !important;
+}
+
+
+/* =========================================================
+   WARNING LINE
+
+   Label + value are intentionally INLINE.
+   ========================================================= */
+
+.student-warning-line {
+    display: block !important;
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 0 3px 0 !important;
+
+    padding: 0 !important;
+
+    font-size: 13px !important;
+
+    line-height: 1.35 !important;
+
+    font-weight: 400 !important;
+
+    color: #475569 !important;
+
+    text-align: left !important;
+
+    white-space: normal !important;
+
+    word-break: break-word !important;
+
+    overflow-wrap: anywhere !important;
+}
+
+
+/* Last line */
+
+.student-warning-line:last-child {
+    margin-bottom: 0 !important;
+}
+
+
+/* =========================================================
+   LABEL
+
+   IMPORTANT:
+   inline-block prevents it from becoming a separate row.
+   ========================================================= */
+
+.student-warning-label {
+    display: inline !important;
+
+    width: auto !important;
+
+    height: auto !important;
+
+    margin: 0 5px 0 0 !important;
+
+    padding: 0 !important;
+
+    font-size: 13px !important;
+
+    line-height: inherit !important;
+
+    font-weight: 600 !important;
+
+    color: #334155 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   VALUE
+
+   IMPORTANT:
+   inline prevents it from going to next line.
+   ========================================================= */
+
+.student-warning-value {
+    display: inline !important;
+
+    width: auto !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    font-size: 13px !important;
+
+    line-height: inherit !important;
+
+    font-weight: 400 !important;
+
+    color: #475569 !important;
+
+    white-space: normal !important;
+
+    word-break: break-word !important;
+
+    overflow-wrap: anywhere !important;
+}
+
+
+/* =========================================================
+   CANCELLED
+   ========================================================= */
+
+.student-warning-cancelled {
+    color: #991b1b !important;
+}
+
+
+.student-warning-cancelled .student-warning-label {
+    color: #991b1b !important;
+}
+
+
+.student-warning-cancelled .student-warning-value {
+    color: #991b1b !important;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.student-warning-empty {
+    display: block !important;
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    text-align: center !important;
+
+    margin: 0 !important;
+
+    padding: 30px 20px !important;
+
+    color: #64748b !important;
+}
+
+
+.student-warning-empty i {
+    display: block !important;
+
+    margin: 0 0 8px 0 !important;
+
+    padding: 0 !important;
+
+    font-size: 32px !important;
+}
+
+
+.student-warning-empty p {
+    display: block !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.4 !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    .student-warning-modal {
+        width: 95vw !important;
+
+        max-width: 95vw !important;
+    }
+
+
+    .student-warning-modal .modal-body {
+        padding: 12px !important;
+    }
+
+
+    .student-warning-modal .student-update-summary {
+        grid-template-columns: 1fr 1fr !important;
+
+        gap: 7px !important;
+
+        margin-bottom: 10px !important;
+    }
+
+
+    .student-warning-modal .summary-item {
+        padding: 8px 10px !important;
+    }
+
+
+    .student-warning-modal .summary-item:last-child {
+        grid-column: 1 / -1 !important;
+    }
+
+
+    .student-warning-card-header {
+        align-items: flex-start !important;
+
+        flex-direction: column !important;
+
+        gap: 5px !important;
+
+        padding: 8px 10px !important;
+    }
+
+
+    .student-warning-title {
+        width: 100% !important;
+    }
+
+
+    .student-warning-date {
+        white-space: normal !important;
+
+        text-align: left !important;
+    }
+
+
+    .student-warning-card-body {
+        padding: 7px 10px !important;
+    }
+
+
+    .student-warning-line {
+        font-size: 13px !important;
+
+        line-height: 1.35 !important;
+
+        margin-bottom: 3px !important;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.student-complaints-modal {
+    width: 780px;
+    max-width: 94vw;
+}
+
+.student-complaints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.student-complaint-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.student-complaint-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.student-complaint-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.student-complaint-number {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.student-complaint-category {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 5px;
+    background: #eef2ff;
+}
+
+.student-complaint-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.student-complaint-date {
+    font-size: 12px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.student-complaint-delete-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.student-complaint-delete-btn:hover {
+    background: #fecaca;
+}
+
+.student-complaint-card-body {
+    padding: 8px 12px;
+}
+
+.student-complaint-line {
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.student-complaint-line:last-child {
+    margin-bottom: 0;
+}
+
+.student-complaint-label {
+    display: inline;
+    font-weight: 700;
+    margin-right: 5px;
+    white-space: nowrap;
+}
+
+.student-complaint-value {
+    display: inline;
+    color: #374151;
+}
+
+.student-no-data {
+    padding: 30px 15px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.student-no-data i {
+    display: block;
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 640px) {
+
+    .student-complaint-card-header {
+        align-items: flex-start;
+    }
+
+    .student-complaint-title {
+        flex-wrap: wrap;
+    }
+
+    .student-complaint-header-right {
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .student-complaint-date {
+        font-size: 11px;
+    }
+
+}
+
+
+
+
+
+
+body {
+    display: block !important;
+}
+
+.student-warning-notice {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 20px;
+
+    background: #fee2e2;
+    border-bottom: 2px solid #dc2626;
+
+    color: #b91c1c;
+    font-weight: 600;
+    line-height: 1.5;
+
+    display: block;
+}
+
+.student-warning-notice strong {
+    font-weight: 800;
+}
+
+
+.complaint-status-badge {
+    display: inline-block;
+}
+
+.complaint-status-badge.status-resolved {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+.complaint-status-badge.status-open {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}

@@ -116,6 +116,9 @@ window.FeeForm = {
       const tillDate = document.getElementById("tillDate");
       if (fromDate) {
           fromDate.addEventListener("change", () => {
+              const newFrom = parseLocalDate(fromDate.value);
+              const newTill = addOneMonth(newFrom);
+              document.getElementById("tillDate").value = formatInputDate(newTill);
               if (fromDate.value && tillDate?.value) {
                   this.calculateFeeSubmittedAmount();
               }
@@ -326,6 +329,7 @@ window.FeeForm = {
     //////////////////////////////////////////////////////
 
     calculateFeeSubmittedAmount() {
+        debugger;
         const batchId = Number(document.getElementById("batchId").value);
         const batch = window.libraryLookups.batches.find(b => Number(b.id) === batchId);
         const fromDate = document.getElementById("fromDate")?.value;
