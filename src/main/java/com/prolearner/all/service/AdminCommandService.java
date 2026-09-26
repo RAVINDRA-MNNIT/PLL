@@ -582,6 +582,7 @@ public class AdminCommandService {
                     .build();
 
             studentWarningRepo.save(warning);
+            student.setTerminationCount((student.getTerminationCount() == null ? 0 : student.getTerminationCount()) + 1);
         }
         if (EnrollmentStatus.ACTIVE.name().equals(status)) {
             deleteTerminateWarning(student.getStudentId());

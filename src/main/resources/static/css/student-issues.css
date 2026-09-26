@@ -46,13 +46,13 @@
    TABS
    ========================================================= */
 
-.tabs-container {
+.studentIssuesTabs-container {
     width: 100%;
     margin-bottom: 15px;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.tabs {
+.studentIssuesTabs {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -60,7 +60,7 @@
     scrollbar-width: thin;
 }
 
-.tab {
+.studentIssuesTab {
     position: relative;
 
     display: inline-flex;
@@ -90,21 +90,21 @@
             border-color 0.2s ease;
 }
 
-.tab:hover {
+.studentIssuesTab:hover {
     color: #2563eb;
     background: #f8fafc;
 }
 
-.tab.active {
+.studentIssuesTab.active {
     color: #2563eb;
     border-bottom-color: #2563eb;
 }
 
-.tab i {
+.studentIssuesTab i {
     font-size: 14px;
 }
 
-.tab-count {
+.studentIssuesTab-count {
     min-width: 22px;
     height: 22px;
 
@@ -123,7 +123,7 @@
     font-weight: 700;
 }
 
-.tab.active .tab-count {
+.studentIssuesTab.active .studentIssuesTab-count {
     background: #dbeafe;
     color: #1d4ed8;
 }
@@ -434,7 +434,7 @@
         font-size: 13px;
     }
 
-    .tab {
+    .studentIssuesTab {
         padding: 9px 13px;
         font-size: 13px;
     }
@@ -459,15 +459,15 @@
         font-size: 12px;
     }
 
-    .tabs-container {
+    .studentIssuesTabs-container {
         margin-bottom: 12px;
     }
 
-    .tabs {
+    .studentIssuesTabs {
         gap: 0;
     }
 
-    .tab {
+    .studentIssuesTab {
         padding: 9px 11px;
         font-size: 12px;
     }

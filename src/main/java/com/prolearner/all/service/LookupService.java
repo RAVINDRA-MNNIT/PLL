@@ -68,7 +68,7 @@ public class LookupService {
         dto.setStudentDetailUpdateEnable(Boolean.parseBoolean(configs.get("STUDENT_DETAIL_UPDATE_ENABLE")));
         dto.setStudentFeeUpdateEnable(Boolean.parseBoolean(configs.get("STUDENT_FEE_UPDATE_ENABLE")));
         dto.setStudentSeatUpdateEnable(Boolean.parseBoolean(configs.get("STUDENT_SEAT_UPDATE_ENABLE")));
-
+        dto.setStudentAddComplaintEnable(Boolean.parseBoolean(configs.get("STUDENT_ADD_COMPLAINT_ENABLE")));
         return dto;
     }
 

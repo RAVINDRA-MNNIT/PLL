@@ -363,7 +363,15 @@ const Strength = {
                 `
             <tr class="${occupied ? "" : "vacant-row"}">
                 <td>${student.seatNumber}</td>
-                <td>${student.studentId ?? "—"}</td>
+                <td>
+                    ${
+                                    student.studentId
+                                        ? `<a href="/student-details.html?id=${student.studentId}">
+                                   ${student.studentId}
+                               </a>`
+                                        : "-"
+                                }
+                </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
@@ -435,7 +443,15 @@ const Strength = {
                 `
             <tr class="${occupied ? "" : "vacant-row"}">
                 <td>${student.seatNumber}</td>
-                <td>${student.studentId ?? "—"}</td>
+                <td>
+                    ${
+                                    student.studentId
+                                        ? `<a href="/student-details.html?id=${student.studentId}">
+                                   ${student.studentId}
+                               </a>`
+                                        : "-"
+                                }
+                </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>

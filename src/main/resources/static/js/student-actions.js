@@ -45,7 +45,7 @@ window.StudentActionsUI = {
         const STUDENT_DETAIL_UPDATE_ENABLE = this.getConfigurations().STUDENT_DETAIL_UPDATE_ENABLE ?? false;
         const STUDENT_FEE_UPDATE_ENABLE = this.getConfigurations().STUDENT_FEE_UPDATE_ENABLE ?? false;
         const STUDENT_SEAT_UPDATE_ENABLE = this.getConfigurations().STUDENT_SEAT_UPDATE_ENABLE ?? false;
-        const STUDENT_ADD_COMPLAINT_ENABLE = this.getConfigurations().STUDENT_FEE_UPDATE_ENABLE ?? false;
+        const STUDENT_ADD_COMPLAINT_ENABLE = this.getConfigurations().STUDENT_ADD_COMPLAINT_ENABLE ?? false;
         const showSeat = this.isSeatApplicable();
         const isAdmin = Session.isAdmin();
         const isStudent = Session.isStudent();
@@ -1474,10 +1474,7 @@ showUpdateStatus(currentStatus) {
         };
 
         try {
-            await Api.post(
-                Endpoints.admin.updateStudentDiscount,
-                payload
-            );
+            await Api.post(Endpoints.admin.updateStudentDiscount, payload);
             alert("✅ Discount updated successfully" );
             StudentActionsUI.closeModal();
             await StudentDetailsPage.loadStudent(this.studentId);
@@ -1487,272 +1484,165 @@ showUpdateStatus(currentStatus) {
     },
 
     async showAddWarning() {
-
         const student = this.student;
-
         const html = `
         <div class="modal-content student-warning-modal">
-
             <!-- HEADER -->
             <div class="modal-header">
                 <h2>
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     Add Warning
                 </h2>
-
-                <button
-                    type="button"
-                    onclick="StudentActionsUI.closeModal()">
+                <button type="button" onclick="StudentActionsUI.closeModal()">
                     ✕
                 </button>
             </div>
-
             <!-- BODY -->
             <div class="modal-body">
-
                 <!-- STUDENT DETAILS -->
                 <div class="student-update-summary">
-
                     <div class="summary-item">
                         <label>
                             Membership ID
                         </label>
-
                         <strong>
                             ${student.studentId ?? "-"}
                         </strong>
                     </div>
-
                     <div class="summary-item">
                         <label>
                             Student
                         </label>
-
                         <strong>
                             ${student.fullName ?? "-"}
                         </strong>
                     </div>
-
                 </div>
-
                 <!-- WARNING DETAILS -->
                 <div class="form-grid">
-
                     <div class="form-group">
-
                         <label for="warningLevel">
                             Warning Level
                         </label>
-
                         <select id="warningLevel">
                             ${this.getWarningLevelOptions()}
                         </select>
-
                     </div>
-
                     <div class="form-group">
-
                         <label for="warningCategory">
                             Category
                         </label>
-
                         <select id="warningCategory">
-
                             <option value="">
                                 -- Select Category --
                             </option>
-
                             <option value="DISCIPLINE">
                                 Discipline
                             </option>
-
                             <option value="TIMING">
                                 Timing
                             </option>
-
                             <option value="ATTENDANCE">
                                 Attendance
                             </option>
-
                             <option value="NOISE">
                                 Noise
                             </option>
-
                             <option value="MISCONDUCT">
                                 Misconduct
                             </option>
-
                             <option value="PROPERTY">
                                 Property
                             </option>
-
                             <option value="SEAT">
                                 Seat
                             </option>
-
                             <option value="LIBRARY_RULE">
                                 Library Rule
                             </option>
-
                             <option value="OTHER">
                                 Other
                             </option>
-
                         </select>
-
                     </div>
-
                 </div>
-
                 <!-- DESCRIPTION -->
                 <div class="form-group">
-
                     <label for="warningDescription">
                         Description
                     </label>
-
-                    <textarea
-                        id="warningDescription"
-                        rows="5"
-                        placeholder="Enter reason for warning..."
-                    ></textarea>
-
+                    <textarea id="warningDescription" rows="5" placeholder="Enter reason for warning..."></textarea>
                 </div>
-
                 <!-- ACTION TAKEN -->
                 <div class="form-group">
-
                     <label for="warningActionTaken">
                         Action Taken
                     </label>
-
-                    <textarea
-                        id="warningActionTaken"
-                        rows="4"
-                        placeholder="Enter action taken..."
-                    ></textarea>
-
+                    <textarea id="warningActionTaken" rows="4" placeholder="Enter action taken..."></textarea>
                 </div>
-
-                <div
-                    id="warningModalMessage"
-                    class="update-batch-modal-message">
-                </div>
-
+                <div id="warningModalMessage" class="update-batch-modal-message"></div>
             </div>
-
             <!-- FOOTER -->
             <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    onclick="StudentActionsUI.closeModal()">
+                <button type="button" class="secondary-btn" onclick="StudentActionsUI.closeModal()">
                     Cancel
                 </button>
-
-                <button
-                    type="button"
-                    class="primary-btn"
-                    id="saveWarningBtn"
-                    onclick="StudentActionsUI.saveWarning()">
-
+                <button type="button" class="primary-btn" id="saveWarningBtn" onclick="StudentActionsUI.saveWarning()">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     Add Warning
-
                 </button>
-
             </div>
-
         </div>
     `;
-
         this.openModal(html);
     },
 
     getNextWarningLevel() {
-
         const warnings = this.warnings ?? [];
-
-        // Only active warnings should count
-        const activeWarnings = warnings.filter(
-            warning => !warning.cancelledAt
-        );
-
-        const hasFirstWarning = activeWarnings.some(
-            warning =>
-                String(warning.warningLevel).toUpperCase() === "FIRST_WARNING"
-        );
-
-        const hasSecondWarning = activeWarnings.some(
-            warning =>
-                String(warning.warningLevel).toUpperCase() === "SECOND_WARNING"
-        );
-
-        const hasFinalWarning = activeWarnings.some(
-            warning =>
-                String(warning.warningLevel).toUpperCase() === "FINAL_WARNING"
-        );
-
-        const hasTerminate = activeWarnings.some(
-            warning =>
-                String(warning.warningLevel).toUpperCase() === "TERMINATE"
-        );
-
-
+        const activeWarnings = warnings.filter(warning => !warning.cancelledAt);
+        const hasFirstWarning = activeWarnings.some(warning => String(warning.warningLevel).toUpperCase() === "FIRST_WARNING");
+        const hasSecondWarning = activeWarnings.some(warning => String(warning.warningLevel).toUpperCase() === "SECOND_WARNING");
+        const hasFinalWarning = activeWarnings.some(warning => String(warning.warningLevel).toUpperCase() === "FINAL_WARNING");
+        const hasTerminate = activeWarnings.some(warning => String(warning.warningLevel).toUpperCase() === "TERMINATE");
         // Already terminated
         if (hasTerminate) {
             return null;
         }
-
-
         // Final warning already exists
         if (hasFinalWarning) {
             return "TERMINATE";
         }
-
-
         // Second warning already exists
         if (hasSecondWarning) {
             return "FINAL_WARNING";
         }
-
-
         // First warning already exists
         if (hasFirstWarning) {
             return "SECOND_WARNING";
         }
-
-
         // No warning exists
         return "FIRST_WARNING";
     },
 
     getWarningLevelLabel(level) {
-
         const labels = {
             FIRST_WARNING: "First Warning",
             SECOND_WARNING: "Second Warning",
             FINAL_WARNING: "Final Warning",
             TERMINATE: "Terminate"
         };
-
         return labels[level] ?? level;
     },
 
     getWarningLevelOptions() {
-
         const nextLevel = this.getNextWarningLevel();
-
         if (!nextLevel) {
-
             return `
             <option value="">
                 No further action available
             </option>
         `;
         }
-
         return `
         <option value="${nextLevel}" selected>
             ${this.getWarningLevelLabel(nextLevel)}
@@ -1761,13 +1651,11 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveWarning() {
-
         const student = this.student;
         const warningLevel = document.getElementById("warningLevel")?.value;
         const category = document.getElementById("warningCategory")?.value;
         const description = document.getElementById("warningDescription")?.value.trim();
         const actionTaken = document.getElementById("warningActionTaken")?.value.trim();
-
         if (!warningLevel) {
             alert("Please select warning level.");
             return;
@@ -1793,10 +1681,7 @@ showUpdateStatus(currentStatus) {
             return
         }
         try {
-            await Api.post(
-                Endpoints.students.addWarning,
-                payload
-            );
+            await Api.post(Endpoints.students.addWarning, payload);
             alert("✅ Warning updated successfully" );
             StudentActionsUI.closeModal();
             await StudentDetailsPage.loadStudent(this.studentId);
@@ -1806,474 +1691,242 @@ showUpdateStatus(currentStatus) {
     },
 
     async deleteWarning(warningId) {
-
         if (!warningId) {
             console.error("Warning ID is missing.");
             return;
         }
-
-
         const warning = (this.warnings ?? []).find(
             item => Number(item.id) === Number(warningId)
         );
-
-
         if (!warning) {
             console.error("Warning not found:", warningId);
             return;
         }
-
-
-        const warningLevel =
-            formatWarningLevel(warning.warningLevel);
-
-
-        const confirmed = confirm(
-            `Are you sure you want to delete this ${warningLevel}?\n\n` +
-            `This action cannot be undone.`
-        );
-
-
+        const warningLevel = formatWarningLevel(warning.warningLevel);
+        const confirmed = confirm(`Are you sure you want to delete this ${warningLevel}?\n\n` + `This action cannot be undone.`);
         if (!confirmed) {
             return;
         }
-
-
         try {
-
-            await Api.delete(
-                Endpoints.students.deleteStudentWarning(warningId)
-            );
-
-
-            // Remove from local list
-            this.warnings = (this.warnings ?? []).filter(
-                item => Number(item.id) !== Number(warningId)
-            );
-
-
-            // Re-render warnings modal
+            await Api.delete(Endpoints.students.deleteStudentWarning(warningId));
+            this.warnings = (this.warnings ?? []).filter(item => Number(item.id) !== Number(warningId));
             this.showWarnings();
-
-
         } catch (error) {
-
-            console.error(
-                "Failed to delete warning:",
-                error
-            );
-
-
-            alert(
-                error?.message ||
-                "Failed to delete warning."
-            );
+            console.error("Failed to delete warning:", error);
+            alert(error?.message || "Failed to delete warning.");
         }
     },
 
     async showAddComplaint() {
-
         const student = this.student;
-
         const html = `
         <div class="modal-content student-complaint-modal">
-
             <!-- HEADER -->
             <div class="modal-header">
-
                 <h2>
                     <i class="fa-solid fa-comment-dots"></i>
                     Add Complaint
                 </h2>
-
-                <button type="button"
-                        onclick="StudentActionsUI.closeModal()">
+                <button type="button" onclick="StudentActionsUI.closeModal()">
                     ✕
                 </button>
-
             </div>
-
             <!-- BODY -->
             <div class="modal-body">
-
                 <!-- STUDENT SUMMARY -->
                 <div class="student-update-summary">
-
                     <div class="summary-item">
                         <label>
                             Membership ID
                         </label>
-
                         <strong>
                             ${student.studentId ?? "-"}
                         </strong>
                     </div>
-
                     <div class="summary-item">
                         <label>
                             Student
                         </label>
-
                         <strong>
                             ${student.fullName ?? "-"}
                         </strong>
                     </div>
-
                 </div>
-
                 <!-- COMPLAINT DETAILS -->
                 <div class="form-group">
-
                     <label for="complaintCategory">
                         Category
                     </label>
-
                     <select id="complaintCategory">
-
                         <option value="">
                             -- Select Category --
                         </option>
-
                         <option value="FACILITY">
                             Facility
                         </option>
-
                         <option value="BATCH">
                             Batch
                         </option>
-
                         <option value="FEES">
                             Fees
                         </option>
-
                         <option value="SEAT">
                             Seat
                         </option>
-
                         <option value="STAFF">
                             Staff
                         </option>
-
                         <option value="LIBRARY">
                             Library
                         </option>
-
                         <option value="CLEANLINESS">
                             Cleanliness
                         </option>
-
                         <option value="TIMING">
                             Timing
                         </option>
-
                         <option value="OTHER">
                             Other
                         </option>
-
                     </select>
-
                 </div>
-
                 <div class="form-group">
-
                     <label for="complaintDescription">
                         Complaint
                     </label>
-
-                    <textarea
-                        id="complaintDescription"
-                        rows="7"
-                        placeholder="Enter complaint..."
-                    ></textarea>
-
+                    <textarea id="complaintDescription" rows="7" placeholder="Enter complaint..."></textarea>
                 </div>
-
-                <div id="complaintModalMessage"
-                     class="update-batch-modal-message">
+                <div id="complaintModalMessage" class="update-batch-modal-message">
                 </div>
-
             </div>
-
             <!-- FOOTER -->
             <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    onclick="StudentActionsUI.closeModal()">
+                <button type="button" class="secondary-btn" onclick="StudentActionsUI.closeModal()">
                     Cancel
                 </button>
-
-                <button
-                    type="button"
-                    class="primary-btn"
-                    id="saveComplaintBtn"
-                    onclick="StudentActionsUI.saveComplaint()">
-
+                <button type="button" class="primary-btn" id="saveComplaintBtn" onclick="StudentActionsUI.saveComplaint()">
                     <i class="fa-solid fa-comment-dots"></i>
                     Add Complaint
-
                 </button>
-
             </div>
-
         </div>
     `;
-
         this.openModal(html);
     },
 
     async saveComplaint() {
-
         const student = this.student;
-
-        const category =
-            document.getElementById("complaintCategory")?.value;
-
-        const description =
-            document.getElementById("complaintDescription")
-                ?.value
-                .trim();
-
-
+        const category = document.getElementById("complaintCategory")?.value;
+        const description = document.getElementById("complaintDescription")?.value.trim();
         if (!category) {
             alert("Please select complaint category.");
             return;
         }
-
-
         if (!description) {
             alert("Please enter complaint description.");
             return;
         }
-
-
         const payload = {
             studentId: student.studentId,
             category,
             description
         };
-
-
         if (!confirm(printPayload(payload))) {
             return;
         }
-
-
         try {
-
-            await Api.post(
-                Endpoints.students.addComplaint,
-                payload
-            );
-
-
+            await Api.post(Endpoints.students.addComplaint, payload);
             alert("✅ Complaint submitted successfully");
-
-
             StudentActionsUI.closeModal();
-
-
-            await StudentDetailsPage.loadStudent(
-                this.studentId
-            );
-
-
+            await StudentDetailsPage.loadStudent(this.studentId);
         } catch (err) {
-
-            console.error(
-                "Failed to save complaint:",
-                err
-            );
-
-
-            alert(
-                err?.message ||
-                "Failed to submit complaint."
-            );
+            console.error("Failed to save complaint:", err);
+            alert(err?.message || "Failed to submit complaint.");
         }
     },
 
     async deleteComplaint(complaintId) {
-
         if (!complaintId) {
-
-            console.error(
-                "Complaint ID is missing."
-            );
-
+            console.error("Complaint ID is missing.");
             return;
         }
-
-
-        const complaint =
-            (this.complaints ?? []).find(
-                item =>
-                    Number(item.id) === Number(complaintId)
-            );
-
-
+        const complaint = (this.complaints ?? []).find(item => Number(item.id) === Number(complaintId));
         if (!complaint) {
-
-            console.error(
-                "Complaint not found:",
-                complaintId
-            );
-
+            console.error("Complaint not found:", complaintId);
             return;
         }
-
-
-        const confirmed = confirm(
-            "Are you sure you want to delete this complaint?\n\n" +
-            "This action cannot be undone."
-        );
-
-
+        const confirmed = confirm("Are you sure you want to delete this complaint?\n\n" + "This action cannot be undone.");
         if (!confirmed) {
             return;
         }
-
-
         try {
-
-            await Api.delete(
-                Endpoints.students.deleteStudentComplaint(
-                    complaintId
-                )
-            );
-
-
-            // Remove from local list
-            this.complaints =
-                (this.complaints ?? []).filter(
-                    item =>
-                        Number(item.id) !== Number(complaintId)
-                );
-
-
-            // Re-render complaints modal
+            await Api.delete(Endpoints.students.deleteStudentComplaint(complaintId));
+            this.complaints = (this.complaints ?? []).filter(item => Number(item.id) !== Number(complaintId));
             this.showComplaints();
-
-
         } catch (error) {
-
-            console.error(
-                "Failed to delete complaint:",
-                error
-            );
-
-
-            alert(
-                error?.message ||
-                "Failed to delete complaint."
-            );
+            console.error("Failed to delete complaint:", error);
+            alert(error?.message || "Failed to delete complaint.");
         }
     },
 
     showWarnings() {
-
         const warnings = this.warnings ?? [];
         const student = this.student;
         const canDeleteWarning = (this.student.enrollmentStatus.toUpperCase() === "TERMINATED") ? false : Session.isAdmin();
         let content = "";
-
         if (!warnings.length) {
-
             content = `
             <div class="student-warning-empty">
                 <i class="fa-solid fa-circle-check"></i>
                 <p>No warnings found for this student.</p>
             </div>
         `;
-
         } else {
-
             content = warnings.map((warning, index) => {
-
-                const issuedAt = warning.issuedAt
-                    ? renderRequestedAt(warning.issuedAt)
-                    : "-";
-
-                const cancelledAt = warning.cancelledAt
-                    ? renderRequestedAt(warning.cancelledAt)
-                    : null;
-
-                // Only the latest/last warning gets delete button
+                const issuedAt = warning.issuedAt ? renderRequestedAt(warning.issuedAt) : "-";
+                const cancelledAt = warning.cancelledAt ? renderRequestedAt(warning.cancelledAt) : null;
                 const isLatestWarning = index === 0;
-
                 return `
                 <div class="student-warning-card">
-
                     <div class="student-warning-card-header">
-
                         <div class="student-warning-title">
-
                             <span class="student-warning-number">
                                 Warning #${warnings.length - index}
                             </span>
-
                             <span class="student-warning-level">
                                 ${formatWarningLevel(warning.warningLevel)}
                             </span>
-
                         </div>
-
-
                         <div class="student-warning-header-right">
-
                             <span class="student-warning-date">
                                 ${issuedAt}
                             </span>
-
-                            ${
-                    canDeleteWarning && isLatestWarning
-                        ? `
-                                        <button
-                                            type="button"
-                                            class="student-warning-delete-btn"
-                                            title="Delete Warning"
-                                            onclick="StudentActionsUI.deleteWarning(${warning.id})">
-
+                            ${canDeleteWarning && isLatestWarning ? `
+                                        <button type="button" class="student-warning-delete-btn" title="Delete Warning" onclick="StudentActionsUI.deleteWarning(${warning.id})">
                                             <i class="fa-solid fa-trash"></i>
-
                                         </button>
                                     `
                         : ""
                 }
-
                         </div>
-
                     </div>
-
-
                     <div class="student-warning-card-body">
-
                         <div class="student-warning-line">
-
                             <span class="student-warning-label">
                                 Category:
                             </span>
-
                             <span class="student-warning-value">
                                 ${formatWarningCategory(warning.category)}
                             </span>
-
                         </div>
-
-
                         <div class="student-warning-line">
-
                             <span class="student-warning-label">
                                 Description:
                             </span>
-
                             <span class="student-warning-value">
                                 ${warning.description ?? "-"}
                             </span>
-
                         </div>
-                        
                         <div class="student-warning-line">
                             <span class="student-warning-label">
                                 Issued By:
@@ -2282,168 +1935,96 @@ showUpdateStatus(currentStatus) {
                                 ${warning.issuedByName ?? "-"}
                             </span>
                         </div>
-
                         <div class="student-warning-line">
-
                             <span class="student-warning-label">
                                 Action Taken:
                             </span>
-
                             <span class="student-warning-value">
                                 ${warning.actionTaken || "-"}
                             </span>
-
                         </div>
-
-
-                        ${
-                    cancelledAt
-                        ? `
+                        ${cancelledAt ? `
                                     <div class="student-warning-line student-warning-cancelled">
-
                                         <span class="student-warning-label">
                                             Cancelled:
                                         </span>
-
                                         <span class="student-warning-value">
                                             ${cancelledAt}${
-                            warning.cancellationReason
-                                ? ` — ${warning.cancellationReason}`
-                                : ""
+                            warning.cancellationReason ? ` — ${warning.cancellationReason}` : ""
                         }
                                         </span>
-
                                     </div>
                                 `
                         : ""
                 }
-
                     </div>
-
                 </div>
             `;
-
             }).join("");
         }
-
-
         const html = `
         <div class="modal-content student-warning-modal">
-
             <div class="modal-header">
-
                 <h2>
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     Warnings
                 </h2>
-
-                <button
-                    type="button"
-                    onclick="StudentActionsUI.closeModal()">
+                <button type="button" onclick="StudentActionsUI.closeModal()">
                     ✕
                 </button>
-
             </div>
-
-
             <div class="modal-body">
-
                 <div class="student-update-summary">
-
                     <div class="summary-item">
-
                         <label>Membership ID</label>
-
                         <strong>
                             ${student?.studentId ?? "-"}
                         </strong>
-
                     </div>
-
-
                     <div class="summary-item">
-
                         <label>Student</label>
-
                         <strong>
                             ${student?.fullName ?? "-"}
                         </strong>
-
                     </div>
-
-
                     <div class="summary-item">
-
                         <label>Total Warnings</label>
-
                         <strong>
                             ${warnings.length}
                         </strong>
-
                     </div>
-
                 </div>
-
-
                 <div class="student-warning-list">
                     ${content}
                 </div>
-
             </div>
-
-
             <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="secondary-btn"
-                    onclick="StudentActionsUI.closeModal()">
-
+                <button type="button" class="secondary-btn" onclick="StudentActionsUI.closeModal()">
                     <i class="fa-solid fa-xmark"></i>
                     Close
-
                 </button>
-
             </div>
-
         </div>
     `;
-
         this.openModal(html);
     },
 
     async showComplaints() {
-
         const complaints = this.complaints ?? [];
-
-        const canDeleteComplaint =
-            Session.isAdmin() || Session.isStudent();
-
+        const canDeleteComplaint = Session.isAdmin() || Session.isStudent();
         const html = `
     <div class="modal-content student-complaints-modal">
-
-        <!-- HEADER -->
         <div class="modal-header">
-
             <h2>
                 <i class="fa-solid fa-comments"></i>
                 Student Complaints
             </h2>
-
-            <button
-                type="button"
-                onclick="StudentActionsUI.closeModal()">
+            <button type="button" onclick="StudentActionsUI.closeModal()">
                 ✕
             </button>
-
         </div>
-
-        <!-- BODY -->
         <div class="modal-body">
-
-            ${
-            complaints.length === 0
-                ? `
+            ${complaints.length === 0 ? `
                     <div class="student-no-data">
                         <i class="fa-solid fa-comment-slash"></i>
                         <span>No complaints found.</span>
@@ -2451,219 +2032,117 @@ showUpdateStatus(currentStatus) {
                   `
                 : `
                     <div class="student-complaints-list">
-
                         ${complaints.map((complaint, index) => {
-
-                    const submittedAt =
-                        complaint.submittedAt
-                            ? new Date(
-                                complaint.submittedAt
-                            ).toLocaleString()
-                            : "-";
-
-                    const resolvedAt =
-                        complaint.resolvedAt
-                            ? new Date(
-                                complaint.resolvedAt
-                            ).toLocaleString()
-                            : null;
-
-                    const closedAt =
-                        complaint.closedAt
-                            ? new Date(
-                                complaint.closedAt
-                            ).toLocaleString()
-                            : null;
-
-                    const status =
-                        String(
-                            complaint.status ?? "OPEN"
-                        ).toUpperCase();
-
-                    const statusLabel =
-                        status
-                            .replaceAll("_", " ")
-                            .replace(
-                                /\b\w/g,
-                                c => c.toUpperCase()
-                            );
-
-                    const category =
-                        String(
-                            complaint.category ?? "-"
-                        )
-                            .replaceAll("_", " ")
-                            .replace(
-                                /\b\w/g,
-                                c => c.toUpperCase()
-                            );
-                    const complaintStatus =
-                        String(complaint.status || "OPEN").toUpperCase();
-                    
+                    const submittedAt = complaint.submittedAt ? new Date(complaint.submittedAt).toLocaleString() : "-";
+                    const resolvedAt = complaint.resolvedAt ? new Date(complaint.resolvedAt).toLocaleString() : null;
+                    const closedAt = complaint.closedAt ? new Date(complaint.closedAt).toLocaleString() : null;
+                    const status = String(complaint.status ?? "OPEN").toUpperCase();
+                    const statusLabel = status.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+                    const category = String(complaint.category ?? "-").replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+                    const complaintStatus = String(complaint.status || "OPEN").toUpperCase();
                     return `
                                 <div class="student-complaint-card">
-
                                     <!-- CARD HEADER -->
                                     <div class="student-complaint-card-header">
-
                                         <div class="student-complaint-title">
-
                                             <span class="student-complaint-number">
                                                 Complaint #${complaints.length - index}
                                             </span>
-
                                             <span class="student-complaint-category">
                                                 ${category}
                                             </span>
-
                                         </div>
-
                                         <div class="student-complaint-header-right">
-
                                             <span class="student-complaint-date">
                                                 ${submittedAt}
                                             </span>
-
-                                            ${
-                        canDeleteComplaint
-                            ? `
-                                                        <button
-                                                            type="button"
-                                                            class="student-complaint-delete-btn"
-                                                            title="Delete Complaint"
-                                                            onclick="StudentActionsUI.deleteComplaint(${complaint.id})">
+                                            ${canDeleteComplaint ? `
+                                                        <button type="button" class="student-complaint-delete-btn" title="Delete Complaint" onclick="StudentActionsUI.deleteComplaint(${complaint.id})">
                                                             <i class="fa-solid fa-trash"></i>
                                                         </button>
                                                       `
                             : ""
                     }
-
                                         </div>
-
                                     </div>
-
                                     <!-- CARD BODY -->
                                     <div class="student-complaint-card-body">
-
                                         <div class="student-complaint-line">
-
                                             <span class="student-complaint-label">
                                                 Category:
                                             </span>
-
                                             <span class="student-complaint-value">
                                                 ${category}
                                             </span>
-
                                         </div>
-
                                         <div class="student-complaint-line">
-
                                             <span class="student-complaint-label">
                                                 Complaint:
                                             </span>
-
                                             <span class="student-complaint-value">
                                                 ${complaint.description ?? "-"}
                                             </span>
-
                                         </div>
-
                                         <div class="student-complaint-line">
-
                                             <span class="student-complaint-label">
                                                 Status:
                                             </span>
-
 <span class="student-complaint-value complaint-status-badge status-${status.toLowerCase()}">
     ${statusLabel}
 </span>
-
-                                        </div>
-
-                                        ${
-                        complaint.resolution
-                            ? `
+                                       </div>
+                                        ${complaint.resolution ? `
                                                     <div class="student-complaint-line">
-
                                                         <span class="student-complaint-label">
                                                             Resolution:
                                                         </span>
-
                                                         <span class="student-complaint-value">
                                                             ${complaint.resolution}
                                                         </span>
-
                                                     </div>
                                                   `
                             : ""
                     }
-
-                                        ${
-                        resolvedAt
-                            ? `
+                                        ${resolvedAt ? `
                                                     <div class="student-complaint-line">
-
                                                         <span class="student-complaint-label">
                                                             Resolved:
                                                         </span>
-
                                                         <span class="student-complaint-value">
                                                             ${resolvedAt}
                                                         </span>
-
                                                     </div>
                                                   `
                             : ""
                     }
-
-                                        ${
-                        closedAt
-                            ? `
+                                        ${closedAt ? `
                                                     <div class="student-complaint-line">
-
                                                         <span class="student-complaint-label">
                                                             Closed:
                                                         </span>
-
                                                         <span class="student-complaint-value">
                                                             ${closedAt}
                                                         </span>
-
                                                     </div>
                                                   `
                             : ""
                     }
-
                                     </div>
-
                                 </div>
                             `;
-
                 }).join("")}
-
                     </div>
                   `
         }
-
         </div>
-
         <!-- FOOTER -->
         <div class="modal-footer">
-
-            <button
-                type="button"
-                class="secondary-btn"
-                onclick="StudentActionsUI.closeModal()">
+            <button type="button" class="secondary-btn" onclick="StudentActionsUI.closeModal()">
                 Close
             </button>
-
         </div>
-
     </div>
 `;
-
         this.openModal(html);
     },
-
 };

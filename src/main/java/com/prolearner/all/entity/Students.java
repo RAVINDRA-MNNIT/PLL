@@ -86,4 +86,7 @@ public class Students {
 
     @Column(name = "allowed_discount", precision = 12, scale = 2, nullable = false)
     private BigDecimal allowedDiscount = BigDecimal.ZERO;
+
+    @Column(name = "termination_count", nullable = false)
+    private Integer terminationCount = 0;
 }

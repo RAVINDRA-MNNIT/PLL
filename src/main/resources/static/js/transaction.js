@@ -240,7 +240,11 @@ const Transactions = {
             html += `
             <tr>
                 <td>${income.id}</td>
-                <td>${income.studentId}</td>
+                <td>
+                     <a href="/student-details.html?id=${income.studentId}">
+                        ${income.studentId ?? "-"}
+                    </a>
+                </td>
                 <td>${income.sourceType ?? "-"}</td>
                 <td>${formatCurrency(income.amount)}</td>
                 <td>${income.paymentMode}</td>

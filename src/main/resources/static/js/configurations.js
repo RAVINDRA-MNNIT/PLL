@@ -223,6 +223,9 @@ const Configurations = {
 
         document.getElementById("studentSeatUpdate").checked =
             config.STUDENT_SEAT_UPDATE_ENABLE;
+
+        document.getElementById("studentAddComplaint").checked =
+            config.STUDENT_ADD_COMPLAINT_ENABLE;
     },
 
     async createUser(user) {
@@ -499,7 +502,8 @@ const Configurations = {
             STUDENT_LOGIN_ENABLED: document.getElementById("studentLogin").checked,
             STUDENT_DETAIL_UPDATE_ENABLE: document.getElementById("studentDetailUpdate").checked,
             STUDENT_FEE_UPDATE_ENABLE: document.getElementById("studentFeeUpdate").checked,
-            STUDENT_SEAT_UPDATE_ENABLE: document.getElementById("studentSeatUpdate").checked
+            STUDENT_SEAT_UPDATE_ENABLE: document.getElementById("studentSeatUpdate").checked,
+            STUDENT_ADD_COMPLAINT_ENABLE: document.getElementById("studentAddComplaint").checked,
         };
 
         try {

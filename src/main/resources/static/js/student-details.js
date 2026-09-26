@@ -50,8 +50,8 @@ initialize() {
         }
         try {
             this.currentStudent = await Api.get(Endpoints.students.details(studentId));
-            this.studentWarnings = await this.getStudentWarnings(studentId);
-            this.studentComplaints = await this.getStudentComplaints(studentId);
+            this.studentWarnings = this.currentStudent.warnings ?? [];
+            this.studentComplaints = this.currentStudent.complaints ?? [];
         } catch (error) {
             console.error(error);
             alert(error.message || "Something went wrong.");
@@ -137,6 +137,7 @@ initialize() {
     },
 
     showWarningNotice() {
+        debugger;
         const warningCount = this.studentWarnings.length ?? 0;
         const isStudent = Session.isStudent();
         const notice =
@@ -162,7 +163,11 @@ initialize() {
             if (this.currentStudent.enrollmentStatus.toUpperCase() === "TERMINATED") {
                 notice.textContent = `This student is terminated.`;
             } else {
-                notice.textContent = `This student has ${warningCount} warning(s).`;
+                if ((this.currentStudent.terminationCount ?? 0) > 0) {
+                    notice.textContent = `This student terminated ${this.currentStudent.terminationCount} time(s), and has ${warningCount} warning(s).`;
+                } else {
+                    notice.textContent = `This student has ${warningCount} warning(s).`;
+                }
             }
         }
 

@@ -80,11 +80,10 @@ public class StudentService {
     public StudentDetailsResponse getStudentDetails(Long studentId) {
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-
+        List<StudentWarning> warnings = studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
+        List<StudentComplaint> complaints = studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
         FeeRecord fee = student.getLastFee();
-
         StudentFeeHistoryResponse lastFee = null;
-
         if (fee != null) {
             lastFee = new StudentFeeHistoryResponse(
                     fee.getId(),
@@ -159,6 +158,9 @@ public class StudentService {
                 student.getDateOfAdmission(),
                 enrollmentStatus.name(),
                 student.getAllowedDiscount(),
+                student.getTerminationCount(),
+                warnings,
+                complaints,
                 lastFee
         );
     }
@@ -466,6 +468,7 @@ public class StudentService {
                 }
             }
             studentRepo.save(student);
+            student.setTerminationCount((student.getTerminationCount() == null ? 0 : student.getTerminationCount()) + 1);
         }
         studentWarningRepo.save(warning);
     }

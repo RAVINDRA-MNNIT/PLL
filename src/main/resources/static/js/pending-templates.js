@@ -69,7 +69,11 @@ window.PendingTemplates = {
         return `
             <tr>
                 <td>${item.requestId}</td>
-                <td>${item.studentId ?? "-"}</td>
+                <td>
+                    <a href="/student-details.html?id=${item.studentId}">
+                        ${item.studentId ?? "-"}
+                    </a>
+                </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${item.batchName ?? "-"}</td>
                 <td>
@@ -117,7 +121,11 @@ window.PendingTemplates = {
         return `
             <tr>
                 <td>${item.requestId}</td>
-                <td>${item.studentId ?? "-"}</td>
+                <td>
+                     <a href="/student-details.html?id=${item.studentId}">
+                        ${item.studentId ?? "-"}
+                    </a>
+                </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${item.lastFeeSeatNumber ?? "-"}</td>
                 <td>${item.seatNumber ?? "-"}</td>
@@ -150,7 +158,11 @@ window.PendingTemplates = {
         return `
             <tr>
                 <td>${item.requestId ?? "-"}</td>
-                <td>${item.studentId ?? "-"}</td>
+                <td>
+                     <a href="/student-details.html?id=${item.studentId}">
+                        ${item.studentId ?? "-"}
+                    </a>
+                </td>
                 <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber)}</td>
                 <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber)}</td>
                 <td>${item.requestedBy ?? "-"}</td>
@@ -184,7 +196,11 @@ window.PendingTemplates = {
         return `
             <tr>
                 <td>${item.requestId ?? "-"}</td>
-                <td>${item.studentId ?? "-"}</td>
+                <td>
+                     <a href="/student-details.html?id=${item.studentId}">
+                        ${item.studentId ?? "-"}
+                    </a>
+                </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${this.renderStatus(item.lastEnrollmentStatus)}</td>
                 <td>${this.renderStatus(item.enrollmentStatus)}</td>
@@ -218,7 +234,11 @@ window.PendingTemplates = {
         return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
-            <td>${item.studentId ?? "-"}</td>
+            <td>
+                 <a href="/student-details.html?id=${item.studentId}">
+                    ${item.studentId ?? "-"}
+                </a>
+            </td>
             <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
             <td>
                 <strong class="amount-highlight">
@@ -262,7 +282,11 @@ window.PendingTemplates = {
         return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
-            <td>${item.studentId ?? "-"}</td>
+            <td>
+                 <a href="/student-details.html?id=${item.studentId}">
+                    ${item.studentId ?? "-"}
+                </a>
+            </td>
             <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
             <td>
                  <div>${this.formatBatchDetails(findBatch(item.lastFeeBatchId).name ?? "-", item.lastFeeSeatNumber ?? "-", item.lastFeeFromDate ?? "-", item.lastFeeTillDate ?? "-")}</div>
@@ -309,8 +333,11 @@ allRow(item, actions)
     return `
         <tr>
             <td>${item.requestId ?? "-"}</td>
-            <td>${item.studentId ?? "-"}</td>
-
+            <td>
+                 <a href="/student-details.html?id=${item.studentId}">
+                    ${item.studentId ?? "-"}
+                </a>
+            </td>
             <td>
                 <button
                     class="icon-btn"
@@ -451,16 +478,6 @@ renderStatus(status) {
             <div><strong>From Date: </strong>${fromDate}</div>
             <div><strong>Till Date: </strong>${tillDate}</div>
         `;
-    },
-
-    renderMembership(item) {
-        if (item.fromDate || item.tillDate) {
-            return `
-                <div><strong>From:</strong> ${item.fromDate ?? "-"}</div>
-                <div><strong>To:</strong> ${item.tillDate ?? "-"}</div>
-            `;
-        }
-        return "-";
     },
 
     viewRequestData(comment) {

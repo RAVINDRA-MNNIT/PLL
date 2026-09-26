@@ -60,6 +60,9 @@ public class ConfigurationService {
 
         update("STUDENT_SEAT_UPDATE_ENABLE",
                 String.valueOf(configuration.getStudentSeatUpdateEnable()));
+
+        update("STUDENT_ADD_COMPLAINT_ENABLE",
+                String.valueOf(configuration.getStudentAddComplaintEnable()));
     }
 
     private void update(String property, String value) {

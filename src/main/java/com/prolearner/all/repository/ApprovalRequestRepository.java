@@ -238,7 +238,7 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
     -- =====================================================
 
     LEFT JOIN library.students s
-        ON s.id = ar.student_id
+        ON s.student_id = ar.student_id
 
 
     -- =====================================================

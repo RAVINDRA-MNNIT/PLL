@@ -55,4 +55,7 @@ public class ConfigurationDTO {
 
     @JsonProperty("STUDENT_SEAT_UPDATE_ENABLE")
     private Boolean studentSeatUpdateEnable;
+
+    @JsonProperty("STUDENT_ADD_COMPLAINT_ENABLE")
+    private Boolean studentAddComplaintEnable;
 }
