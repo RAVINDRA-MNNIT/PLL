@@ -562,6 +562,7 @@ public class AdminCommandService {
                 lastFee.setTillDate(today);
                 feeRecordRepository.save(lastFee);
             }
+            student.setAllowedDiscount(BigDecimal.ZERO);
         }
         if (EnrollmentStatus.TERMINATED.name().equals(status)) {
             if (userId == null) {
