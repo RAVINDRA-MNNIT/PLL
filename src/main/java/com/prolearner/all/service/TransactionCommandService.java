@@ -95,14 +95,6 @@ public class TransactionCommandService {
         transactionRepository.delete(transaction);
     }
 
-//    public void saveAdmissionIncome(...) {
-//
-//    }
-//
-//    public void saveFeeIncome(...) {
-//
-//    }
-
     public void saveTransaction(TransactionRequest request,
                                 Long userId,
                                 Boolean isAdmin) {

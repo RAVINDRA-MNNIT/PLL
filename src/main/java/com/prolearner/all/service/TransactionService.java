@@ -16,57 +16,23 @@ import java.util.List;
 
 @Service
 public class TransactionService {
-
     private final TransactionCommandService transactionCommandService;
     private final TransactionQueryService transactionQueryService;
 
-
-    public TransactionService(TransactionCommandService transactionCommandService, TransactionQueryService transactionQueryService
-    ) {
+    public TransactionService(TransactionCommandService transactionCommandService, TransactionQueryService transactionQueryService) {
         this.transactionCommandService = transactionCommandService;
         this.transactionQueryService = transactionQueryService;
     }
 
+    public void saveExpense(TransactionRequest request, Long userId) {transactionCommandService.saveExpense(request, userId);}
 
-    public void saveExpense(TransactionRequest request,
-                            Long userId) {
-        transactionCommandService.saveExpense(request, userId);
-    }
+    public void saveExpensePending(TransactionRequest request, Long userId) {transactionCommandService.saveExpensePending(request, userId);}
 
-    public void saveExpensePending(TransactionRequest request,
-                            Long userId) {
-        transactionCommandService.saveExpensePending(request, userId);
-    }
+    public void approveExpense(Long id, Long adminId) {transactionCommandService.approveExpense(id, adminId);}
 
-    public void approveExpense(Long id,
-                               Long adminId) {
-        transactionCommandService.approveExpense(id, adminId);
-    }
+    public void rejectExpense(Long id, Long adminId) {transactionCommandService.rejectExpense(id, adminId);}
 
-    public void rejectExpense(Long id,
-                              Long adminId) {
-        transactionCommandService.rejectExpense(id, adminId);
-    }
-
-    public void cancelExpense(Long id,
-                              Long managerId) {
-
-        transactionCommandService.cancelExpense(id, managerId);
-    }
-
-    public ExpenseDashboardResponse getExpenseDashboard() {
-        return transactionQueryService.getExpenseDashboard();
-    }
-
-//    public void saveAdmissionIncome(...) {
-//
-//    }
-//
-//    public void saveFeeIncome(...) {
-//
-//    }
-
-
+    public void cancelExpense(Long id, Long managerId) {transactionCommandService.cancelExpense(id, managerId);}
 
     public List<Transaction> getExpenses() {
         return transactionQueryService.getExpenses();
@@ -75,10 +41,8 @@ public class TransactionService {
     public List<Transaction>  getDailyIncome() {
         return transactionQueryService.getDailyIncome();
     }
-//
-    public MonthlyIncomeSummary getMonthlyIncome(YearMonth month) {
-        return transactionQueryService.getMonthlyIncome(month);
-    }
+
+    public MonthlyIncomeSummary getMonthlyIncome(YearMonth month) {return transactionQueryService.getMonthlyIncome(month);}
 
     public ProfitSummary getProfitSummary() {
         return transactionQueryService.getProfitSummary();

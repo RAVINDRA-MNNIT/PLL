@@ -20,34 +20,6 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
 
     boolean existsByAadhaarNumber(String addhar);
 
-    Boolean existsByRequestTypeAndStudentIdAndStatus(RequestType typeStr,
-                                                     Long studentId, PendingRequestStatus status);
-    // ====================================================
-    // 🔹 LIST BY STATUS
-    // ====================================================
-    List<ApprovalRequest> findByStatus(PendingRequestStatus status);
-
-    // ====================================================
-    // 🔹 LIST BY TYPE + STATUS
-    // ====================================================
-    List<ApprovalRequest> findByRequestTypeAndStatus(
-            RequestType requestType,
-            PendingRequestStatus status
-    );
-
-    // ====================================================
-    // 🔹 ALL REQUESTS (LATEST FIRST)
-    // ====================================================
-    List<ApprovalRequest> findAllByOrderByRequestedAtDesc();
-
-    // ====================================================
-    // 🔹 COUNT BY TYPE (for dashboard)
-    // ====================================================
-    long countByRequestTypeAndStatus(
-            RequestType requestType,
-            PendingRequestStatus status
-    );
-
     // ====================================================
     // 🔹 COUNT BY STATUS (for dashboard)
     // ====================================================
@@ -106,19 +78,6 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
           AND ar.request_type IN ('ADMISSION', 'FEES', 'PENDING_FEES', 'BATCH');
 """, nativeQuery = true)
     List<Object[]> sumByPaymentMode(); // ✅ FIXED RETURN TYPE
-
-
-    // ====================================================
-    // 🔹 CLEAR PROCESSED
-    // ====================================================
-    @Modifying
-    @Transactional
-    @Query("""
-        DELETE FROM ApprovalRequest a
-        WHERE a.status IN ('APPROVED','REJECTED','CANCELLED')
-    """)
-    void deleteProcessed();
-
 
 // ====================================================
 // 🔥 SINGLE API FOR ALL TYPES

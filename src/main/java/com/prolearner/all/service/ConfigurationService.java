@@ -84,14 +84,6 @@ public class ConfigurationService {
         );
     }
 
-    public int getDaysForExpire() {
-        return Integer.parseInt(
-                configurationRepo.findByProperty("DAYS_FOR_EXPIRE")
-                        .orElseThrow(() -> new RuntimeException("Configuration not found"))
-                        .getValue()
-        );
-    }
-
     public boolean getManagerLoginEnable() {
         return Boolean.parseBoolean(
                 configurationRepo.findByProperty("MANAGER_LOGIN_ENABLE")

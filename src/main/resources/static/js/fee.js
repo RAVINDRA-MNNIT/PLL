@@ -17,39 +17,27 @@ window.FeeForm = {
         return this.editRequestId != null;
     },
 
-  setEditMode(requestId) {
-
-    this.editRequestId = requestId;
-
-    const extendRadio = document.querySelector(
-        "input[name='durationType'][value='EXTEND']"
-    );
-
-    const customRadio = document.querySelector(
-        "input[name='durationType'][value='CUSTOM']"
-    );
-
-    if (extendRadio && customRadio) {
-    extendRadio.disabled = true;
-    customRadio.checked = true;
-    }
-},
+    setEditMode(requestId) {
+        this.editRequestId = requestId;
+        const extendRadio = document.querySelector("input[name='durationType'][value='EXTEND']");
+        const customRadio = document.querySelector("input[name='durationType'][value='CUSTOM']");
+        if (extendRadio && customRadio) {
+            extendRadio.disabled = true;
+            customRadio.checked = true;
+        }
+    },
 
     populateLookups(seats) {
         const batchSelect = document.getElementById("batchId");
         const seatSelect = document.getElementById("seatId");
-
         if (!batchSelect) {
             throw new Error("batchId select not found in fee.html");
         }
-
         if (!seatSelect) {
             throw new Error("seatId select not found in fee.html");
         }
-
         batchSelect.replaceChildren();
         seatSelect.replaceChildren();
-
         getBatches().forEach(batch => {
             batchSelect.innerHTML += `
             <option value="${batch.id}">
@@ -57,14 +45,11 @@ window.FeeForm = {
             </option>
             `;
         });
-
         document.getElementById("batchId").onchange = () => {
             toggleSeatField();
             this.calculateFeeSubmittedAmount();
         };
-
         seats.forEach(seat => {
-
             seatSelect.innerHTML += `
             <option value="${seat.id}">
                 ${seat.seatNumber}
@@ -86,23 +71,17 @@ window.FeeForm = {
         closeFeeModal();
         const modal = document.getElementById("feeModal");
         const container = document.getElementById("feeModalBody");
-
         modal.style.display = "flex";
-
         container.innerHTML = `
             <div style="padding:20px;text-align:center">
                 Loading Fee Details...
             </div>
         `;
-
         const html = await fetchHtml("/fee.html");
-
         if (!html) {
             return;
         }
-
         container.innerHTML = html;
-
     },
 
   populate(data) {
@@ -536,165 +515,112 @@ function validateFeeForm() {
             const currentTill = new Date(FeeForm.currentTill);
             // Till >= From
             if (tillDateTemp < fromDateTemp) {
-                errors.push(
-                    "Membership Till date cannot be earlier than Membership From date."
-                );
+                errors.push("Membership Till date cannot be earlier than Membership From date.");
             }
             // Till > Current Till
             if (tillDateTemp <= currentTill) {
-                errors.push(
-                    "New Membership Till date must be greater than the current Membership Till date."
-                );
+                errors.push("New Membership Till date must be greater than the current Membership Till date.");
             }
             // From >= Current Till
             if (fromDateTemp < currentTill) {
-                errors.push(
-                    "Membership From date cannot be earlier than the current Membership Till date."
-                );
+                errors.push("Membership From date cannot be earlier than the current Membership Till date.");
             }
         }
     }
-
     // Pay Amount
     if (payAmount <= 0) {
         errors.push("Please enter a valid Submitted Amount.");
     }
-
     if (discount < 0) {
         errors.push("Please enter a valid Discount Amount.");
     }
-
     if (pendingAmount < 0) {
         errors.push("Please enter a valid Pending Amount.");
     }
-
     if ((FeeForm.currentPending > 0) && (Number(pendingAmount ?? 0) > 0)) {
         errors.push("You cannot submit next fees until not clearing the previous pending fees.");
     }
-
-
     // Payment Mode
     if (!paymentMode) {
         errors.push("Please select Payment Mode.");
     }
-
     // Transaction ID
-    if (
-        paymentMode === "ONLINE" &&
-        transactionId === ""
-    ) {
-        errors.push(
-            "Please enter Transaction ID for Online payment."
-        );
+    if (paymentMode === "ONLINE" && transactionId === "") {
+        errors.push("Please enter Transaction ID for Online payment.");
     }
     if (paymentMode === "BOTH") {
         if (cashAmount <= 0) {
             errors.push("Cash Amount cannot be empty, negative or 0 in case of both payment option.");
         }
-
         if (onlineAmount <= 0) {
             errors.push("Online Amount cannot be empty, negative or 0 in case of both payment option.");
         }
-
         if (cashAmount + onlineAmount !== payAmount) {
             errors.push(`Cash Amount + Online Amount must equal ₹${payAmount}.`);
         }
-
         if (!transactionId) {
             errors.push("Please enter Transaction ID for Online payment.");
         }
     }
-
     if (errors.length > 0) {
         showFormMessage(errors);
-
         return false;
     }
-
     return true;
 }
 
 function showFormMessage(messages) {
-
     const box = document.getElementById("feeMessage");
-
     box.innerHTML = `
         <strong>Please correct the following:</strong>
         <ul>
             ${messages.map(m => `<li>${m}</li>`).join("")}
         </ul>
     `;
-
     box.style.display = "block";
 }
 
 function clearFormMessage() {
-
     const box = document.getElementById("feeMessage");
-
-    if (!box) {
-        return;
-    }
-
+    if (!box) {return;}
     box.style.display = "none";
     box.innerHTML = "";
 }
 
 function closeFeeModal() {
     FeeForm.reset();
-
     const modal = document.getElementById("feeModal");
     const body = document.getElementById("feeModalBody");
-
     if (modal) modal.style.display = "none";
     if (body) body.innerHTML = "";
 }
 
 async function updateFees(studentId) {
     FeeForm.reset();
-
     const modal = document.getElementById("feeModal");
     const container = document.getElementById("feeModalBody");
-
     modal.style.display = "flex";
-
     container.innerHTML = `
         <div style="padding:20px;text-align:center">
             Loading Fee Details...
         </div>
     `;
-
     try {
         const seats = await filteredSeat(studentId)
         const html = await fetchHtml("/fee.html");
-        if (!html) {
-            return;
-        }
-
+        if (!html) {return;}
         container.innerHTML = html;
-
         FeeForm.populateLookups(seats);
-
-        const student = students.find(
-            s => s.studentId === studentId
-        );
-
+        const student = students.find(s => s.studentId === studentId);
         if (!student) {
             throw new Error("Student not found.");
         }
-
         FeeForm.setStudent(studentId);
-
         FeeForm.populate(student);
-
     } catch (error) {
-
         console.error(error);
-
         closeFeeModal();
-
         alert(error.message);
-
     }
 }
 

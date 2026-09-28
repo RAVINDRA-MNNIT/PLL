@@ -76,12 +76,12 @@ public class StudentController {
 
     @GetMapping("/strength/room2")
     public ShiftStrengthResponse getRoom2Strength() {
-        return studentService.getRoom2Strength();
+        return studentService.getRoomStrength("R2");
     }
 
     @GetMapping("/strength/room3")
     public ShiftStrengthResponse getRoom3Strength() {
-        return studentService.getRoom3Strength();
+        return studentService.getRoomStrength("R3");
     }
 
     @PostMapping("/addwarning")
@@ -92,18 +92,6 @@ public class StudentController {
     @PostMapping("/addcomplaint")
     public void addComplaint(@RequestBody AddComplaintRequest request) {
         studentService.addComplaint(request);
-    }
-
-    @GetMapping("/getwarnings/{studentId}")
-    public List<StudentWarning> getStudentWarnings(
-            @PathVariable Long studentId) {
-        return studentService.getStudentWarnings(studentId);
-    }
-
-    @GetMapping("/getcomplaints/{studentId}")
-    public List<StudentComplaint> getStudentComplaints(
-            @PathVariable Long studentId) {
-        return studentService.getStudentComplaints(studentId);
     }
 
     @DeleteMapping("/deletewarning/{warningId}")

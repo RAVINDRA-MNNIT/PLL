@@ -3,9 +3,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import com.prolearner.all.dto.FullDayStrength;
 import com.prolearner.all.dto.FullDayStrengthProjection;
-import com.prolearner.all.dto.StrengthProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,14 +15,7 @@ import com.prolearner.all.entity.Seat;
 
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
-
-    // Find seat by seat number
-    Optional<Seat> findBySeatNumber(String seatNumber);
     List<Seat> findByIsActiveTrueOrderById();
-
-    // Check whether a seat number already exists
-    boolean existsBySeatNumber(String seatNumber);
-
     Long countByStudentIdIsNotNullAndSeatNumberStartingWith(String room);
 
     // ====================================================

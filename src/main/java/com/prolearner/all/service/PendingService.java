@@ -44,11 +44,6 @@ public class PendingService {
         );
     }
 
-//    // ✅ Optional custom status (flexible)
-//    public List<Map<String, Object>> list(RequestType type, PendingRequestStatus status) {
-//        return queryService.list(type, status);
-//    }
-
     public ApprovalRequest get(RequestType type, Long id) {
         ApprovalRequest request = queryService.get(id);
         if (!request.getRequestType().equals(type)) {

@@ -28,8 +28,7 @@ async function switchView(view) {
     document.getElementById("complaintsView")?.style.setProperty("display", "none");
 
     // Remove active class
-    document.querySelectorAll(".nav-item")
-        .forEach(item => item.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
 
     switch (view) {
         case "fees":

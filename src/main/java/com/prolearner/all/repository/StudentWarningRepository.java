@@ -14,10 +14,7 @@ public interface StudentWarningRepository
         extends JpaRepository<StudentWarning, Long> {
 
     List<StudentWarning> findByStudentIdOrderByIssuedAtDesc(Long studentId);
-    List<StudentWarning> findByStudentIdAndWarningLevel(
-            Long studentId,
-            String warningLevel
-    );
+    List<StudentWarning> findByStudentIdAndWarningLevel(Long studentId, String warningLevel);
     @Query("""
     SELECT new com.prolearner.all.dto.StudentWarningResponse(
         w.id,

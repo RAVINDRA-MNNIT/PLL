@@ -4,7 +4,7 @@ window.Endpoints = {
     auth: {
         currentUser: "/api/auth/me",
         logout: "/api/auth/logout",
-        studentlogin: "/api/auth/student/login"
+        studentLogin: "/api/auth/student/login"
     },
 
     // ================= STUDENTS =================
@@ -52,14 +52,8 @@ window.Endpoints = {
         },
         addWarning: "/api/students/addwarning",
         addComplaint: "/api/students/addcomplaint",
-        getStudentWarnings(studentId) {
-            return `/api/students/getwarnings/${studentId}`;
-        },
         deleteStudentWarning(warningId) {
             return `/api/students/deletewarning/${warningId}`;
-        },
-        getStudentComplaints(studentId) {
-            return `/api/students/getcomplaints/${studentId}`;
         },
         deleteStudentComplaint(complaintId) {
             return `/api/students/deletecomplaint/${complaintId}`;
@@ -67,7 +61,7 @@ window.Endpoints = {
         getAllComplaints: "/api/students/getallcomplaints",
 
         getAllWarnings: "/api/students/getallwarnings",
-        resolvecomplaint(complaintId) {
+        resolveComplaint(complaintId) {
             return `/api/students/resolvecomplaint/${complaintId}`;
         },
     },
@@ -83,10 +77,6 @@ window.Endpoints = {
 
         nonPending() {
             return `/api/nonpending`;
-        },
-
-        update(requestId) {
-            return `/api/manager/pending/${requestId}`;
         },
     },
 
@@ -116,17 +106,11 @@ window.Endpoints = {
         getExpense: `/api/admin/expense/get`,
         approveExpense: `/api/admin/expense/approve`,
         rejectExpense: `/api/admin/expense/reject`,
-        expenseAnalytics: `/api/admin/transactions/expense/dashboard`,
         getDailyIncome: `/api/admin/income/daily`,
         getMonthlyIncome(month) {
             return `/api/admin/income/monthly?month=${month}`
         },
         getProfit: `/api/admin/profit/summary`,
-
-
-        clear() {
-            return `/api/pending/clear`;
-        },
 
         saveGeneralConfiguration: `/api/admin/configuration/general`,
         saveManagerConfiguration: `/api/admin/configuration/manager`,
@@ -172,7 +156,6 @@ window.Endpoints = {
         },
 
         saveExpense: `/api/manager/expense/save`,
-        getExpense: `/api/manager/expense/get`,
         cancelExpense: `/api/manager/expense/cancel`,
     },
     

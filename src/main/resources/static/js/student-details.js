@@ -226,28 +226,6 @@ initialize() {
         });
         StudentDetailsModal.changeSeat(options);
     },
-
-    // ================= API =================
-
-    async getStudentWarnings(studentId) {
-        try {
-            return await Api.get(
-                Endpoints.students.getStudentWarnings(studentId)
-            );
-        } catch (error) {
-            return [];
-        }
-    },
-
-    async getStudentComplaints(studentId) {
-        try {
-            return await Api.get(
-                Endpoints.students.getStudentComplaints(studentId)
-            );
-        } catch (error) {
-            return [];
-        }
-    },
 };
 // ✅ INIT
 StudentDetailsPage.init();

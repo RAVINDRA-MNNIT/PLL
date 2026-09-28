@@ -10,8 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface StudentComplaintRepository
-        extends JpaRepository<StudentComplaint, Long> {
+public interface StudentComplaintRepository extends JpaRepository<StudentComplaint, Long> {
 
     List<StudentComplaint> findByStudentIdOrderBySubmittedAtDesc(Long studentId);
 

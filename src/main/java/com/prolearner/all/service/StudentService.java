@@ -5,6 +5,8 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.FeeRecord;
@@ -278,166 +280,64 @@ public class StudentService {
         );
     }
 
-    public ShiftStrengthResponse getRoom2Strength() {
-
-        LocalDate discontinuedDate =
-                LocalDate.now().minusDays(
-                        configurationService.getDaysForDiscontinue()
-                );
-
-        List<Room2StrengthProjection> rows =
-                studentRepo.getStrengthByCategories(
-                        List.of("5 HOURS", "6 HOURS"),
-                        List.of("ACTIVE", "EXPIRED"),
-                        discontinuedDate
-                );
-        long fullDayCount = getStrength(List.of("R2")).occupied();
-
-        List<StrengthCount> firstShift = new ArrayList<>();
-        List<StrengthCount> secondShift = new ArrayList<>();
-        List<StrengthCount> thirdShift = new ArrayList<>();
-
-        for (Room2StrengthProjection row : rows) {
-
-            StrengthCount strength =
-                    new StrengthCount(
-                            row.getBatchName(),
-                            row.getCount()
-                    );
-
-            switch (row.getBatchName()) {
-
-                case "1 (6 HRS)" -> firstShift.add(strength);
-
-                case "2 (5 HRS)" -> secondShift.add(strength);
-
-                case "3 (5 HRS)" -> thirdShift.add(strength);
-
-                case "1 & 2" -> {
-                    firstShift.add(strength);
-                    secondShift.add(strength);
-                }
-
-                case "1 & 3" -> {
-                    firstShift.add(strength);
-                    thirdShift.add(strength);
-                }
-
-                case "2 & 3" -> {
-                    secondShift.add(strength);
-                    thirdShift.add(strength);
-                }
-            }
-        }
-        StrengthCount fullDay = new StrengthCount(
-                "Full Day",
-                fullDayCount
-        );
-
-        firstShift.add(fullDay);
-        secondShift.add(fullDay);
-        thirdShift.add(fullDay);
-
-        return new ShiftStrengthResponse(
-                firstShift,
-                secondShift,
-                thirdShift,
-                List.of()
-        );
-    }
-
-    public ShiftStrengthResponse getRoom3Strength() {
-
-        LocalDate discontinuedDate =
-                LocalDate.now().minusDays(
-                        configurationService.getDaysForDiscontinue()
-                );
-
-        List<Room2StrengthProjection> rows =
-                studentRepo.getStrengthByCategories(
-                        List.of("4 HOURS", "8 HOURS"),
-                        List.of("ACTIVE", "EXPIRED"),
-                        discontinuedDate
-                );
-
-        long fullDayCount = getStrength(List.of("R3")).occupied();
+    public ShiftStrengthResponse getRoomStrength(String room) {
+        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        List<Room2StrengthProjection> rows = studentRepo.getStrengthByRooms(List.of(room), List.of("ACTIVE", "EXPIRED"), discontinuedDate);
+        long fullDayCount = getStrength(List.of(room)).occupied();
 
         List<StrengthCount> firstShift = new ArrayList<>();
         List<StrengthCount> secondShift = new ArrayList<>();
         List<StrengthCount> thirdShift = new ArrayList<>();
         List<StrengthCount> fourthShift = new ArrayList<>();
 
+        Pattern shiftPattern =
+                Pattern.compile("^\\s*\\(?\\s*([1-4](?:\\s*&\\s*[1-4])*)");
+
         for (Room2StrengthProjection row : rows) {
+
+            String batchName = row.getBatchName();
+
+            if (batchName == null ||
+                    "FULL DAY".equalsIgnoreCase(batchName)) {
+                continue;
+            }
 
             StrengthCount strength =
                     new StrengthCount(
-                            row.getBatchName(),
+                            batchName,
                             row.getCount()
                     );
 
-            switch (row.getBatchName()) {
+            Matcher matcher = shiftPattern.matcher(batchName);
 
-                case "1 (4 HRS)" ->
-                        firstShift.add(strength);
+            if (!matcher.find()) {
+                continue;
+            }
 
-                case "2 (4 HRS)" ->
-                        secondShift.add(strength);
+            String shiftPart = matcher.group(1);
 
-                case "3 (4 HRS)" ->
-                        thirdShift.add(strength);
+            String[] shifts = shiftPart.split("\\s*&\\s*");
 
-                case "4 (4 HRS)" ->
-                        fourthShift.add(strength);
+            for (String shift : shifts) {
 
-                case "1 (8 HRS)",
-                     "(1 & 2) - 8 HRS" -> {
-                    firstShift.add(strength);
-                    secondShift.add(strength);
-                }
+                switch (shift) {
 
-                case "2 (8 HRS)" -> {
-                    thirdShift.add(strength);
-                    fourthShift.add(strength);
-                }
+                    case "1" -> firstShift.add(strength);
 
-                case "(1 & 3) - 4 HRS" -> {
-                    firstShift.add(strength);
-                    thirdShift.add(strength);
-                }
+                    case "2" -> secondShift.add(strength);
 
-                case "(1 & 4) - 4 HRS" -> {
-                    firstShift.add(strength);
-                    fourthShift.add(strength);
-                }
+                    case "3" -> thirdShift.add(strength);
 
-                case "(2 & 3) - 4 HRS" -> {
-                    secondShift.add(strength);
-                    thirdShift.add(strength);
-                }
-
-                case "(2 & 4) - 4 HRS" -> {
-                    secondShift.add(strength);
-                    fourthShift.add(strength);
+                    case "4" -> fourthShift.add(strength);
                 }
             }
         }
-
-        StrengthCount fullDay = new StrengthCount(
-                "Full Day",
-                fullDayCount
-        );
-
+        StrengthCount fullDay = new StrengthCount("Full Day", fullDayCount);
         firstShift.add(fullDay);
         secondShift.add(fullDay);
         thirdShift.add(fullDay);
         fourthShift.add(fullDay);
-
-        return new ShiftStrengthResponse(
-                firstShift,
-                secondShift,
-                thirdShift,
-                fourthShift
-        );
+        return new ShiftStrengthResponse(firstShift, secondShift, thirdShift, fourthShift);
     }
 
     public void addWarning(AddWarningRequest request) {
@@ -488,14 +388,6 @@ public class StudentService {
                 .build();
 
         studentComplaintRepo.save(complaint);
-    }
-
-    public List<StudentWarning> getStudentWarnings(Long studentId) {
-        return studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
-    }
-
-    public List<StudentComplaint> getStudentComplaints(Long studentId) {
-        return studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
     }
 
     public void deleteWarning(Long warningId) {

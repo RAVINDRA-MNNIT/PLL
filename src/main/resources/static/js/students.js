@@ -42,9 +42,7 @@ async function loadStudents(page = 1) {
 
 async function loadPendingCounts() {
     try {
-        const response = await Api.get(
-            Endpoints.pending.pendingCount
-        );
+        const response = await Api.get(Endpoints.pending.pendingCount);
         document.getElementById("pendingCount").textContent = response;
     } catch (error) {
         console.error(error);
@@ -59,27 +57,19 @@ async function loadPendingCounts() {
 function renderStudents() {
     document.getElementById("currentPage").textContent = currentPage;
     document.getElementById("totalPages").textContent = totalPages;
-
-    // const filtered =
-    //     filterStudents(students);
-
     renderStudentTable(students);
-
     updateStatistics(students);
     updatePaginationButtons();
-
 }
 
 function updatePaginationButtons() {
-
     document.getElementById("firstPageBtn").disabled = currentPage === 1;
     document.getElementById("prevPageBtn").disabled = currentPage === 1;
-
     document.getElementById("nextPageBtn").disabled = currentPage === totalPages;
     document.getElementById("lastPageBtn").disabled = currentPage === totalPages;
 }
 
-function setPaginationButtonandAction() {
+function setPaginationButtonAndAction() {
     pageSize = getConfigurations().PAGE_LIMIT ?? 20;
     document.getElementById("firstPageBtn").onclick = () => {
         if (currentPage !== 1) {
@@ -122,7 +112,6 @@ function resetPageAndLoadStudent() {
  * Render table.
  */
 function renderStudentTable(studentList) {
-
     const tbody =
         document.getElementById("studentRows");
 
@@ -154,9 +143,7 @@ function renderStudentTable(studentList) {
  */
 function createStudentRow(student) {
     const row = document.createElement("tr");
-
     row.classList.add("student-row");
-
     row.onclick = function (event) {
         // Don't open details if Update Fees button was clicked
         if (event.target.closest(".update-fees-btn")) {
@@ -190,30 +177,20 @@ function createStudentRow(student) {
         <td>
             <strong>${escapeHtml(student.studentId)}</strong>
         </td>
-
         <td>${escapeHtml(student.fullName.toUpperCase())}</td>
-
         <td>${escapeHtml(student.mobileNumber)}</td>
-
         <td>${escapeHtml(student.batchName)}</td>
-
         <td>${escapeHtml(student.seatNumber ?? "-")}</td>
-
         <td>
-            ₹${Number(student.submittedAmount ?? 0)
-                .toLocaleString("en-IN")}
+            ₹${Number(student.submittedAmount ?? 0).toLocaleString("en-IN")}
         </td>
-
         <td>${formatDate(student.fromDate)}</td>
-
         <td>${formatDate(student.tillDate)}</td>
-
         <td>
             <span class="badge ${badgeClass}">
                 ${escapeHtml(student.enrollmentStatus)}
             </span>
         </td>
-
         <td>
             <button class="update-fees-btn" ${isTerminated ? `disabled title="${buttonMsg}"` : `onclick="updateFees(${student.studentId})"`}>
             <i class="fa-solid fa-money-bill-wave"></i>
@@ -221,29 +198,16 @@ function createStudentRow(student) {
             </button>
         </td>
     `;
-
     return row;
-
 }
 
 /**
  * Update dashboard statistics.
  */
 function updateStatistics(data = students) {
-
     document.getElementById("total").textContent = totalStudents;
-
-    document.getElementById("activeCount").textContent =
-        data.filter(student =>
-            (student.enrollmentStatus ?? "")
-                .toUpperCase() === "ACTIVE"
-        ).length;
-
-    document.getElementById("expiredCount").textContent =
-        data.filter(student =>
-            (student.enrollmentStatus ?? "")
-                .toUpperCase() === "EXPIRED"
-        ).length;
+    document.getElementById("activeCount").textContent = data.filter(student => (student.enrollmentStatus ?? "").toUpperCase() === "ACTIVE").length;
+    document.getElementById("expiredCount").textContent = data.filter(student => (student.enrollmentStatus ?? "").toUpperCase() === "EXPIRED").length;
 }
 
 function viewStudentDetails(studentId) {

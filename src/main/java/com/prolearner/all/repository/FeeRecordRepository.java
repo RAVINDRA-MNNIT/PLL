@@ -14,8 +14,6 @@ import com.prolearner.all.entity.FeeRecord;
 
 @Repository
 public interface FeeRecordRepository extends JpaRepository<FeeRecord, Long> {
-    Optional<FeeRecord> findTopByStudentIdOrderByCreatedAtDesc(Long studentId);
-    Optional<FeeRecord> findTopByStudentIdOrderByIdDesc(Long studentId);
     List<FeeRecord> findByStudentIdOrderByIdDesc(Long studentId);
 
     // ====================================================

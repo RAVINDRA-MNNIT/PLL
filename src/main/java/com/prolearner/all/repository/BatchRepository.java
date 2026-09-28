@@ -7,9 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BatchRepository extends JpaRepository<Batches, Long> {
-
-    List<Batches> findAllByOrderByCategoryAscBatchNameAsc();
-
     @Query("""
     SELECT b
     FROM Batches b

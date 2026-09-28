@@ -470,7 +470,7 @@ const StudentIssues = {
     async resolveComplaint(id) {
         if (!id) {return;}
         try {
-            await Api.put(Endpoints.students.resolvecomplaint(id));
+            await Api.put(Endpoints.students.resolveComplaint(id));
             await this.loadCurrentPage();
         } catch (error) {
             console.error("Failed to resolve complaint:", error);

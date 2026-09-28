@@ -1,9 +1,5 @@
 package com.prolearner.all.dto;
-
-import com.prolearner.all.entity.Students;
-
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -129,104 +129,43 @@ function populateBatchFilter() {
 
 }
 
-/**
- * Configurations
- */
 function getConfigurations() {
-
     return window.libraryLookups.configurations;
-
 }
 
-/**
- * Qualifications
- */
 function getQualifications() {
-
     return window.libraryLookups.qualifications;
-
 }
 
-/**
- * Batches
- */
 function getBatches() {
-
     return window.libraryLookups.batches;
-
 }
 
-/**
- * Full Batches
- */
 function getFullBatchesList() {
-
     return window.libraryLookups.fullBatchList;
-
 }
 
-/**
- * Preparations
- */
 function getPreparations() {
-
     return window.libraryLookups.preparations;
-
 }
 
-/**
- * Seats
- */
 function getSeats() {
-
     return window.libraryLookups.seats;
-
 }
 
-/**
- * Find Batch
- */
 function findBatch(batchId) {
-
-    return window.libraryLookups.batches.find(
-        batch =>
-            String(batch.id) === String(batchId)
-    );
-
+    return window.libraryLookups.batches.find(batch => String(batch.id) === String(batchId));
 }
 
-/**
- * Find Preparation
- */
-function findPreparation(preparationId) {
-
-    return window.libraryLookups.preparations.find(
-        preparation =>
-            String(preparation.id) === String(preparationId)
-    );
-
-}
-
-/**
- * Find Seat
- */
 function findSeat(seatId) {
-
-    return window.libraryLookups.seats.find(
-        seat =>
-            String(seat.id) === String(seatId)
-    );
-
+    return window.libraryLookups.seats.find(seat => String(seat.id) === String(seatId));
 }
 
 async function filteredSeat(studentId) {
     const lookups = window.libraryLookups || {};
     var seats = lookups.seats || [];
     if (seats.length > 0) {
-        return seats.filter(seat =>
-            !seat.student_id ||
-            String(seat.student_id) === String(studentId)
-        );
+        return seats.filter(seat => !seat.student_id || String(seat.student_id) === String(studentId));
     }
     try {
         await reloadSeats();

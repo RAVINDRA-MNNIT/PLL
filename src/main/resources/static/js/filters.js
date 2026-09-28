@@ -8,31 +8,12 @@
  */
 function getFilters() {
     return {
-        keyword:
-            document.getElementById("search")
-                ?.value
-                .trim()
-                .toLowerCase() || "",
-
-        searchType:
-            document.getElementById("searchType")
-                ?.value || "all",
-
-        batch:
-            document.getElementById("batchFilter")
-                ?.value || "",
-
-        status:
-            document.getElementById("statusFilter")
-                ?.value || "",
-
-        pendingFees:
-            document.getElementById("pendingFeesFilter")
-                ?.checked || false,
-
-        discount:
-            document.getElementById("discountFilter")
-                ?.checked || false
+        keyword: document.getElementById("search")?.value.trim().toLowerCase() || "",
+        searchType: document.getElementById("searchType")?.value || "all",
+        batch: document.getElementById("batchFilter")?.value || "",
+        status: document.getElementById("statusFilter")?.value || "",
+        pendingFees: document.getElementById("pendingFeesFilter")?.checked || false,
+        discount: document.getElementById("discountFilter")?.checked || false
     };
 }
 /**
@@ -56,16 +37,13 @@ function resetFilters() {
     document.getElementById("search").value = "";
     document.getElementById("batchFilter").value = "";
     document.getElementById("statusFilter").value = "";
-
     document.getElementById("pendingFeesFilter").checked = false;
     document.getElementById("discountFilter").checked = false;
-
     resetPageAndLoadStudent();
 }
 
 function debounce(fn, delay) {
     let timeout;
-
     return (...args) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => fn(...args), delay);
@@ -76,57 +54,23 @@ function debounce(fn, delay) {
  * Register filter events.
  */
 function initializeFilters() {
+    const search = document.getElementById("search");
+    const searchType = document.getElementById("searchType");
+    const batch = document.getElementById("batchFilter");
+    const status = document.getElementById("statusFilter");
+    const pendingFees = document.getElementById("pendingFeesFilter");
+    const discount = document.getElementById("discountFilter");
+    const debouncedSearch = debounce(() => {resetPageAndLoadStudent();}, 1000);
 
-    const search =
-        document.getElementById("search");
-
-    const searchType =
-        document.getElementById("searchType");
-
-    const batch =
-        document.getElementById("batchFilter");
-
-    const status =
-        document.getElementById("statusFilter");
-
-    const pendingFees =
-        document.getElementById("pendingFeesFilter");
-
-    const discount =
-        document.getElementById("discountFilter");
-
-    const debouncedSearch = debounce(() => {
-        resetPageAndLoadStudent();
-    }, 1000);
-
-    search?.addEventListener(
-        "input",
-        debouncedSearch
-    );
-
+    search?.addEventListener("input", debouncedSearch);
     searchType?.addEventListener("change", () => {
         if (search?.value.trim() !== "") {
             resetPageAndLoadStudent();
         }
     });
 
-    batch?.addEventListener(
-        "change",
-        resetPageAndLoadStudent
-    );
-
-    status?.addEventListener(
-        "change",
-        resetPageAndLoadStudent
-    );
-
-    pendingFees?.addEventListener(
-        "change",
-        resetPageAndLoadStudent
-    );
-
-    discount?.addEventListener(
-        "change",
-        resetPageAndLoadStudent
-    );
+    batch?.addEventListener("change", resetPageAndLoadStudent);
+    status?.addEventListener("change", resetPageAndLoadStudent);
+    pendingFees?.addEventListener("change", resetPageAndLoadStudent);
+    discount?.addEventListener("change", resetPageAndLoadStudent);
 }

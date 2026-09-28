@@ -135,11 +135,6 @@ public class AdminController {
         transactionService.rejectExpense(requestId, adminId);
     }
 
-    @GetMapping("/transactions/expense/dashboard")
-    public ExpenseDashboardResponse getExpenseDashboard() {
-        return transactionService.getExpenseDashboard();
-    }
-
     @GetMapping("/income/daily")
     public List<Transaction> getDailyIncome() {
         return transactionService.getDailyIncome();

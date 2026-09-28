@@ -4,39 +4,26 @@ const Strength = {
     activeTab: "overall",
 
     async load() {
-
-        const container =
-            document.getElementById("strengthContainer");
-
+        const container = document.getElementById("strengthContainer");
         if (!container) {
             console.error("strengthContainer not found.");
             return;
         }
-
         container.innerHTML = `
             <section class="card loading-card">
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 <span>Loading Student Strength...</span>
             </section>
         `;
-
         try {
-
-            const html =
-                await fetchHtml("/studentStrength.html");
-
+            const html = await fetchHtml("/studentStrength.html");
             if (!html) {
                 throw new Error("Unable to load studentStrength.html");
             }
-
             container.innerHTML = html;
-
             await this.initialize();
-
         } catch (error) {
-
             console.error(error);
-
             container.innerHTML = `
                 <section class="card">
                     <div class="error-state">
@@ -46,99 +33,63 @@ const Strength = {
                     </div>
                 </section>
             `;
-
         }
-
     },
 
     async initialize() {
-
         this.initializeTabs();
-
         this.initializeSubTabs();
-
         const availableSection = document.getElementById("summaryItemId");
         availableSection.style.display = "none";
         await this.loadOverall();
-
     },
 
     initializeTabs() {
-
-        const container =
-            document.getElementById("strengthContainer");
-
-        const tabs =
-            container.querySelectorAll(".strength-tab");
-
-        const contents =
-            container.querySelectorAll(".tab-content");
-
-        const summary =
-            container.querySelector("#strengthSummary");
-
+        const container = document.getElementById("strengthContainer");
+        const tabs = container.querySelectorAll(".strength-tab");
+        const contents = container.querySelectorAll(".tab-content");
+        const summary = container.querySelector("#strengthSummary");
        const sortSection = document.getElementById("sortSection");
        sortSection.style.display = "none";
 
-
-        const availableSection =
-            container.querySelector("#summaryItemId");
-
+        const availableSection = container.querySelector("#summaryItemId");
         tabs.forEach(tab => {
-
             tab.addEventListener("click", async () => {
-
                 // Active Tab
-                tabs.forEach(t =>
-                    t.classList.remove("active")
-                );
-
+                tabs.forEach(t => t.classList.remove("active"));
                 tab.classList.add("active");
-
                 // Active Content
-                contents.forEach(c =>
-                    c.classList.remove("active")
-                );
-
-                const target =
-                    container.querySelector(`#${tab.dataset.tab}`);
-
+                contents.forEach(c => c.classList.remove("active"));
+                const target = container.querySelector(`#${tab.dataset.tab}`);
                 if (target) {
                     target.classList.add("active");
                 }
-
                 // Reset summary visibility
                 summary.style.display = "flex";
                 availableSection.style.display = "flex";
-
                 switch (tab.dataset.tab) {
-
                     case "overall":
                         this.activeTab = "overall";
                         availableSection.style.display = "none";
                         sortSection.style.display = "none";
                         await this.loadOverall();
                         break;
-
                     case "fullday":
                         this.activeTab = "fullday";
                        sortSection.style.display = "";
                         await this.loadFullDay();
                         break;
-
                     case "room1":
                         this.activeTab = "room1";
                        sortSection.style.display = "";
                         await this.loadRoom1();
                         break;
-
                     case "room2":
                         this.activeTab = "room2";
                         summary.style.display = "none";
                         sortSection.style.display = "none";
                         await this.loadRoom2();
                         break;
-
                     case "room3":
                         this.activeTab = "room3";
                         summary.style.display = "none";
@@ -146,78 +97,40 @@ const Strength = {
                         await this.loadRoom3();
                         break;
                 }
-
             });
-
         });
-
     },
 
     initializeSubTabs() {
-
-        const container =
-            document.getElementById("strengthContainer");
-
-        container
-            .querySelectorAll(".sub-tabs")
-            .forEach(group => {
-
-                const tabs =
-                    group.querySelectorAll(".sub-tab");
-
-                tabs.forEach(tab => {
-
-                    tab.addEventListener("click", async () => {
-
-                        tabs.forEach(t =>
-                            t.classList.remove("active"));
-
-                        tab.classList.add("active");
-
-                        const room =
-                            group.closest(".tab-content").id;
-
-                        const shift =
-                            tab.textContent.trim();
-
-                        if (room === "room2") {
-
-                            await this.loadRoom2(shift);
-
-                        } else if (room === "room3") {
-
-                            await this.loadRoom3(shift);
-
-                        }
-
-                    });
-
+        const container = document.getElementById("strengthContainer");
+        container.querySelectorAll(".sub-tabs").forEach(group => {
+            const tabs = group.querySelectorAll(".sub-tab");
+            tabs.forEach(tab => {
+                tab.addEventListener("click", async () => {
+                    tabs.forEach(t => t.classList.remove("active"));
+                    tab.classList.add("active");
+                    const room = group.closest(".tab-content").id;
+                    const shift = tab.textContent.trim();
+                    if (room === "room2") {
+                        await this.loadRoom2(shift);
+                    } else if (room === "room3") {
+                        await this.loadRoom3(shift);
+                    }
                 });
-
             });
-
+        });
     },
 
     async loadOverall() {
-
         try {
-
-            const data = await Api.get(
-                Endpoints.strength.overall
-            );
-
+            const data = await Api.get(Endpoints.strength.overall);
             this.renderOverall(data);
-
         } catch (e) {
-
             alert(e.message ?? "Unable to load student strength.");
-
         }
-
     },
 
     renderOverall(data) {
-
         const sections = {
             room1: {
                 tbody: document.getElementById("room1Strength"),
@@ -236,20 +149,14 @@ const Strength = {
                 total: document.getElementById("nightTotal")
             }
         };
-
-        const totalStudentsElement =
-            document.getElementById("totalStudents");
-
+        const totalStudentsElement = document.getElementById("totalStudents");
         Object.values(sections).forEach(section => {
-
             if (section.tbody) {
                 section.tbody.innerHTML = "";
             }
-
             if (section.total) {
                 section.total.textContent = "0";
             }
-
         });
 
         const totals = {
@@ -258,15 +165,10 @@ const Strength = {
             room3: 0,
             nightShift: 0
         };
-
         let overallTotal = 0;
-
         const renderRows = (rows, sectionKey) => {
-
             const section = sections[sectionKey];
-
             if (!rows || rows.length === 0) {
-
                 section.tbody.innerHTML = `
                 <tr>
                     <td colspan="2" class="text-center">
@@ -274,17 +176,12 @@ const Strength = {
                     </td>
                 </tr>
             `;
-
                 return;
             }
-
             rows.forEach(row => {
-
                 const count = Number(row.count) || 0;
-
                 totals[sectionKey] += count;
                 overallTotal += count;
-
                 section.tbody.insertAdjacentHTML(
                     "beforeend",
                     `
@@ -294,55 +191,33 @@ const Strength = {
                 </tr>
                 `
                 );
-
             });
-
             section.total.textContent = totals[sectionKey];
-
         };
-
         renderRows(data.room1, "room1");
         renderRows(data.room2, "room2");
         renderRows(data.room3, "room3");
         renderRows(data.nightShift, "nightShift");
-
         if (totalStudentsElement) {
             totalStudentsElement.textContent = overallTotal;
         }
-
     },
 
     async loadFullDay() {
-
         try {
-
-            this.fullDayData = await Api.get(
-                Endpoints.strength.fullDayStatus
-            );
-
+            this.fullDayData = await Api.get(Endpoints.strength.fullDayStatus);
             this.renderFullDay(this.fullDayData);
-
         } catch (e) {
-
             alert(e.message ?? "Unable to load Full Day.");
-
         }
-
     },
 
     renderFullDay(data) {
         const tbody = document.getElementById("fulldayTable");
-
-        document.getElementById("totalStudents").textContent =
-            data.occupied;
-
-        document.getElementById("availableSeats").textContent =
-            data.available;
-
+        document.getElementById("totalStudents").textContent = data.occupied;
+        document.getElementById("availableSeats").textContent = data.available;
         tbody.innerHTML = "";
-
         if (!data.students || data.students.length === 0) {
-
             tbody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center">
@@ -350,27 +225,19 @@ const Strength = {
                 </td>
             </tr>
         `;
-
             return;
         }
 
         data.students.forEach(student => {
-
             const occupied = student.studentId != null;
             const diff = occupied ? (student.status !== "ACTIVE" ? getDateDifferenceInDays(student.tillDate, Date()) :  "-") : "-"
-            tbody.insertAdjacentHTML(
-                "beforeend",
-                `
+            tbody.insertAdjacentHTML("beforeend", `
             <tr class="${occupied ? "" : "vacant-row"}">
                 <td>${student.seatNumber}</td>
                 <td>
                     ${
-                                    student.studentId
-                                        ? `<a href="/student-details.html?id=${student.studentId}">
-                                   ${student.studentId}
-                               </a>`
-                                        : "-"
-                                }
+                        student.studentId ? `<a href="/student-details.html?id=${student.studentId}">${student.studentId}</a>` : "-"
+                    }
                 </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
@@ -378,51 +245,30 @@ const Strength = {
                 <td>${diff}</td>
                 <td>
                     ${
-                    occupied
-                        ? `<span class="status ${student.status.toLowerCase()}">${student.status}</span>`
-                        : `<span class="status available">Available</span>`
-                }
+                        occupied ? `<span class="status ${student.status.toLowerCase()}">${student.status}</span>` : `<span class="status available">Available</span>`
+                    }
                 </td>
             </tr>
             `
             );
-
         });
-
     },
 
     async loadRoom1() {
-
         try {
-
-            this.room1Data = await Api.get(
-                Endpoints.strength.room1Status
-            );
-
+            this.room1Data = await Api.get(Endpoints.strength.room1Status);
             this.renderRoom1(this.room1Data);
-
         } catch (e) {
-
             alert(e.message ?? "Unable to load Full Day.");
-
         }
-
     },
 
     renderRoom1(data) {
-
         const tbody = document.getElementById("room1Table");
-
-        document.getElementById("totalStudents").textContent =
-            data.occupied;
-
-        document.getElementById("availableSeats").textContent =
-            data.available;
-
+        document.getElementById("totalStudents").textContent = data.occupied;
+        document.getElementById("availableSeats").textContent = data.available;
         tbody.innerHTML = "";
-
         if (!data.students || data.students.length === 0) {
-
             tbody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center">
@@ -430,81 +276,52 @@ const Strength = {
                 </td>
             </tr>
         `;
-
             return;
         }
-
         data.students.forEach(student => {
-
             const occupied = student.studentId != null;
             const diff = occupied ? (student.status !== "ACTIVE" ? getDateDifferenceInDays(student.tillDate, Date()) :  "-") : "-"
-            tbody.insertAdjacentHTML(
-                "beforeend",
-                `
+            tbody.insertAdjacentHTML("beforeend", `
             <tr class="${occupied ? "" : "vacant-row"}">
                 <td>${student.seatNumber}</td>
                 <td>
-                    ${
-                                    student.studentId
-                                        ? `<a href="/student-details.html?id=${student.studentId}">
-                                   ${student.studentId}
-                               </a>`
-                                        : "-"
-                                }
+                    ${student.studentId ? `<a href="/student-details.html?id=${student.studentId}">${student.studentId}</a>`: "-"}
                 </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
                 <td>${diff}</td>
                 <td>
-                    ${
-                    occupied
-                        ? `<span class="status ${student.status.toLowerCase()}">${student.status}</span>`
-                        : `<span class="status available">Available</span>`
-                }
+                    ${occupied ? `<span class="status ${student.status.toLowerCase()}">${student.status}</span>` : `<span class="status available">Available</span>`}
                 </td>
             </tr>
             `
             );
-
         });
-
     },
 
     printSection(sectionId, title) {
-
     const content = document.getElementById(sectionId).innerHTML;
-
     const printWindow = window.open("", "_blank");
-
     printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
             <title>${title}</title>
-
             <link rel="stylesheet" href="/css/manager.css">
             <link rel="stylesheet" href="/css/studentStrength.css">
-
             <style>
                 .print-btn{
                     display:none;
                 }
             </style>
-
         </head>
-
         <body>
-
             ${content}
-
         </body>
-
         </html>
     `);
-
     printWindow.document.close();
-
     printWindow.onload = () => {
         printWindow.print();
         printWindow.close();
@@ -512,46 +329,34 @@ const Strength = {
 },
 
     printWithOutNumber(sectionId, title) {
-
         // Clone so the original page is untouched
         const clone = document.getElementById(sectionId).cloneNode(true);
-
         // Hide 4th column (Mobile)
         clone.querySelectorAll("table tr").forEach(row => {
-
             if (row.children.length >= 4) {
                 row.children[3].style.display = "none";
             }
-
         });
-
         const printWindow = window.open("", "_blank");
-
         printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
             <title>${title}</title>
-
             <link rel="stylesheet" href="/css/manager.css">
             <link rel="stylesheet" href="/css/studentStrength.css">
-
             <style>
                 .print-btn{
                     display:none;
                 }
             </style>
-
         </head>
-
         <body>
             ${clone.innerHTML}
         </body>
         </html>
     `);
-
         printWindow.document.close();
-
         printWindow.onload = () => {
             printWindow.print();
             printWindow.close();
@@ -559,54 +364,26 @@ const Strength = {
     },
 
     async loadRoom2() {
-
         try {
-
-            const data = await Api.get(
-                Endpoints.strength.room2Status
-            );
-
+            const data = await Api.get(Endpoints.strength.room2Status);
             this.renderRoom2Strength(data);
-
         } catch (e) {
-
             alert(e.message ?? "Unable to load Room 2 Strength.");
-
         }
-
     },
 
     renderRoom2Strength(data) {
-
-        this.renderShift(
-            data.firstShift,
-            "room2Shift1Strength",
-            "room2Shift1Total"
-        );
-
-        this.renderShift(
-            data.secondShift,
-            "room2Shift2Strength",
-            "room2Shift2Total"
-        );
-
-        this.renderShift(
-            data.thirdShift,
-            "room2Shift3Strength",
-            "room2Shift3Total"
-        );
+        this.renderShift(data.firstShift, "room2Shift1Strength", "room2Shift1Total");
+        this.renderShift(data.secondShift, "room2Shift2Strength", "room2Shift2Total");
+        this.renderShift(data.thirdShift, "room2Shift3Strength", "room2Shift3Total");
 
     },
 
     renderShift(items, tbodyId, totalId) {
-
         const tbody = document.getElementById(tbodyId);
         const total = document.getElementById(totalId);
-
         tbody.innerHTML = "";
-
         if (!items || items.length === 0) {
-
             tbody.innerHTML = `
             <tr>
                 <td colspan="2" class="text-center">
@@ -614,106 +391,54 @@ const Strength = {
                 </td>
             </tr>
         `;
-
             total.textContent = "0";
             return;
         }
-
         let sum = 0;
-
         items.forEach(item => {
-
             sum += item.count;
-
-            tbody.insertAdjacentHTML(
-                "beforeend",
-                `
-            <tr>
-                <td>${item.batch}</td>
-                <td class="text-end">${item.count}</td>
-            </tr>
+            tbody.insertAdjacentHTML("beforeend", `
+                <tr>
+                    <td>${item.batch}</td>
+                    <td class="text-end">${item.count}</td>
+                </tr>
             `
             );
-
         });
-
         total.textContent = sum;
-
     },
 
     async loadRoom3() {
-
         try {
-
-            const data = await Api.get(
-                Endpoints.strength.room3Status
-            );
-
+            const data = await Api.get(Endpoints.strength.room3Status);
             this.renderRoom3Strength(data);
-
         } catch (e) {
-
             alert(e.message ?? "Unable to load Room 3.");
-
         }
-
     },
 
     renderRoom3Strength(data) {
-
-        this.renderShift(
-            data.firstShift,
-            "room3Shift1Strength",
-            "room3Shift1Total"
-        );
-
-        this.renderShift(
-            data.secondShift,
-            "room3Shift2Strength",
-            "room3Shift2Total"
-        );
-
-        this.renderShift(
-            data.thirdShift,
-            "room3Shift3Strength",
-            "room3Shift3Total"
-        );
-
-        this.renderShift(
-            data.fourthShift,
-            "room3Shift4Strength",
-            "room3Shift4Total"
-        );
-
+        this.renderShift(data.firstShift, "room3Shift1Strength", "room3Shift1Total");
+        this.renderShift(data.secondShift, "room3Shift2Strength", "room3Shift2Total");
+        this.renderShift(data.thirdShift, "room3Shift3Strength", "room3Shift3Total");
+        this.renderShift(data.fourthShift, "room3Shift4Strength", "room3Shift4Total");
     },
 
     sort(data, sortBy) {
-
         const students = [...data.students];
-
         switch (sortBy) {
-
             case "studentId":
-                students.sort((a, b) =>
-                    String(a.studentId ?? "").localeCompare(
-                        String(b.studentId ?? "")
-                    )
-                );
+                students.sort((a, b) => String(a.studentId ?? "").localeCompare(String(b.studentId ?? "")));
                 break;
-
             case "tillDate":
-                students.sort((a, b) =>
-                    new Date(a.tillDate || 0) - new Date(b.tillDate || 0)
-                );
+                students.sort((a, b) => new Date(a.tillDate || 0) - new Date(b.tillDate || 0));
                 break;
         }
-
         return {
             ...data,
             students
         };
     },
-
 };
 
 Strength.sortCurrentTab = function(sortBy) {
@@ -721,7 +446,6 @@ Strength.sortCurrentTab = function(sortBy) {
         case "fullday":
             this.renderFullDay(this.sort(this.fullDayData, sortBy));
             break;
-
         case "room1":
             this.renderRoom1(this.sort(this.room1Data, sortBy));
             break;

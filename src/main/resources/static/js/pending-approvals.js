@@ -81,7 +81,7 @@ async loadData() {
     let res;
 
     if (this.current === this.TABS.ALL) {
-        res = await this.load(Endpoints.pending.nonPending());
+        res = await this.load(Endpoints.pending.nonPending);
     } else {
         res = await this.load(Endpoints.pending.listByType(this.current));
     }
