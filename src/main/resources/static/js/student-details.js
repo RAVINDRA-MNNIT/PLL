@@ -137,37 +137,50 @@ initialize() {
     },
 
     showWarningNotice() {
-        debugger;
-        const warningCount = this.studentWarnings.length ?? 0;
+        const warningCount = this.studentWarnings?.length ?? 0;
+        const terminationCount = this.currentStudent?.terminationCount ?? 0;
+        const enrollmentStatus = this.currentStudent?.enrollmentStatus?.toUpperCase() ?? "";
+
         const isStudent = Session.isStudent();
-        const notice =
-            document.getElementById("studentWarningNotice");
+        const notice = document.getElementById("studentWarningNotice");
 
         if (!notice) {
             return;
         }
-
-        if (!warningCount || warningCount <= 0) {
+        // No warnings and no termination history
+        if (warningCount <= 0 && terminationCount <= 0) {
             notice.style.display = "none";
             notice.textContent = "";
             return;
         }
 
+        // =========================
+        // STUDENT VIEW
+        // =========================
         if (isStudent) {
-            if (this.currentStudent.enrollmentStatus.toUpperCase() === "TERMINATED") {
-                notice.textContent = `You are terminated.`;
-            } else {
+            if (enrollmentStatus === "TERMINATED") {
+                notice.textContent = "You are terminated.";
+            } else if (warningCount > 0 && terminationCount > 0) {
+                notice.textContent =
+                    `You have ${warningCount} warning(s) and have been terminated ${terminationCount} time(s), ` +
+                    `you will get terminated again so don't make mistakes.`;
+            } else if (warningCount > 0) {
                 notice.textContent = `You have ${warningCount} warning(s), only three warnings will be tolerated after that you will get terminated so don't make mistakes.`;
+            } else if (terminationCount > 0) {
+                notice.textContent = `You have been terminated ${terminationCount} time(s), you will get terminated again so don't make mistakes.`;
             }
+            // =========================
+            // ADMIN / MANAGER VIEW
+            // =========================
         } else {
-            if (this.currentStudent.enrollmentStatus.toUpperCase() === "TERMINATED") {
-                notice.textContent = `This student is terminated.`;
-            } else {
-                if ((this.currentStudent.terminationCount ?? 0) > 0) {
-                    notice.textContent = `This student terminated ${this.currentStudent.terminationCount} time(s), and has ${warningCount} warning(s).`;
-                } else {
-                    notice.textContent = `This student has ${warningCount} warning(s).`;
-                }
+            if (enrollmentStatus === "TERMINATED") {
+                notice.textContent = "This student is terminated.";
+            } else if (warningCount > 0 && terminationCount > 0) {
+                notice.textContent = `This student terminated ${terminationCount} time(s), and has ${warningCount} warning(s).`;
+            } else if (warningCount > 0) {
+                notice.textContent = `This student has ${warningCount} warning(s).`;
+            } else if (terminationCount > 0) {
+                notice.textContent = `This student terminated ${terminationCount} time(s).`;
             }
         }
 

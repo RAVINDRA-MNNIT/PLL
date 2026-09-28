@@ -308,7 +308,6 @@ window.FeeForm = {
     //////////////////////////////////////////////////////
 
     calculateFeeSubmittedAmount() {
-        debugger;
         const batchId = Number(document.getElementById("batchId").value);
         const batch = window.libraryLookups.batches.find(b => Number(b.id) === batchId);
         const fromDate = document.getElementById("fromDate")?.value;
@@ -537,7 +536,7 @@ function validateFeeForm() {
     if (pendingAmount < 0) {
         errors.push("Please enter a valid Pending Amount.");
     }
-    if ((FeeForm.currentPending > 0) && (Number(pendingAmount ?? 0) > 0)) {
+    if (FeeForm.isEdit() === false && (FeeForm.currentPending > 0) && (Number(pendingAmount ?? 0) > 0)) {
         errors.push("You cannot submit next fees until not clearing the previous pending fees.");
     }
     // Payment Mode
