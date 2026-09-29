@@ -49,7 +49,7 @@ async function initializeAdmin() {
         // ==========================
         // Pagination Buttons
         // ==========================
-        setPaginationButtonandAction();
+        setPaginationButtonAndAction();
 
         // ==========================
         // Load First Page
