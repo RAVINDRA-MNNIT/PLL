@@ -34,6 +34,7 @@ public class AdminCommandService {
     private final ConfigurationService configurationService;
     private final StudentWarningRepository studentWarningRepo;
     private final UserRepository userRepo;
+    private final BatchService batchService;
 
     // ====================================================
     // 🔹 Admission
@@ -87,7 +88,7 @@ public class AdminCommandService {
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-        if (body.getBatchId() == 28L || body.getBatchId() == 27L) {
+        if (batchService.requiresSeat(body.getBatchId())) {
             seatService.updateSeat(fee.getSeatId(), body.getSeatId(), body.getStudentId());
         } else {
             seatService.removeReservedSeat(body.getSeatId());
@@ -232,7 +233,7 @@ public class AdminCommandService {
                         .createdAt(OffsetDateTime.now())
                         .build();
 
-                if (r.getBatchId() == 28L || r.getBatchId() == 27L) {
+                if (batchService.requiresSeat(r.getBatchId())) {
                     seatService.updateSeat(fee.getSeatId(), r.getSeatId(), r.getStudentId());
                 } else {
                     seatService.removeReservedSeat(r.getSeatId());
@@ -296,7 +297,7 @@ public class AdminCommandService {
                 }
 
                 lastFee.setPaymentMode(r.getPaymentMode());
-                if (r.getBatchId() == 28L || r.getBatchId() == 27L) {
+                if (batchService.requiresSeat(r.getBatchId())) {
                     seatService.updateSeat(lastFee.getSeatId(), r.getSeatId(), r.getStudentId());
                 } else {
                     seatService.removeReservedSeat(r.getSeatId());
@@ -394,7 +395,7 @@ public class AdminCommandService {
                 lastFee.setRemarks(remarks);
             }
             lastFee.setPaymentMode(body.getPaymentMode());
-            if (body.getBatchId() == 28L || body.getBatchId() == 27L) {
+            if (batchService.requiresSeat(body.getBatchId())) {
                 seatService.updateSeat(lastFee.getSeatId(), body.getSeatId(), body.getStudentId());
             } else {
                 seatService.removeReservedSeat(body.getSeatId());

@@ -23,6 +23,20 @@ public class BatchService {
         this.feeRecordRepo = feeRecordRepo;
     }
 
+    public boolean requiresSeat(Long batchId) {
+        Batches batch = batchRepo.findById(batchId)
+                .orElseThrow(() ->
+                        new RuntimeException("Batch not found: " + batchId));
+
+        return ("FULL DAY".equalsIgnoreCase(batch.getCategory()) || "24 HOURS".equalsIgnoreCase(batch.getCategory()));
+    }
+
+    @Transactional(readOnly = true)
+    public Batches getBatch(Long id) {
+        return batchRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Batch not found: " + id));
+    }
+
     @Transactional
     public BatchResponse create(BatchRequest request) {
         Batches batch = new Batches();

@@ -37,6 +37,7 @@ public class ManagerCommandService {
     private final FeeRecordRepository feeRecordRepo;
     private final SeatService seatService;
     private final StudentIdService studentIdService;
+    private final BatchService batchService;
 
     // ====================================================
     // 🔹 Create Request
@@ -242,7 +243,7 @@ public class ManagerCommandService {
         // ENROLLMENT
         request.setEnrollmentStatus(body.getEnrollmentStatus());
         // SAVE REQUEST
-        if (request.getBatchId() == 28L || request.getBatchId() == 27L) {
+        if (batchService.requiresSeat(request.getBatchId())) {
             seatService.updateSeat(previousSeatId, body.getSeatId(), request.getStudentId());
         } else {
             seatService.removeReservedSeat(request.getSeatId());
