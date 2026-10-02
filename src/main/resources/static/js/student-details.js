@@ -117,7 +117,13 @@ initialize() {
             permanentAddress = student.permanentAddress;
             icon.className = "fa-solid fa-arrow-left";
             text.textContent = "Back";
-            btn.onclick = () => history.back();
+            btn.onclick = () => {
+                if (window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+                window.close();
+            };
         }
         if (idCardBtn) {
             idCardBtn.onclick = () => {

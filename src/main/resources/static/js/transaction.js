@@ -197,8 +197,8 @@ const Transactions = {
             <tr>
                 <td>${income.id}</td>
                 <td>
-                     <a href="/student-details.html?id=${income.studentId}">
-                        ${income.studentId ?? "-"}
+                    <a href="/student-details.html?id=${income.studentId}" target="_blank" rel="noopener noreferrer">
+                        <strong>${escapeHtml(income.studentId)}</strong>
                     </a>
                 </td>
                 <td>${income.sourceType ?? "-"}</td>

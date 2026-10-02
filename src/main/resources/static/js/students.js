@@ -211,5 +211,5 @@ function updateStatistics(data = students) {
 }
 
 function viewStudentDetails(studentId) {
-    window.location.href = `/student-details.html?id=${studentId}`;
+    window.open(`/student-details.html?id=${studentId}`, "_blank");
 }

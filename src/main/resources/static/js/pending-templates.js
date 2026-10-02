@@ -74,8 +74,8 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId}</td>
                 <td>
-                    <a href="/student-details.html?id=${item.studentId}">
-                        ${item.studentId ?? "-"}
+                    <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                        <strong>${escapeHtml(item.studentId)}</strong>
                     </a>
                 </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
@@ -126,8 +126,8 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId}</td>
                 <td>
-                     <a href="/student-details.html?id=${item.studentId}">
-                        ${item.studentId ?? "-"}
+                    <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                        <strong>${escapeHtml(item.studentId)}</strong>
                     </a>
                 </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
@@ -163,8 +163,8 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId ?? "-"}</td>
                 <td>
-                     <a href="/student-details.html?id=${item.studentId}">
-                        ${item.studentId ?? "-"}
+                    <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                        <strong>${escapeHtml(item.studentId)}</strong>
                     </a>
                 </td>
                 <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber)}</td>
@@ -201,8 +201,8 @@ window.PendingTemplates = {
             <tr>
                 <td>${item.requestId ?? "-"}</td>
                 <td>
-                     <a href="/student-details.html?id=${item.studentId}">
-                        ${item.studentId ?? "-"}
+                    <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                        <strong>${escapeHtml(item.studentId)}</strong>
                     </a>
                 </td>
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
@@ -239,8 +239,8 @@ window.PendingTemplates = {
         <tr>
             <td>${item.requestId ?? "-"}</td>
             <td>
-                 <a href="/student-details.html?id=${item.studentId}">
-                    ${item.studentId ?? "-"}
+                <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                    <strong>${escapeHtml(item.studentId)}</strong>
                 </a>
             </td>
             <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
@@ -287,8 +287,8 @@ window.PendingTemplates = {
         <tr>
             <td>${item.requestId ?? "-"}</td>
             <td>
-                 <a href="/student-details.html?id=${item.studentId}">
-                    ${item.studentId ?? "-"}
+                <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                    <strong>${escapeHtml(item.studentId)}</strong>
                 </a>
             </td>
             <td>${(item.lastFullName ?? item.fullName ?? "-").toUpperCase()}</td>
@@ -338,8 +338,8 @@ allRow(item, actions)
         <tr>
             <td>${item.requestId ?? "-"}</td>
             <td>
-                 <a href="/student-details.html?id=${item.studentId}">
-                    ${item.studentId ?? "-"}
+                <a href="/student-details.html?id=${item.studentId}" target="_blank" rel="noopener noreferrer">
+                    <strong>${escapeHtml(item.studentId)}</strong>
                 </a>
             </td>
             <td>

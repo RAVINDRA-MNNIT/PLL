@@ -236,8 +236,15 @@ const Strength = {
                 <td>${student.seatNumber}</td>
                 <td>
                     ${
-                        student.studentId ? `<a href="/student-details.html?id=${student.studentId}">${student.studentId}</a>` : "-"
-                    }
+                    student.studentId
+                        ? `<a
+                                href="/student-details.html?id=${student.studentId}"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <strong>${escapeHtml(student.studentId)}</strong>
+                              </a>`
+                        : "-"
+                }
                 </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
@@ -285,7 +292,16 @@ const Strength = {
             <tr class="${occupied ? "" : "vacant-row"}">
                 <td>${student.seatNumber}</td>
                 <td>
-                    ${student.studentId ? `<a href="/student-details.html?id=${student.studentId}">${student.studentId}</a>`: "-"}
+                    ${
+                                    student.studentId
+                                        ? `<a
+                                href="/student-details.html?id=${student.studentId}"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <strong>${escapeHtml(student.studentId)}</strong>
+                              </a>`
+                                        : "-"
+                                }
                 </td>
                 <td>${student.fullName ?? "—"}</td>
                 <td>${student.mobileNumber ?? "—"}</td>

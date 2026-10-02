@@ -79,7 +79,7 @@ const VerifyStudent = {
             input?.focus();
             return;
         }
-        window.location.href = `/student-details.html?id=${membershipId}`;
+        window.open(`/student-details.html?id=${membershipId}`, "_blank", "noopener,noreferrer");
     },
 
     render(student) {
