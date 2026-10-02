@@ -314,11 +314,12 @@ window.FeeForm = {
         const tillDate = document.getElementById("tillDate")?.value;
         const pending = Number(document.getElementById("pendingAmount")?.value || 0);
         const submittedAmount = document.getElementById("submittedAmount");
+        const membershipDays = calculateMembershipDays(fromDate, tillDate);
 
         if (FeeForm.currentBatchId !== batchId) {
             document.getElementById("discount").value = 0;
         } else {
-            document.getElementById("discount").value = FeeForm.allowedDiscount;
+            document.getElementById("discount").value = calculateTotalFee(FeeForm.allowedDiscount, membershipDays);
         }
         const discount = Number(document.getElementById("discount")?.value || 0);
         if (!batch || !submittedAmount) {
@@ -331,7 +332,6 @@ window.FeeForm = {
             FeeForm.calculateSplitPayment();
             return;
         }
-        const membershipDays = calculateMembershipDays(fromDate, tillDate);
         if (membershipDays <= 0) {
             submittedAmount.value = 0;
             FeeForm.calculateSplitPayment();

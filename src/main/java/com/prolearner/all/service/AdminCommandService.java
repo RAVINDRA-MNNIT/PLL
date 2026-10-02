@@ -106,6 +106,7 @@ public class AdminCommandService {
                 body.getPaymentMode(),
                 SourceType.FEE,
                 "",
+                OffsetDateTime.now(),
                 null,
                 adminId);
 
@@ -201,6 +202,7 @@ public class AdminCommandService {
                             r.getPaymentMode(),
                             SourceType.ADMISSION,
                             "",
+                            r.getRequestedAt(),
                             1L,
                             adminId
                     );
@@ -247,6 +249,7 @@ public class AdminCommandService {
                         r.getPaymentMode(),
                         SourceType.FEE,
                         "",
+                        r.getRequestedAt(),
                         1L,
                         adminId);
                 // Update Fee
@@ -312,6 +315,7 @@ public class AdminCommandService {
                             r.getPaymentMode(),
                             SourceType.BATCH_ADJUSTMENT,
                             r.getTransactionId(),
+                            r.getRequestedAt(),
                             2L,
                             2L);
                 }
@@ -337,6 +341,7 @@ public class AdminCommandService {
                             r.getPaymentMode(),
                             SourceType.FEE,
                             r.getTransactionId(),
+                            r.getRequestedAt(),
                             2L,
                             2L);
                 }
@@ -410,6 +415,7 @@ public class AdminCommandService {
                         body.getPaymentMode(),
                         SourceType.BATCH_ADJUSTMENT,
                         body.getTransactionId(),
+                        OffsetDateTime.now(),
                         2L,
                         2L);
             }
@@ -435,6 +441,7 @@ public class AdminCommandService {
                         body.getPaymentMode(),
                         SourceType.FEE,
                         body.getTransactionId(),
+                        OffsetDateTime.now(),
                         2L,
                         2L);
             }
@@ -514,6 +521,7 @@ public class AdminCommandService {
                 body.getPaymentMode(),
                 SourceType.ADMISSION,
                 null,
+                OffsetDateTime.now(),
                 null,
                 adminId
         );
@@ -608,6 +616,7 @@ public class AdminCommandService {
                                   String paymentMode,
                                   SourceType sourceType,
                                   String description,
+                                  OffsetDateTime transactionDate,
                                   Long managerId,
                                   Long adminId) {
         Long createdBy = adminId;
@@ -624,7 +633,7 @@ public class AdminCommandService {
                 .cashAmount(cashAmount)
                 .onlineAmount(onlineAmount)
                 .paymentMode(PaymentMode.valueOf(paymentMode))
-                .transactionDate(OffsetDateTime.now())
+                .transactionDate(transactionDate)
                 .description(description)
                 .status(PendingRequestStatus.APPROVED)
                 .createdBy(createdBy)

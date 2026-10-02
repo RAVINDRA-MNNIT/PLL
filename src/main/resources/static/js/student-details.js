@@ -18,8 +18,13 @@ init() {
 },
 
 initialize() {
-    document.getElementById("detailLibraryName").textContent = `${this.getConfigurations().LIBRARY_NAME}`;
     try {
+        const configurations = this.getConfigurations();
+        const libraryName = configurations?.LIBRARY_NAME ?? "Pro Learner's Digital Library";
+        const libraryNameElement = document.getElementById("detailLibraryName");
+        if (libraryNameElement) {
+            libraryNameElement.textContent = libraryName;
+        }
         // ✅ GET ID FROM URL (CORRECT FLOW)
         const params = new URLSearchParams(window.location.search);
         let studentId = params.get("id");
@@ -64,7 +69,14 @@ initialize() {
     },
 
     getConfigurations() {
-        return JSON.parse(sessionStorage.getItem("configurations"));
+        try {
+            return JSON.parse(
+                sessionStorage.getItem("configurations") || "{}"
+            );
+        } catch (error) {
+            console.error("Failed to parse configurations:", error);
+            return {};
+        }
     },
 
     // ================= RENDER =================

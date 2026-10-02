@@ -12,6 +12,8 @@ window.PendingTemplates = {
                 <th>Batch</th>
                 <th>Admission</th>
                 <th>Submitted</th>
+                <th>Discount</th>
+                <th>Pending</th>
                 <th>Requested At</th>
                 <th>Actions</th>
             </tr>
@@ -37,8 +39,10 @@ window.PendingTemplates = {
                     ${item.paymentMode !== "BOTH" ? "" : (item.onlineAmount != null && item.onlineAmount !== "" ? `<br>Online: ₹${item.onlineAmount}` : "")}
                     ${item.transactionId ? `<br>${item.transactionId}` : ""}
                 </td>
-            <td>${renderRequestedAt(item.requestedAt)}</td>
-            <td>${actions}</td>
+                <td>₹${item.discount ?? 0}</td>
+                <td>₹${item.pendingAmount ?? 0}</td>
+                <td>${renderRequestedAt(item.requestedAt)}</td>
+                <td>${actions}</td>
             </tr>
         `;
     },
@@ -56,8 +60,8 @@ window.PendingTemplates = {
                 <th>Submitted</th>
                 <th>Discount</th>
                 <th>Pending</th>
+                <th>Requested By</th>
                 <th>Requested At</th>
-                <th>Requested On</th>
                 <th>Actions</th>
             </tr>
         `;

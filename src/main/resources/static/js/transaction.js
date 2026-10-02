@@ -55,6 +55,7 @@ const Transactions = {
     ======================================================= */
     showIncome() {
         this.activateMainTab("income");
+        document.getElementById("monthFilter").style.display = "";
         document.getElementById("incomeView").style.display = "block";
         document.getElementById("profitView").style.display = "none";
         document.getElementById("expenseView").style.display = "none";
@@ -63,6 +64,7 @@ const Transactions = {
 
     showProfit() {
         this.activateMainTab("profit");
+        document.getElementById("monthFilter").style.display = "";
         document.getElementById("incomeView").style.display = "none";
         document.getElementById("profitView").style.display = "block";
         document.getElementById("expenseView").style.display = "none";
@@ -90,7 +92,6 @@ const Transactions = {
         document.getElementById("monthlyIncomeBtn").classList.remove("active");
         document.getElementById("dailyIncomeView").style.display = "block";
         document.getElementById("monthlyIncomeView").style.display = "none";
-        document.getElementById("monthFilter").style.display = "none";
         this.loadDailyIncome();
     },
 
@@ -99,16 +100,42 @@ const Transactions = {
         document.getElementById("monthlyIncomeBtn").classList.add("active");
         document.getElementById("dailyIncomeView").style.display = "none";
         document.getElementById("monthlyIncomeView").style.display = "block";
-        document.getElementById("monthFilter").style.display = "flex";
         this.loadMonthlyIncome();
     },
 
+    onMonthChange() {
+        const incomeView = document.getElementById("incomeView");
+        const expenseView = document.getElementById("expenseView");
+        const profitView = document.getElementById("profitView");
+
+        if (incomeView?.style.display !== "none") {
+            if (document.getElementById("dailyIncomeView")?.style.display !== "none") {
+                this.loadDailyIncome();
+            } else {
+                this.loadMonthlyIncome();
+            }
+            return;
+        }
+
+        if (expenseView?.style.display !== "none") {
+            this.loadExpenses();
+            return;
+        }
+
+        if (profitView?.style.display !== "none") {
+            this.loadProfit();
+        }
+    },
+
+
+
     async loadDailyIncome() {
         try {
-            const response = await Api.get(Endpoints.admin.getDailyIncome);
+            const month = document.getElementById("incomeMonth").value;
+            const response = await Api.get(Endpoints.admin.getDailyIncome(month));
             this.renderDailyIncome(response);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     },
 
@@ -189,8 +216,8 @@ const Transactions = {
     ======================================================= */
     async loadProfit() {
         try {
-            Session.isAdmin();
-            const response = await Api.get(Endpoints.admin.getProfit);
+            const month = document.getElementById("incomeMonth").value;
+            const response = await Api.get(Endpoints.admin.getProfit(month));
             this.renderProfit(response);
         } catch (error) {
             console.error(error);
@@ -233,12 +260,14 @@ const Transactions = {
         this.activateExpenseTab("newExpenseBtn");
         document.getElementById("newExpenseView").style.display = "";
         document.getElementById("expenseListView").style.display = "none";
+        document.getElementById("monthFilter").style.display = "none";
     },
 
     showExpenses() {
         this.activateExpenseTab("expenseListBtn");
         document.getElementById("newExpenseView").style.display = "none";
         document.getElementById("expenseListView").style.display = "";
+        document.getElementById("monthFilter").style.display = "";
         this.loadExpenses();
     },
 
@@ -254,14 +283,14 @@ const Transactions = {
 
     async loadExpenses() {
         try {
-            Session.isAdmin()
-            const response = await Api.get(Endpoints.admin.getExpense);
+            Session.isAdmin();
+            const month = document.getElementById("incomeMonth").value;
+            const response = await Api.get(Endpoints.admin.getExpense(month));
             this.renderExpenses(response);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     },
-
     renderExpenses(expenses) {
         const tbody = document.getElementById("expenseRows");
         if (!tbody) {return;}
@@ -421,7 +450,7 @@ const Transactions = {
         if (!select) {return;}
         select.innerHTML = "";
         const today = new Date();
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 5; i++) {
             const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
             const value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
             const text = d.toLocaleString("default", {

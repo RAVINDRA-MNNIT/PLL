@@ -5,7 +5,15 @@
     <section class="card transaction-card">
         <div class="transaction-header">
             <h2>Transactions</h2>
+            <!-- Month Filter -->
             <div class="transaction-tabs">
+                <div id="monthFilter" class="month-filter">
+                    <label>Month</label>
+                    <select
+                            id="incomeMonth"
+                            onchange="Transactions.onMonthChange()">
+                    </select>
+                </div>
                 <button
                         id="incomeTabBtn"
                         class="transaction-tab"
@@ -47,16 +55,6 @@
                             onclick="Transactions.showMonthlyIncome()">
                         Monthly
                     </button>
-                </div>
-                <div
-                        id="monthFilter"
-                        class="month-filter"
-                        style="display:none">
-                    <label>Month</label>
-                    <select
-                            id="incomeMonth"
-                            onchange="Transactions.loadMonthlyIncome()">
-                    </select>
                 </div>
             </div>
 

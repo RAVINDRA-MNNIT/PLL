@@ -25,17 +25,19 @@ public class TransactionQueryService {
 
     private final TransactionRepository transactionRepository;
 
-    public List<Transaction> getExpenses() {
+    public List<Transaction> getExpenses(String month) {
+
+        YearMonth yearMonth = YearMonth.parse(month);
 
         ZoneOffset offset = ZoneOffset.ofHoursMinutes(5, 30);
 
-        OffsetDateTime from = LocalDate.now()
-                .withDayOfMonth(1)
+        OffsetDateTime from = yearMonth
+                .atDay(1)
                 .atStartOfDay()
                 .atOffset(offset);
 
-        OffsetDateTime to = LocalDate.now()
-                .withDayOfMonth(LocalDate.now().lengthOfMonth())
+        OffsetDateTime to = yearMonth
+                .atEndOfMonth()
                 .atTime(LocalTime.MAX)
                 .atOffset(offset);
 
@@ -47,22 +49,25 @@ public class TransactionQueryService {
                 );
     }
 
-    public List<Transaction> getDailyIncome() {
+    public List<Transaction> getDailyIncome(String month) {
+
+        YearMonth yearMonth = YearMonth.parse(month);
+
         ZoneOffset offset = ZoneOffset.ofHoursMinutes(5, 30);
 
-        OffsetDateTime from = LocalDate.now()
-                .withDayOfMonth(1)
+        OffsetDateTime from = yearMonth
+                .atDay(1)
                 .atStartOfDay()
                 .atOffset(offset);
 
-        OffsetDateTime to = LocalDate.now()
-                .withDayOfMonth(LocalDate.now().lengthOfMonth())
+        OffsetDateTime to = yearMonth
+                .atEndOfMonth()
                 .atTime(LocalTime.MAX)
                 .atOffset(offset);
 
         List<PendingRequestStatus> completedStatuses = List.of(
                 PendingRequestStatus.DIRECT,
-                APPROVED
+                PendingRequestStatus.APPROVED
         );
 
         return transactionRepository
@@ -92,21 +97,24 @@ public class TransactionQueryService {
         );
     }
 
-    public ProfitSummary getProfitSummary() {
+    public ProfitSummary getProfitSummary(String month) {
 
-        YearMonth month = YearMonth.now();
+        YearMonth yearMonth = YearMonth.parse(month);
+
         ZoneOffset ist = ZoneOffset.ofHoursMinutes(5, 30);
 
-        OffsetDateTime from = month.atDay(1)
+        OffsetDateTime from = yearMonth.atDay(1)
                 .atStartOfDay()
                 .atOffset(ist);
 
-        OffsetDateTime to = month.atEndOfMonth()
+        OffsetDateTime to = yearMonth.atEndOfMonth()
                 .atTime(LocalTime.MAX)
                 .atOffset(ist);
+
         // Total summary
         Object[] wrapper = transactionRepository.getProfitSummary(
-                List.of(PendingRequestStatus.APPROVED,
+                List.of(
+                        PendingRequestStatus.APPROVED,
                         PendingRequestStatus.DIRECT
                 ),
                 from,
@@ -132,7 +140,8 @@ public class TransactionQueryService {
         // Daily summary
         List<DailyProfit> daily = transactionRepository
                 .getDailyProfitSummary(
-                        List.of(PendingRequestStatus.APPROVED,
+                        List.of(
+                                PendingRequestStatus.APPROVED,
                                 PendingRequestStatus.DIRECT
                         ),
                         from,
@@ -149,8 +158,11 @@ public class TransactionQueryService {
                     BigDecimal dailyExpenseCash = (BigDecimal) row[3];
                     BigDecimal dailyExpenseOnline = (BigDecimal) row[4];
 
-                    BigDecimal dailyProfitCash = dailyIncomeCash.subtract(dailyExpenseCash);
-                    BigDecimal dailyProfitOnline = dailyIncomeOnline.subtract(dailyExpenseOnline);
+                    BigDecimal dailyProfitCash =
+                            dailyIncomeCash.subtract(dailyExpenseCash);
+
+                    BigDecimal dailyProfitOnline =
+                            dailyIncomeOnline.subtract(dailyExpenseOnline);
 
                     return new DailyProfit(
                             date,

@@ -112,10 +112,12 @@ public class AdminController {
     // 🔹 Get Expenses Request
     // ====================================================
 
-    @GetMapping("/expense/get")
-    public List<Transaction> expenses() {
+    @GetMapping("/expense")
+    public List<Transaction> expenses(
+            @RequestParam String month
+    ) {
         Long managerId = 1L;
-        return transactionService.getExpenses();
+        return transactionService.getExpenses(month);
     }
 
     // ====================================================
@@ -136,8 +138,10 @@ public class AdminController {
     }
 
     @GetMapping("/income/daily")
-    public List<Transaction> getDailyIncome() {
-        return transactionService.getDailyIncome();
+    public List<Transaction> getDailyIncome(
+            @RequestParam String month
+    ) {
+        return transactionService.getDailyIncome(month);
     }
 
     @GetMapping("/income/monthly")
@@ -149,8 +153,9 @@ public class AdminController {
 
     @GetMapping("/profit/summary")
     public ProfitSummary getProfitSummary(
+            @RequestParam String month
     ) {
-        return transactionService.getProfitSummary();
+        return transactionService.getProfitSummary(month);
     }
 
     // ====================================================

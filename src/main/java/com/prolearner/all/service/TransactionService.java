@@ -34,17 +34,17 @@ public class TransactionService {
 
     public void cancelExpense(Long id, Long managerId) {transactionCommandService.cancelExpense(id, managerId);}
 
-    public List<Transaction> getExpenses() {
-        return transactionQueryService.getExpenses();
+    public List<Transaction> getExpenses(String month) {
+        return transactionQueryService.getExpenses(month);
     }
 
-    public List<Transaction>  getDailyIncome() {
-        return transactionQueryService.getDailyIncome();
+    public List<Transaction> getDailyIncome(String month) {
+        return transactionQueryService.getDailyIncome(month);
     }
 
     public MonthlyIncomeSummary getMonthlyIncome(YearMonth month) {return transactionQueryService.getMonthlyIncome(month);}
 
-    public ProfitSummary getProfitSummary() {
-        return transactionQueryService.getProfitSummary();
+    public ProfitSummary getProfitSummary(String month) {
+        return transactionQueryService.getProfitSummary(month);
     }
 }

@@ -19,7 +19,7 @@ window.StudentActionsUI = {
         this.student = studentData;
         if (!this.container) return;
         this.studentId = studentData?.studentId;
-        this.UPDATE_FULL_DETAIL = this.getConfigurations().UPDATE_FULL_DETAIL ?? false;
+        this.UPDATE_FULL_DETAIL = this.getConfigurations()?.UPDATE_FULL_DETAIL ?? false;
         this.warnings = warnings
         this.complaints = complaints
         this.ensureModalRoot();
@@ -38,14 +38,21 @@ window.StudentActionsUI = {
     },
 
     getConfigurations() {
-        return JSON.parse(sessionStorage.getItem("configurations"));
+        try {
+            return JSON.parse(
+                sessionStorage.getItem("configurations") || "{}"
+            );
+        } catch (error) {
+            console.error("Failed to parse configurations:", error);
+            return {};
+        }
     },
 
     render() {
-        const STUDENT_DETAIL_UPDATE_ENABLE = this.getConfigurations().STUDENT_DETAIL_UPDATE_ENABLE ?? false;
-        const STUDENT_FEE_UPDATE_ENABLE = this.getConfigurations().STUDENT_FEE_UPDATE_ENABLE ?? false;
-        const STUDENT_SEAT_UPDATE_ENABLE = this.getConfigurations().STUDENT_SEAT_UPDATE_ENABLE ?? false;
-        const STUDENT_ADD_COMPLAINT_ENABLE = this.getConfigurations().STUDENT_ADD_COMPLAINT_ENABLE ?? false;
+        const STUDENT_DETAIL_UPDATE_ENABLE = this.getConfigurations()?.STUDENT_DETAIL_UPDATE_ENABLE ?? false;
+        const STUDENT_FEE_UPDATE_ENABLE = this.getConfigurations()?.STUDENT_FEE_UPDATE_ENABLE ?? false;
+        const STUDENT_SEAT_UPDATE_ENABLE = this.getConfigurations()?.STUDENT_SEAT_UPDATE_ENABLE ?? false;
+        const STUDENT_ADD_COMPLAINT_ENABLE = this.getConfigurations()?.STUDENT_ADD_COMPLAINT_ENABLE ?? false;
         const showSeat = this.isSeatApplicable();
         const isAdmin = Session.isAdmin();
         const isStudent = Session.isStudent();

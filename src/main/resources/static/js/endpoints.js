@@ -75,9 +75,7 @@ window.Endpoints = {
             return `/api/pending?type=${type}`;
         },
 
-        nonPending() {
-            return `/api/nonpending`;
-        },
+        nonPending: `/api/nonpending`,
     },
 
     // ================= Strength =================
@@ -103,15 +101,20 @@ window.Endpoints = {
         rejectRequest: `/api/admin/pending/reject`,
         approveRequest: `/api/admin/pending/approve`,
         saveExpense: `/api/admin/expense/save`,
-        getExpense: `/api/admin/expense/get`,
+        getExpense(month) {
+            return `/api/admin/expense?month=${month}`;
+        },
         approveExpense: `/api/admin/expense/approve`,
         rejectExpense: `/api/admin/expense/reject`,
-        getDailyIncome: `/api/admin/income/daily`,
+        getDailyIncome(month) {
+            return `/api/admin/income/daily?month=${month}`;
+        },
         getMonthlyIncome(month) {
             return `/api/admin/income/monthly?month=${month}`
         },
-        getProfit: `/api/admin/profit/summary`,
-
+        getProfit(month) {
+            return `/api/admin/profit/summary?month=${month}`;
+        },
         saveGeneralConfiguration: `/api/admin/configuration/general`,
         saveManagerConfiguration: `/api/admin/configuration/manager`,
         saveStudentConfiguration: `/api/admin/configuration/student`,
