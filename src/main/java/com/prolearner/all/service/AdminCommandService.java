@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.prolearner.all.entity.*;
@@ -67,6 +68,7 @@ public class AdminCommandService {
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         FeeRecord lastFee = student.getLastFee();
         LocalDate tillDate = lastFee.getTillDate();
+        Long lastBatchId = lastFee.getBatchId();
         if (body.getFromDate().isBefore(tillDate)) {
             throw new IllegalStateException("Membership from date should not be before last fees due date");
         }
@@ -92,6 +94,11 @@ public class AdminCommandService {
             seatService.updateSeat(fee.getSeatId(), body.getSeatId(), body.getStudentId());
         } else {
             seatService.removeReservedSeat(body.getSeatId());
+        }
+        if (!Objects.equals(lastBatchId, body.getBatchId())) {
+            if (body.getDiscount() != null && body.getDiscount().compareTo(BigDecimal.ZERO) == 0) {
+                student.setAllowedDiscount(BigDecimal.valueOf(0));
+            }
         }
         feeRecordRepository.save(fee);
         student.setEnrollmentStatus(EnrollmentStatus.ACTIVE.name());
@@ -213,9 +220,15 @@ public class AdminCommandService {
                     .orElseThrow(() -> new RuntimeException("Student not found"));
             if (RequestType.FEES.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
+                Long lastBatchId = lastFee.getBatchId();
                 LocalDate tillDate = lastFee.getTillDate();
                 if (r.getFromDate().isBefore(tillDate)) {
                     throw new IllegalStateException("Membership from date should not be before last fees due date");
+                }
+                if (!Objects.equals(lastBatchId, r.getBatchId())) {
+                    if (r.getDiscount() != null && r.getDiscount().compareTo(BigDecimal.ZERO) == 0) {
+                        student.setAllowedDiscount(BigDecimal.valueOf(0));
+                    }
                 }
                 FeeRecord fee = FeeRecord.builder()
                         .studentId(studentId)
@@ -280,6 +293,7 @@ public class AdminCommandService {
                 updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedBy());
             }  else if (RequestType.BATCH.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
+                Long lastBatchId = lastFee.getBatchId();
                 lastFee.setBatchId(r.getBatchId());
                 lastFee.setSeatId(r.getSeatId());
                 if (r.getTillDate() != null) {
@@ -318,6 +332,9 @@ public class AdminCommandService {
                             r.getRequestedAt(),
                             2L,
                             2L);
+                }
+                if (!Objects.equals(lastBatchId, r.getBatchId())) {
+                    student.setAllowedDiscount(BigDecimal.valueOf(0));
                 }
                 // Update Fee
                 feeRecordRepository.save(lastFee);
@@ -383,11 +400,16 @@ public class AdminCommandService {
             updateDetail(student, body.getFullName(), body.getMobileNumber(), body.getGuardianNumber());
         } else if (RequestType.BATCH.name().equals(type)) {
             FeeRecord lastFee = student.getLastFee();
+            Long lastBatchId = lastFee.getBatchId();
+            if (!Objects.equals(lastBatchId, body.getBatchId())) {
+                student.setAllowedDiscount(BigDecimal.valueOf(0));
+            }
             lastFee.setBatchId(body.getBatchId());
             lastFee.setSeatId(body.getSeatId());
             if (body.getTillDate() != null) {
                 lastFee.setTillDate(body.getTillDate());
             }
+
             BigDecimal submittedAmount = body.getSubmittedAmount() != null ? body.getSubmittedAmount() : BigDecimal.ZERO;
             BigDecimal existingAmount = lastFee.getSubmittedAmount() != null ? lastFee.getSubmittedAmount() : BigDecimal.ZERO;
             lastFee.setSubmittedAmount(existingAmount.add(submittedAmount));

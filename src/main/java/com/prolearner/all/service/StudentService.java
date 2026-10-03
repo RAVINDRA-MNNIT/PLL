@@ -33,11 +33,17 @@ public class StudentService {
     private final StudentWarningRepository studentWarningRepo;
     private final StudentComplaintRepository studentComplaintRepo;
     private final SeatService seatService;
+    private final ApprovalRequestRepository approvalRequestRepo;
 
 
     public StudentService(StudentRepository studentRepo,
                           FeeRecordRepository feeRecordRepo,
-                          ConfigurationService configurationService, SeatRepository seatRepo, StudentWarningRepository studentWarningRepo, StudentComplaintRepository studentComplaintRepo, SeatService seatService) {
+                          ConfigurationService configurationService,
+                          SeatRepository seatRepo,
+                          StudentWarningRepository studentWarningRepo,
+                          StudentComplaintRepository studentComplaintRepo,
+                          SeatService seatService,
+                          ApprovalRequestRepository approvalRequestRepo) {
         this.studentRepo = studentRepo;
         this.feeRecordRepo = feeRecordRepo;
         this.configurationService = configurationService;
@@ -45,6 +51,7 @@ public class StudentService {
         this.studentWarningRepo = studentWarningRepo;
         this.studentComplaintRepo = studentComplaintRepo;
         this.seatService = seatService;
+        this.approvalRequestRepo = approvalRequestRepo;
     }
 
     public StudentListResponse getStudents(
@@ -435,6 +442,10 @@ public class StudentService {
         );
     }
 
+    public List<StudentWarning> getStudentWarnings(Long studentId) {
+        return studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
+    }
+
     @Transactional
     public void resolveComplaint(Long complaintId) {
 
@@ -454,6 +465,24 @@ public class StudentService {
         complaint.setUpdatedAt(now);
 
         studentComplaintRepo.save(complaint);
+    }
+
+    public StudentVerificationResponse verifyStudent(Long studentId) {
+        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        StudentVerificationResponse response =
+                studentRepo.verifyStudent(studentId, discontinuedDate)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Student not found: " + studentId
+                                )
+                        );
+
+        long pendingCount =
+                approvalRequestRepo.countPendingRequests(studentId);
+
+        response.setPendingCount(pendingCount);
+
+        return response;
     }
 }
 

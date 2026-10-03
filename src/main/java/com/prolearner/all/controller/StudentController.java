@@ -132,10 +132,24 @@ public class StudentController {
         );
     }
 
+    @GetMapping("/getwarnings/{studentId}")
+    public List<StudentWarning> getStudentWarnings(
+            @PathVariable Long studentId
+    ) {
+        return studentService.getStudentWarnings(studentId);
+    }
+
     @PutMapping("/resolvecomplaint/{complaintId}")
     public void resolveComplaint(
             @PathVariable Long complaintId) {
 
         studentService.resolveComplaint(complaintId);
+    }
+
+    @GetMapping("verifystudent/{studentId}")
+    public StudentVerificationResponse verifyStudent(
+            @PathVariable Long studentId) {
+
+        return studentService.verifyStudent(studentId);
     }
 }

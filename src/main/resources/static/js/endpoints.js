@@ -47,6 +47,14 @@ window.Endpoints = {
             return `/api/students/${studentId}`;
         },
 
+        verifyStudent(studentId) {
+            return `/api/students/verifystudent/${studentId}`;
+        },
+
+        getStudentWarning(studentId) {
+            return `/api/students/getwarnings/${studentId}`;
+        },
+
         feeHistory(studentId) {
             return `/api/students/feeHistory/${studentId}`;
         },

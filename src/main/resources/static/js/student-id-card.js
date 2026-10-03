@@ -160,7 +160,7 @@ const StudentIdCard = {
                 });
             }
         }
-        const batchIssue = this.getBatchTimingIssue(student);
+        const batchIssue = getBatchTimingIssue(student);
         if (batchIssue) {
             issues.push({
                 title: "Batch Timing",
@@ -195,12 +195,12 @@ const StudentIdCard = {
                 (issue, index) => `
                     <div class="issue-item warning">
                         <strong>
-                            ${index + 1}. ${this.escape(issue.title)}:
+                            ${index + 1}. ${escape(issue.title)}:
                         </strong>
-                        ${this.escape(issue.value)}
+                        ${escape(issue.value)}
                         ${issue.subtext ? `
                             <span class="issue-subtext">
-                                ${this.escape(issue.subtext)}
+                                ${escape(issue.subtext)}
                             </span>
                                 ` : ""
                          }
@@ -208,84 +208,4 @@ const StudentIdCard = {
                 `
             ).join("");
     },
-
-    parseBatchTimings(timing) {
-        if (!timing) {return [];}
-
-        return timing.split(",").map(range => {
-                const parts = range.trim().split(/\s*[–-]\s*/);
-                if (parts.length !== 2) {
-                    return null;
-                }
-                return {
-                    start: parts[0].trim(),
-                    end: parts[1].trim()
-                };
-            }).filter(Boolean);
-    },
-
-    timeToMinutes(time) {
-        if (!time) {return null;}
-        const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-        if (!match) {
-            return null;
-        }
-        let hours = Number(match[1]);
-        const minutes = Number(match[2]);
-        const period = match[3].toUpperCase();
-        if (hours < 1 || hours > 12 || minutes < 0 || minutes > 59) {
-            return null;
-        }
-        if (period === "AM") {
-            if (hours === 12) {
-                hours = 0;
-            }
-        } else {
-            if (hours !== 12) {
-                hours += 12;
-            }
-        }
-        return (
-            hours * 60 + minutes
-        );
-    },
-
-    isWithinBatchTiming(timing, currentTime = new Date()) {
-        const timings = this.parseBatchTimings(timing);
-        if (!timings.length) {
-            return false;
-        }
-        const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-        return timings.some(({ start, end }) => {
-                const startMinutes = this.timeToMinutes(start);
-                const endMinutes = this.timeToMinutes(end);
-                if (startMinutes === null || endMinutes === null) {
-                    return false;
-                }
-                if (startMinutes <= endMinutes) {
-                    return (currentMinutes >= startMinutes && currentMinutes <= endMinutes);
-                }
-                return (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
-            }
-        );
-    },
-
-    getBatchTimingIssue(student) {
-        const batchAlias = String(student.lastFee?.batchAlias ?? "").trim();
-        if (!batchAlias) {
-            return null;
-        }
-        if (!this.isWithinBatchTiming(batchAlias)) {
-            return batchAlias;
-        }
-        return null;
-    },
-
-    escape(value) {
-        if (value === null || value === undefined) {
-            return "";
-        }
-
-        return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-    }
 };

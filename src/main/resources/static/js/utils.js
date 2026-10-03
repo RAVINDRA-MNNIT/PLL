@@ -620,3 +620,83 @@ function formatWarningCategory(category) {
 
     return map[category] ?? category ?? "-";
 }
+
+function parseBatchTimings(timing) {
+    if (!timing) {return [];}
+
+    return timing.split(",").map(range => {
+        const parts = range.trim().split(/\s*[–-]\s*/);
+        if (parts.length !== 2) {
+            return null;
+        }
+        return {
+            start: parts[0].trim(),
+            end: parts[1].trim()
+        };
+    }).filter(Boolean);
+}
+
+function timeToMinutes(time) {
+    if (!time) {return null;}
+    const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!match) {
+        return null;
+    }
+    let hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    const period = match[3].toUpperCase();
+    if (hours < 1 || hours > 12 || minutes < 0 || minutes > 59) {
+        return null;
+    }
+    if (period === "AM") {
+        if (hours === 12) {
+            hours = 0;
+        }
+    } else {
+        if (hours !== 12) {
+            hours += 12;
+        }
+    }
+    return (
+        hours * 60 + minutes
+    );
+}
+
+function isWithinBatchTiming(timing, currentTime = new Date()) {
+    const timings = this.parseBatchTimings(timing);
+    if (!timings.length) {
+        return false;
+    }
+    const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+    return timings.some(({ start, end }) => {
+            const startMinutes = this.timeToMinutes(start);
+            const endMinutes = this.timeToMinutes(end);
+            if (startMinutes === null || endMinutes === null) {
+                return false;
+            }
+            if (startMinutes <= endMinutes) {
+                return (currentMinutes >= startMinutes && currentMinutes <= endMinutes);
+            }
+            return (currentMinutes >= startMinutes || currentMinutes <= endMinutes);
+        }
+    );
+}
+
+function getBatchTimingIssue(student) {
+    const batchAlias = String(student.batchAlias ?? "").trim();
+    if (!batchAlias) {
+        return null;
+    }
+    if (!isWithinBatchTiming(batchAlias)) {
+        return batchAlias;
+    }
+    return null;
+}
+
+function escape(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}

@@ -136,7 +136,7 @@ window.StudentActionsUI = {
                     this.showUpdateDetails(this.student.enrollmentStatus);
                     break;
                 case "changeSeat":
-                    this.showChangeSeat(this.student.enrollmentStatus);
+                    this.getUpdatedSeat(this.student.enrollmentStatus);
                     break;
                 case "updateStatus":
                     this.showUpdateStatus(this.student.enrollmentStatus);
@@ -383,6 +383,19 @@ window.StudentActionsUI = {
     `;
         this.openModal(html);
     },
+
+async getUpdatedSeat(currentStatus) {
+    if (currentStatus === "TERMINATED") {
+        alert("You should not change the seat of student if current status is terminated")
+        return;
+    }
+    try {
+        await filteredSeat(this.studentId)
+        await this.showChangeSeat(currentStatus);
+    } catch (error) {
+        alert(error.message || "Something went wrong.");
+    }
+},
 
 async showChangeSeat(currentStatus) {
     if (currentStatus === "TERMINATED") {
@@ -1221,8 +1234,6 @@ showUpdateStatus(currentStatus) {
             alert("Please select a seat");
             return;
         }
-
-        const studentId = this.studentId;
 
         const payload = {
             seatId: Number(seatId),

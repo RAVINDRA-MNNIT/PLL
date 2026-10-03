@@ -260,8 +260,8 @@ const StudentIssues = {
                 return `
                     <tr>
                         <td>
-                             <a href="/student-details.html?id=${complaint.studentId}">
-                                ${complaint.studentId ?? "-"}
+                            <a href="/student-details.html?id=${complaint.studentId}" target="_blank" rel="noopener noreferrer">
+                                <strong>${escapeHtml(complaint.studentId)}</strong>
                             </a>
                         </td>
                         <td>
@@ -346,8 +346,8 @@ const StudentIssues = {
                 return `
                     <tr>
                         <td>
-                             <a href="/student-details.html?id=${warning.studentId}">
-                                ${warning.studentId ?? "-"}
+                            <a href="/student-details.html?id=${warning.studentId}" target="_blank" rel="noopener noreferrer">
+                                <strong>${escapeHtml(warning.studentId)}</strong>
                             </a>
                         </td>
                         <td>

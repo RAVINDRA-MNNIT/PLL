@@ -284,11 +284,16 @@ window.FeeForm = {
                 alert("Fee request submitted successfully.");
             }
             closeFeeModal();
-            // ✅ SAFE REFRESH
-            if (window.PendingApprovals?.current != null) {
-                await window.PendingApprovals.refresh();
+            // ✅ SAFE REFRESH based on selected view
+            if (currentView === "pending") {
+                if (window.PendingApprovals?.current != null) {
+                    await window.PendingApprovals.refresh();
+                }
+            } else if (currentView === "verifyStudent") {
+                await VerifyStudent.verify();
+            } else if (currentView === "fees") {
+                await loadStudents();
             }
-            await loadStudents();
         } catch (error) {
             alert(error.message || "Something went wrong.");
         }
@@ -594,7 +599,7 @@ function closeFeeModal() {
     if (body) body.innerHTML = "";
 }
 
-async function updateFees(studentId) {
+async function updateFees(studentId, studentData) {
     FeeForm.reset();
     const modal = document.getElementById("feeModal");
     const container = document.getElementById("feeModalBody");
@@ -610,7 +615,7 @@ async function updateFees(studentId) {
         if (!html) {return;}
         container.innerHTML = html;
         FeeForm.populateLookups(seats);
-        const student = students.find(s => s.studentId === studentId);
+        const student = studentData ?? students.find(s => s.studentId === studentId);
         if (!student) {
             throw new Error("Student not found.");
         }

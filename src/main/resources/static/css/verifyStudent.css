@@ -6,84 +6,693 @@
     display: flex;
     flex-direction: row;
     align-items: flex-end;
-    gap: 10px;
+    gap: 8px;
+
     width: fit-content;
     max-width: 100%;
 }
 
 .verify-student-form .form-group {
-    width: 220px;
+    width: 135px;
     margin: 0;
 }
 
 .verify-student-form label {
     display: block;
     margin-bottom: 7px;
+
+    font-size: 13px;
     font-weight: 600;
 }
 
 .verify-student-form input {
     display: block;
-    width: 100%;
+
+    width: 135px;
     height: 42px;
+
     box-sizing: border-box;
 }
 
 
 /* =========================
-   VERIFY BUTTON
+   BUTTONS
    ========================= */
 
-#verifyStudentBtn {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 100px;
-    height: 42px;
-    margin: 0;
-    white-space: nowrap;
-    box-sizing: border-box;
-}
-
-#verifyStudentBtn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
+#verifyStudentBtn,
 #openStudentDetailBtn {
     flex: 0 0 auto;
+
     width: auto;
-    min-width: 100px;
+    min-width: 95px;
     height: 42px;
+
     margin: 0;
+
     white-space: nowrap;
     box-sizing: border-box;
 }
 
+#verifyStudentBtn:disabled,
 #openStudentDetailBtn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
 
 
+/* =========================
+   RESULT
+   ========================= */
+
+.verify-student-result {
+    width: 100%;
+    max-width: 380px;
+
+    margin-top: 18px;
+
+    box-sizing: border-box;
+}
+
 
 /* =========================
-   MOBILE
+   SINGLE RESULT CARD
+   ========================= */
+
+.student-result-card {
+    width: 100%;
+
+    box-sizing: border-box;
+    overflow: hidden;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    background: #fff;
+
+    box-shadow:
+            0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =========================
+   HEADER
+   ========================= */
+
+.student-result-header {
+    padding: 14px 16px;
+
+    text-align: center;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.student-result-library {
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    color: #6b7280;
+}
+
+.student-result-title {
+    margin-top: 3px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+    color: #111827;
+}
+
+
+/* =========================
+   BODY
+   ========================= */
+
+.student-result-body {
+    padding: 15px 16px;
+}
+
+.student-result-name {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.3;
+
+    text-align: center;
+
+    color: #111827;
+
+    overflow-wrap: anywhere;
+}
+
+.student-result-id {
+    margin-top: 4px;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    text-align: center;
+
+    color: #6b7280;
+}
+
+.student-result-id strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+
+/* =========================
+   DETAILS
+   ========================= */
+
+.student-result-details {
+    margin-top: 12px;
+}
+
+.student-result-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-height: 38px;
+
+    border-top: 1px solid #f0f0f0;
+}
+
+.student-result-row span {
+    flex-shrink: 0;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    color: #6b7280;
+}
+
+.student-result-row strong {
+    min-width: 0;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    color: #111827;
+
+    text-align: right;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================
+   STATUS BADGE
+   Uses the same colors as
+   existing portal status styles
+   ========================= */
+
+.student-result-status {
+    display: inline-block;
+
+    padding: 4px 9px;
+
+    border-radius: 12px;
+
+    font-size: 10px !important;
+    font-weight: 800 !important;
+
+    text-transform: uppercase;
+}
+
+
+/* ✅ ACTIVE */
+
+.student-result-status.active {
+    background: #d1f2e1;
+    color: #1e7e34;
+}
+
+
+/* ⚠️ EXPIRED */
+
+.student-result-status.expired {
+    background: #f5c6cb;
+    color: #721c24;
+}
+
+
+/* ❌ DISCONTINUED */
+
+.student-result-status.discontinued {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+/* ❌ TERMINATED */
+
+.student-result-status.terminated {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+/* =========================
+   ISSUES SECTION
+   ========================= */
+
+.student-id-issues {
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* =========================
+   ISSUES HEADER
+   ========================= */
+
+.issues-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 11px 16px;
+}
+
+.issues-label {
+    font-size: 13px;
+    font-weight: 800;
+
+    color: #111827;
+}
+
+.issues-summary {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.issues-summary.good {
+    color: #047857;
+}
+
+.issues-summary.warning {
+    color: #856404;
+}
+
+.issues-summary i {
+    font-size: 11px;
+}
+
+
+/* =========================
+   ISSUES LIST
+   ========================= */
+
+.issues-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding: 0 16px 13px;
+}
+
+
+/* =========================
+   ISSUE ITEM
+   ========================= */
+
+.issue-item {
+    padding: 9px 11px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+
+/* =========================
+   ACTIVE ISSUE
+   ========================= */
+
+.issue-item.active {
+    background: #d1f2e1;
+    color: #1e7e34;
+}
+
+
+/* =========================
+   EXPIRED ISSUE
+   ========================= */
+
+.issue-item.expired {
+    background: #f5c6cb;
+    color: #721c24;
+}
+
+
+/* =========================
+   DISCONTINUED ISSUE
+   ========================= */
+
+.issue-item.discontinued {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+/* =========================
+   TERMINATED ISSUE
+   ========================= */
+
+.issue-item.terminated {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+
+/* =========================
+   OTHER WARNING ISSUES
+   ========================= */
+
+.issue-item.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+
+/* =========================
+   ISSUE TITLE
+   ========================= */
+
+.issue-item strong {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* =========================
+   ISSUE SUBTEXT
+   ========================= */
+
+.issue-subtext {
+    display: block;
+
+    margin-top: 2px;
+    margin-left: 14px;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   RESPONSIVE
+   Same layout on mobile
    ========================= */
 
 @media (max-width: 640px) {
 
     .verify-student-form {
-        width: 100%;
         max-width: 100%;
     }
 
-    .verify-student-form .form-group {
-        width: auto;
-        flex: 1;
-        min-width: 0;
+    .verify-student-result {
+        max-width: 100%;
     }
 
-    #verifyStudentBtn {
-        min-width: 90px;
+    .student-result-card {
+        max-width: 100%;
+    }
+}
+
+/* ================================
+   ACTIONS
+================================ */
+
+.student-id-actions {
+    margin-top: 16px;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.actions-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.actions-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.actions-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 5px 10px;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    background: #d1f2e1;
+    color: #1e7e34;
+}
+
+.actions-summary.issue {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.actions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+/* ================================
+   ACTION BUTTON
+================================ */
+
+.student-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    min-height: 38px;
+    padding: 8px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            color 0.2s ease,
+            transform 0.1s ease;
+}
+
+.student-action-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.student-action-btn:active {
+    transform: translateY(1px);
+}
+
+
+/* Primary action */
+
+.student-action-btn.primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.student-action-btn.primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+
+/* Warning action */
+
+.student-action-btn.warning {
+    background: #fff3cd;
+    border-color: #f0c36d;
+    color: #856404;
+}
+
+.student-action-btn.warning:hover {
+    background: #ffe8a1;
+}
+
+
+/* Danger action */
+
+.student-action-btn.danger {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.student-action-btn.danger:hover {
+    background: #fecaca;
+}
+
+
+/* Success action */
+
+.student-action-btn.success {
+    background: #d1f2e1;
+    border-color: #a7dfc2;
+    color: #1e7e34;
+}
+
+.student-action-btn.success:hover {
+    background: #b9e8cf;
+}
+
+
+/* Disabled */
+
+.student-action-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+
+/* Empty action state */
+
+.actions-empty {
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+    border: 1px dashed #d1d5db;
+
+    color: #6b7280;
+
+    font-size: 13px;
+    text-align: center;
+}
+
+
+/* Mobile */
+
+@media (max-width: 640px) {
+
+    .actions-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .actions-list {
+        flex-direction: column;
+    }
+
+    .student-action-btn {
+        width: 100%;
+    }
+}
+
+
+
+
+
+/* ================================
+   CENTERED MODAL OVERLAY
+================================ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: 9999;
+
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+
+/* ================================
+   MODAL CONTENT
+================================ */
+
+.modal-overlay .modal-content {
+    width: min(600px, 100%);
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    box-shadow:
+            0 20px 50px rgba(0, 0, 0, 0.25);
+
+    box-sizing: border-box;
+
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+
+/* ================================
+   MODAL ANIMATION
+================================ */
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }

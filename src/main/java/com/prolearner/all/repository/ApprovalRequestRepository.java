@@ -359,4 +359,15 @@ List<Map<String, Object>> fetchNonPending();
         )
         """)
     void clearProcessedApprovalRequests();
+
+
+    @Query("""
+    SELECT COUNT(a.id)
+    FROM ApprovalRequest a
+    WHERE a.studentId = :studentId
+      AND a.status = com.prolearner.all.enums.PendingRequestStatus.PENDING
+""")
+    long countPendingRequests(
+            @Param("studentId") Long studentId
+    );
 }

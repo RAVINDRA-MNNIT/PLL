@@ -3,6 +3,7 @@ package com.prolearner.all.repository;
 import com.prolearner.all.dto.Room2StrengthProjection;
 import com.prolearner.all.dto.StrengthProjection;
 import com.prolearner.all.dto.StudentListItem;
+import com.prolearner.all.dto.StudentVerificationResponse;
 import com.prolearner.all.entity.Students;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -227,6 +228,48 @@ ORDER BY
     List<Room2StrengthProjection> getStrengthByRooms(
             @Param("rooms") List<String> rooms,
             @Param("statuses") List<String> statuses,
+            @Param("discontinuedDate") LocalDate discontinuedDate
+    );
+
+
+
+    @Query("""
+    SELECT new com.prolearner.all.dto.StudentVerificationResponse(
+        s.studentId,
+        s.fullName,
+        s.mobileNumber,
+        s.allowedDiscount,
+        b.id,
+        b.batchName,
+        b.batchAlias,
+        seat.id,
+        seat.seatNumber,
+        fr.submittedAmount,
+        fr.discountAmount,
+        fr.pendingAmount,
+        fr.paymentMode,
+        fr.transactionId,
+        fr.remarks,
+        fr.fromDate,
+        fr.tillDate,
+    CASE
+        WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED')
+            THEN s.enrollmentStatus
+        WHEN fr.tillDate < :discontinuedDate
+            THEN 'DISCONTINUED'
+        WHEN fr.tillDate < CURRENT_DATE
+            THEN 'EXPIRED'
+        ELSE 'ACTIVE'
+        END
+    )
+    FROM Students s
+    LEFT JOIN s.lastFee fr
+    LEFT JOIN fr.batch b
+    LEFT JOIN fr.seat seat
+    WHERE s.studentId = :studentId
+""")
+    Optional<StudentVerificationResponse> verifyStudent(
+            @Param("studentId") Long studentId,
             @Param("discontinuedDate") LocalDate discontinuedDate
     );
 }

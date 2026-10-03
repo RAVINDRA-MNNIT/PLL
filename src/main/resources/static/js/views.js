@@ -13,6 +13,7 @@
 /**
  * views.js
  */
+var currentView = "fees";
 
 async function switchView(view) {
 
@@ -32,10 +33,12 @@ async function switchView(view) {
 
     switch (view) {
         case "fees":
+            currentView = view;
             document.getElementById("feesView").style.display = "block";
             document.querySelectorAll(".nav-item")[0].classList.add("active");
             break;
         case "add":
+            currentView = view;
             document.getElementById("addView").style.display = "block";
             document.querySelectorAll(".nav-item")[1].classList.add("active");
             if ((getConfigurations().ONLINE_ADMISSION_ENABLED ?? true) === false) {
@@ -47,41 +50,49 @@ async function switchView(view) {
             await AdmissionForm.openNew();
             break;
         case "pending":
+            currentView = view;
             document.getElementById("pendingView").style.display = "block";
             document.querySelectorAll(".nav-item")[2].classList.add("active");
             await loadPendingApprovalSubview();
             break;
         case "transactions":
+            currentView = view;
             document.getElementById("transactionsView").style.display = "block";
             document.querySelectorAll(".nav-item")[3].classList.add("active");
             Transactions.load();
             break;
         case "strength":
+            currentView = view;
             document.getElementById("strengthView").style.display = "block";
             document.querySelectorAll(".nav-item")[4].classList.add("active");
             Strength.load();
             break;
         case "verifyStudent":
+            currentView = view;
             document.getElementById("verifyStudentView").style.display = "block";
             document.querySelectorAll(".nav-item")[5].classList.add("active");
             VerifyStudent.load();
             break;
         case "complaints":
+            currentView = view;
             document.getElementById("complaintsView").style.display = "block";
             document.querySelectorAll(".nav-item")[6].classList.add("active");
             StudentIssues.load();
             break;
         case "batches":
+            currentView = view;
             document.getElementById("batchesView").style.display = "block";
             document.querySelectorAll(".nav-item")[7].classList.add("active");
             BatchManager.load();
             break;
         case "configurations":
+            currentView = view;
             document.getElementById("configurationsView").style.display = "block";
             document.querySelectorAll(".nav-item")[8].classList.add("active");
             Configurations.load();
             break;
         default:
+            currentView = null;
             console.warn("Unknown view:", view);
             document.getElementById("feesView").style.display = "block";
             document.querySelectorAll(".nav-item")[9].classList.add("active");

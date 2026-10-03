@@ -57,7 +57,7 @@ SELECT
 
 FROM library.seats se
 LEFT JOIN library.students st
-       ON st.id = se.student_id
+       ON st.student_id = se.student_id
 LEFT JOIN library.fee_records fr
        ON fr.id = st.last_fee_id
 WHERE split_part(se.seat_number, '-', 1) IN (:rooms)
