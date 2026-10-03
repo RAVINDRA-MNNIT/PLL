@@ -1315,3 +1315,135 @@ input[type="radio"]:disabled {
     }
 
 }
+
+
+
+
+
+
+/* =========================================
+   MOBILE NAVIGATION
+========================================= */
+
+.mobile-menu-btn {
+    display: none;
+}
+
+.sidebar-overlay {
+    display: none;
+}
+
+
+@media (max-width: 800px) {
+
+    /* -----------------------------
+       MENU BUTTON
+    ----------------------------- */
+
+    .mobile-menu-btn {
+        display: flex;
+
+        position: fixed;
+        top: 12px;
+        left: 12px;
+
+        width: 42px;
+        height: 42px;
+
+        align-items: center;
+        justify-content: center;
+
+        border: none;
+        border-radius: 8px;
+
+        background: #2563eb;
+        color: #fff;
+
+        font-size: 19px;
+
+        cursor: pointer;
+
+        z-index: 10002;
+
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+
+
+    /* -----------------------------
+       SIDEBAR
+    ----------------------------- */
+
+    .sidebar {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 280px;
+        height: 100vh;
+
+        max-height: 100vh;
+
+        overflow-y: auto;
+
+        transform: translateX(-100%);
+
+        transition: transform 0.25s ease;
+
+        z-index: 10001;
+
+        box-sizing: border-box;
+    }
+
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+
+    /* -----------------------------
+       OVERLAY
+    ----------------------------- */
+
+    .sidebar-overlay {
+        display: block;
+
+        position: fixed;
+
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.45);
+
+        opacity: 0;
+        visibility: hidden;
+
+        transition:
+                opacity 0.25s ease,
+                visibility 0.25s ease;
+
+        z-index: 10000;
+    }
+
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+
+    /* -----------------------------
+       MAIN CONTENT
+    ----------------------------- */
+
+    .main {
+        margin-left: 0 !important;
+        width: 100%;
+        min-width: 0;
+    }
+
+
+    /* Give header some room for menu button */
+    .header {
+        padding-left: 65px;
+    }
+}
