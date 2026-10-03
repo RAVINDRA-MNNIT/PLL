@@ -23,26 +23,15 @@ function openMobileSidebar() {
     sidebarOverlay?.classList.add("active");
 }
 
-
 function closeMobileSidebar() {
     sidebar?.classList.remove("mobile-open");
     sidebarOverlay?.classList.remove("active");
 }
 
-
-mobileMenuBtn?.addEventListener(
-    "click",
-    openMobileSidebar
-);
-
-
-sidebarOverlay?.addEventListener(
-    "click",
-    closeMobileSidebar
-);
+mobileMenuBtn?.addEventListener("click", openMobileSidebar);
+sidebarOverlay?.addEventListener("click", closeMobileSidebar);
 
 async function switchView(view) {
-
     // Hide all views
     document.getElementById("feesView").style.display = "none";
     document.getElementById("addView").style.display = "none";
