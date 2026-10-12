@@ -133,7 +133,7 @@ initialize() {
 
         this.setValue("studentId", student.studentId);
         this.setValue("admissionDate", formatDate(student.dateOfAdmission));
-        this.setValue("fullName", student.fullName);
+        this.setValue("fullName", student.fullName.toUpperCase());
         this.setValue("dateOfBirth", dob);
         this.setValue("mobileNumber", mobileNumber);
         this.setValue("guardianNumber", guardianNumber);

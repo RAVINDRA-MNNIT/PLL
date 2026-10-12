@@ -290,6 +290,9 @@ async viewEdit(requestId) {
 
         const warnings = [];
         if (pendingRow.requestType == "FEES") {
+            if(checkIsPastDate(pendingRow.tillDate)) {
+                warnings.push("⚠️ Warning!\nThe selected Till Date has already passed.");
+            }
             if (pendingRow.lastFeeTillDate !== pendingRow.fromDate) {
                 warnings.push(
                     `• Membership gap detected.\n  Last membership till: ${pendingRow.lastFeeTillDate}\n  New membership from: ${pendingRow.fromDate}`
@@ -298,13 +301,13 @@ async viewEdit(requestId) {
 
             if (diffInDays > 31) {
                 warnings.push(
-                    `• You are updating fees for more than one month (${diffInDays} days).`
+                    `⚠️ Warning!• You are updating fees for more than one month (${diffInDays} days).`
                 );
             }
 
             if (pendingRow.lastFeePendingAmount > 0) {
                 warnings.push(
-                    `• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
+                    `⚠️ Warning!• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
                 );
             }
         }

@@ -106,7 +106,7 @@ const StudentIdCard = {
         const configurations = getConfigurations();
         this.setValue("idCardLibraryName", configurations?.LIBRARY_NAME ?? "-");
         this.setValue("idCardLibraryNameFooter", configurations?.LIBRARY_NAME ?? "-");
-        this.setValue("idCardStudentName", student.fullName ?? "-");
+        this.setValue("idCardStudentName", (student.fullName ?? "-").toUpperCase());
         this.setValue("idCardStudentId", student.studentId ?? "-");
         this.setValue("idCardBatch", lastFee.batchName ?? "-");
         this.setValue("idCardSeat", lastFee.seatNumber ?? "-");

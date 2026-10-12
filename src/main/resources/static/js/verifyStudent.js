@@ -477,7 +477,7 @@ const VerifyStudent = {
                     <div class="summary-item">
                         <label>Student</label>
                         <strong>
-                            ${student?.fullName ?? "-"}
+                            ${(student?.fullName ?? "-").toUpperCase()}
                         </strong>
                     </div>
 

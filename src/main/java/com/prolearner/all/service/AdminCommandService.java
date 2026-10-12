@@ -290,7 +290,7 @@ public class AdminCommandService {
                 }
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
-                updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedBy());
+                updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedAt().toLocalDate(), r.getRequestedBy());
             }  else if (RequestType.BATCH.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
                 Long lastBatchId = lastFee.getBatchId();
@@ -378,7 +378,7 @@ public class AdminCommandService {
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         if (RequestType.ENROLLMENT.name().equals(type)) {
-            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), 2L);
+            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(),2L);
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
         } else if (RequestType.DETAILS.name().equals(type)) {
@@ -573,7 +573,9 @@ public class AdminCommandService {
                              String guardianNumber) {
         student.setFullName(fullName);
         student.setMobileNumber(mobileNumber);
-        student.setGuardianNumber(guardianNumber);
+        if (guardianNumber != null && !guardianNumber.isEmpty()) {
+            student.setGuardianNumber(guardianNumber);
+        }
         studentRepo.save(student);
     }
 
@@ -581,16 +583,15 @@ public class AdminCommandService {
     // ENROLLMENT UPDATE REQUEST
     // =========================================================
     public void updateEnrollment(Students student,
-                                 String status, String remarks, Long userId) {
+                                 String status, String remarks, LocalDate statusDate, Long userId) {
         student.setEnrollmentStatus(status);
         FeeRecord lastFee = student.getLastFee();
         if (EnrollmentStatus.DISCONTINUED.name().equals(status) || EnrollmentStatus.TERMINATED.name().equals(status)) {
             Long seatId = lastFee.getSeatId();
             seatService.removeReservedSeat(seatId);
-            LocalDate today = LocalDate.now();
             // Update only if tillDate is null or in the future
-            if (lastFee.getTillDate() == null || lastFee.getTillDate().isAfter(today)) {
-                lastFee.setTillDate(today);
+            if (lastFee.getTillDate() == null || lastFee.getTillDate().isAfter(statusDate)) {
+                lastFee.setTillDate(statusDate);
                 feeRecordRepository.save(lastFee);
             }
             student.setAllowedDiscount(BigDecimal.ZERO);

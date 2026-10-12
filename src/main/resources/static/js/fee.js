@@ -171,7 +171,7 @@ window.FeeForm = {
         data.studentId;
 
     document.getElementById("studentName").textContent =
-        data.fullName ?? data.lastFullName;
+        (data.fullName ?? data.lastFullName).toUpperCase();
 
     // -------------------------
     // Payment Mode
@@ -257,8 +257,13 @@ window.FeeForm = {
             remarks: document.getElementById("paymentRemarks")?.value.trim() || null,
             requestedBy: this.isEdit() ? this.requestedBy : Session.getUserId()
         };
+        if(checkIsPastDate(document.getElementById("tillDate").value)) {
+            if (!confirm("⚠️ Warning!\n\nThe selected Till Date has already passed.\n\nAre you sure you want to continue with this past date?")) {
+                return;
+            }
+        }
         if (this.currentPending > 0) {
-            if (!confirm(`Current pending amount of this student is ₹${this.currentPending}.\n\n Make sure you have received the amount!`)) {
+            if (!confirm(`⚠️ Warning!\n\nCurrent pending amount of this student is ₹${this.currentPending}.\n\n Make sure you have received the amount!`)) {
                 // User clicked Cancel
                 return;
             }
@@ -279,9 +284,9 @@ window.FeeForm = {
                 }
             }
             if (Session.isAdmin()) {
-                alert("Fee submitted successfully.");
+                alert("✅ Fee submitted successfully.");
             } else {
-                alert("Fee request submitted successfully.");
+                alert("✅ Fee request submitted successfully.");
             }
             closeFeeModal();
             // ✅ SAFE REFRESH based on selected view

@@ -265,7 +265,7 @@ const StudentIssues = {
                             </a>
                         </td>
                         <td>
-                            ${this.escape(complaint.fullName ?? "-")}
+                            ${this.escape((complaint.fullName ?? "-").toUpperCase())}
                         </td>
                         <td>
                             <span class="category-badge">${this.escape(category)}</span>
@@ -351,7 +351,7 @@ const StudentIssues = {
                             </a>
                         </td>
                         <td>
-                            ${this.escape(warning.fullName ?? "-")}
+                            ${this.escape((warning.fullName ?? "-").toUpperCase())}
                         </td>
                         <td>
                             <span class="warning-level-badge"> ${this.escape(warningLevel)}

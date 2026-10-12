@@ -327,7 +327,7 @@ window.StudentActionsUI = {
                 <div id="updateStudentMessage" class="form-message"></div>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input id="updateFullName" type="text" value="${this.student.fullName ?? ""}">
+                    <input id="updateFullName" type="text" value="${(this.student.fullName ?? "").toUpperCase()}">
                 </div>
                 <div class="form-group">
                     <label>Mobile Number</label>
@@ -586,7 +586,7 @@ showUpdateStatus(currentStatus) {
                             Student
                         </label>
                         <strong>
-                            ${student.fullName ?? "-"}
+                            ${(student.fullName ?? "-").toUpperCase()}
                         </strong>
                     </div>
                     <!-- CURRENT BATCH -->
@@ -1115,7 +1115,7 @@ showUpdateStatus(currentStatus) {
         const message = `
         Please review before request.
         Student ID : ${this.studentId}
-        Student Name  : ${this.student.fullName}
+        Student Name  : ${(this.student.fullName).toUpperCase()}
         Batch          : ${batch.name}
         Seat           : ${last.seatNumber}
         Next From Date: ${formatDate(last.tillDate)}
@@ -1131,7 +1131,7 @@ showUpdateStatus(currentStatus) {
 
     async saveStudentDetails() {
 
-        const fullName = document.getElementById("updateFullName")?.value.trim();
+        const fullName = document.getElementById("updateFullName")?.value.trim().toUpperCase();
         const mobile = document.getElementById("updateMobileNumber")?.value.trim();
         const guardian = document.getElementById("updateGuardianNumber")?.value.trim();
 
@@ -1532,7 +1532,7 @@ showUpdateStatus(currentStatus) {
                             Student
                         </label>
                         <strong>
-                            ${student.fullName ?? "-"}
+                            ${(student.fullName ?? "-").toUpperCase()}
                         </strong>
                     </div>
                 </div>
@@ -1766,7 +1766,7 @@ showUpdateStatus(currentStatus) {
                             Student
                         </label>
                         <strong>
-                            ${student.fullName ?? "-"}
+                            ${(student.fullName ?? "-").toUpperCase()}
                         </strong>
                     </div>
                 </div>
@@ -2002,7 +2002,7 @@ showUpdateStatus(currentStatus) {
                     <div class="summary-item">
                         <label>Student</label>
                         <strong>
-                            ${student?.fullName ?? "-"}
+                            ${(student?.fullName ?? "-").toUpperCase()}
                         </strong>
                     </div>
                     <div class="summary-item">

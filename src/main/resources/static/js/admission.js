@@ -344,7 +344,7 @@ function bindFormEvents() {
 //////////////////////////////////////////////////////
 
 function populate(data = {}) {
-    setValue("studentName", data.fullName);
+    setValue("studentName", data.fullName.toUpperCase());
     setValue("dateOfBirth", data.dateOfBirth);
     setValue("studentMobile", data.mobileNumber);
     setValue("guardianNumber", data.guardianNumber);
@@ -458,7 +458,7 @@ async function submitStudentRegistration(event) {
 
     const payload = {
         id: currentRequestId,
-        fullName: document.getElementById("studentName")?.value?.trim(),
+        fullName: document.getElementById("studentName")?.value?.trim().toUpperCase(),
         dateOfBirth: document.getElementById("dateOfBirth")?.value || null,
         mobileNumber: document.getElementById("studentMobile")?.value?.trim(),
         guardianNumber: document.getElementById("guardianNumber")?.value?.trim() || null,
@@ -515,7 +515,7 @@ async function submitStudentRegistration(event) {
 
         successLines.push(
             `Student ID     : ${response?.studentId ?? "-"}`,
-            `Full Name      : ${response?.fullName ?? payload.fullName ?? "-"}`,
+            `Full Name      : ${(response?.fullName ?? payload.fullName ?? "-").toUpperCase()}`,
             `Mobile         : ${response?.mobileNumber ?? payload.mobileNumber ?? "-"}`
         );
         const successMessage = successLines.join("\n");

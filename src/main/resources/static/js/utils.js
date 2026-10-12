@@ -247,7 +247,7 @@ function toCommaSeparated(requestData) {
     }
 
     return [
-        data.fullName,
+        (data.fullName).toUpperCase(),
         data.mobileNumber,
         data.guardianNumber
     ]
@@ -698,4 +698,14 @@ function escape(value) {
         return "";
     }
     return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function checkIsPastDate(tillDate) {
+    if (!tillDate) {
+        return false;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    return tillDate < today;
 }

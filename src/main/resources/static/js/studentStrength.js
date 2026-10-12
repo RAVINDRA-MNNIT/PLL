@@ -246,7 +246,7 @@ const Strength = {
                         : "-"
                 }
                 </td>
-                <td>${student.fullName ?? "—"}</td>
+                <td>${(student.fullName ?? "—").toUpperCase()}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
                 <td>${diff}</td>
@@ -303,7 +303,7 @@ const Strength = {
                                         : "-"
                                 }
                 </td>
-                <td>${student.fullName ?? "—"}</td>
+                <td>${(student.fullName ?? "—").toUpperCase()}</td>
                 <td>${student.mobileNumber ?? "—"}</td>
                 <td>${formatDate(student.tillDate ?? "") ?? "—"}</td>
                 <td>${diff}</td>
