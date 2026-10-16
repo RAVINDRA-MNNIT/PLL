@@ -188,7 +188,7 @@ public class ManagerCommandService {
         FeeRecord lastFee = student.getLastFee();
         if (r.getRequestType() == RequestType.ADMISSION) {
             seatService.removeReservedSeat(r.getSeatId());
-        } else if (r.getRequestType() == RequestType.FEES) {
+        } else if ((r.getRequestType() == RequestType.FEES) || (r.getRequestType() == RequestType.SEAT) || (r.getRequestType() == RequestType.BATCH)) {
             if (!Objects.equals(lastFee.getSeatId(), r.getSeatId())) {
                 seatService.removeReservedSeat(r.getSeatId());
             }
