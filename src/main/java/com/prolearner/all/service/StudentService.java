@@ -1,5 +1,6 @@
 package com.prolearner.all.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -9,11 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.prolearner.all.dto.*;
-import com.prolearner.all.entity.FeeRecord;
-import com.prolearner.all.entity.StudentComplaint;
-import com.prolearner.all.entity.StudentWarning;
-import com.prolearner.all.entity.Students;
+import com.prolearner.all.entity.*;
 import com.prolearner.all.enums.EnrollmentStatus;
+import com.prolearner.all.enums.PendingRequestStatus;
+import com.prolearner.all.enums.RequestType;
 import com.prolearner.all.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -87,13 +87,100 @@ public class StudentService {
     }
 
     public StudentDetailsResponse getStudentDetails(Long studentId) {
+
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-        List<StudentWarning> warnings = studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
-        List<StudentComplaint> complaints = studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
+
+        // =========================================================
+        // WARNINGS
+        // =========================================================
+
+        List<StudentWarning> warnings =
+                studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
+
+        // =========================================================
+        // COMPLAINTS
+        // =========================================================
+
+        List<StudentComplaint> complaints =
+                studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
+
+        // =========================================================
+        // ALL APPROVAL REQUESTS - ALL STATUSES
+        // =========================================================
+
+        List<ApprovalRequest> approvalRequests =
+                approvalRequestRepo.findByStudentIdAndStatusInAndRequestTypeNotOrderByRequestedAtDesc(
+                        studentId,
+                        List.of(
+                                PendingRequestStatus.PENDING,
+                                PendingRequestStatus.REJECTED
+                        ),
+                        RequestType.ADMISSION
+                );
+
+        List<PendingRequestDTO> approvalRequestDTOs =
+                approvalRequests.stream()
+                        .map(request -> {
+
+                            PendingRequestDTO dto = new PendingRequestDTO();
+
+                            dto.setId(request.getId());
+                            dto.setStudentId(request.getStudentId());
+
+                            dto.setFullName(request.getFullName());
+                            dto.setDateOfBirth(request.getDateOfBirth());
+                            dto.setMobile(request.getMobileNumber());
+                            dto.setGuardianNumber(request.getGuardianNumber());
+                            dto.setFatherName(request.getFatherName());
+
+                            dto.setLocalAddress(request.getLocalAddress());
+                            dto.setPermanentAddress(request.getPermanentAddress());
+
+                            dto.setAadhaarNumber(request.getAadhaarNumber());
+                            dto.setQualification(request.getQualification());
+                            dto.setPreparationFor(request.getPreparationFor());
+
+                            dto.setBatchId(request.getBatchId());
+                            dto.setSeatId(request.getSeatId());
+
+                            dto.setFromDate(request.getFromDate());
+                            dto.setTillDate(request.getTillDate());
+
+                            dto.setSubmittedAmount(request.getSubmittedAmount());
+                            dto.setCashAmount(request.getCashAmount());
+                            dto.setOnlineAmount(request.getOnlineAmount());
+                            dto.setDiscount(request.getDiscount());
+                            dto.setPendingAmount(request.getPendingAmount());
+
+                            dto.setPaymentMode(request.getPaymentMode());
+                            dto.setTransactionId(request.getTransactionId());
+                            dto.setRemarks(request.getRemarks());
+
+                            dto.setEnrollmentStatus(request.getEnrollmentStatus());
+                            dto.setRequestedBy(request.getRequestedBy());
+                            dto.setRequestType(request.getRequestType().name());
+                            dto.setRequestedAt(request.getRequestedAt());
+
+                            // Approval request status
+                            if (request.getStatus() != null) {
+                                dto.setStatus(request.getStatus().name());
+                            }
+
+                            return dto;
+                        })
+                        .toList();
+
+        // =========================================================
+        // LAST FEE
+        // =========================================================
+
         FeeRecord fee = student.getLastFee();
+
         StudentFeeHistoryResponse lastFee = null;
+
         if (fee != null) {
+
             lastFee = new StudentFeeHistoryResponse(
                     fee.getId(),
                     fee.getBatch() == null ? null : fee.getBatch().getId(),
@@ -116,16 +203,23 @@ public class StudentService {
             );
         }
 
+        // =========================================================
+        // ENROLLMENT STATUS
+        // =========================================================
+
         LocalDate today = LocalDate.now();
 
-        EnrollmentStatus enrollmentStatus = EnrollmentStatus.valueOf(student.getEnrollmentStatus());
+        EnrollmentStatus enrollmentStatus =
+                EnrollmentStatus.valueOf(student.getEnrollmentStatus());
 
         if (fee != null && fee.getTillDate() != null) {
 
-            long diffDays = ChronoUnit.DAYS.between(today, fee.getTillDate());
+            long diffDays =
+                    ChronoUnit.DAYS.between(today, fee.getTillDate());
 
             boolean isExpired =
-                    diffDays < 0 && enrollmentStatus == EnrollmentStatus.ACTIVE;
+                    diffDays < 0
+                            && enrollmentStatus == EnrollmentStatus.ACTIVE;
 
             boolean isDiscontinued =
                     diffDays < -configurationService.getDaysForDiscontinue()
@@ -135,7 +229,7 @@ public class StudentService {
                     || enrollmentStatus == EnrollmentStatus.DISCONTINUED
                     || enrollmentStatus == EnrollmentStatus.EXPIRED) {
 
-                // keep existing status
+                // Keep existing status
 
             } else if (isDiscontinued) {
 
@@ -148,9 +242,12 @@ public class StudentService {
             } else {
 
                 enrollmentStatus = EnrollmentStatus.ACTIVE;
-
             }
         }
+
+        // =========================================================
+        // RESPONSE
+        // =========================================================
 
         return new StudentDetailsResponse(
                 student.getStudentId(),
@@ -170,7 +267,8 @@ public class StudentService {
                 student.getTerminationCount(),
                 warnings,
                 complaints,
-                lastFee
+                lastFee,
+                approvalRequestDTOs
         );
     }
 
