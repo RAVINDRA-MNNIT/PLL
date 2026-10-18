@@ -709,3 +709,32 @@ function checkIsPastDate(tillDate) {
 
     return tillDate < today;
 }
+
+function viewRequestData(comment) {
+    alert(comment)
+}
+
+function renderStatus(status) {
+    if (!status) return "-";
+
+    const key = status.toLowerCase();
+
+    const map = {
+        active: "status-active",
+        pending: "status-pending",
+        rejected: "status-rejected",
+        approved: "status-approved",
+        cancelled: "status-cancelled",
+        expired: "status-expired",
+        discontinued: "status-discontinued",
+        terminated: "status-terminated"
+    };
+
+    const cls = map[key] || "status-default";
+
+    return `
+        <span class="status ${cls}">
+            ${status.toUpperCase()}
+        </span>
+    `;
+}
