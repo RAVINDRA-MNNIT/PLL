@@ -7,6 +7,7 @@ window.StudentDetailsPage = {
     currentStudent: null,
     studentWarnings: [],
     studentComplaints: [],
+    approvalRequests: [],
 
     // ================= INIT =================
 init() {
@@ -57,6 +58,7 @@ initialize() {
             this.currentStudent = await Api.get(Endpoints.students.details(studentId));
             this.studentWarnings = this.currentStudent.warnings ?? [];
             this.studentComplaints = this.currentStudent.complaints ?? [];
+            this.approvalRequests = this.currentStudent.approvalRequests ?? [];
         } catch (error) {
             console.error(error);
             alert(error.message || "Something went wrong.");
@@ -151,7 +153,7 @@ initialize() {
         const enrollmentStatus = student.enrollmentStatus;
         this.setValue("membershipTitle", enrollmentStatus === "ACTIVE" ? "Current Membership" : "Last Membership (Outdated)");
         this.updateEnrollmentStatus(enrollmentStatus);
-        StudentActionsUI.init("studentActions", student, this.studentWarnings, this.studentComplaints);
+        StudentActionsUI.init("studentActions", student, this.studentWarnings, this.studentComplaints, this.approvalRequests);
     },
 
     showWarningNotice() {

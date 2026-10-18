@@ -11,17 +11,19 @@ window.StudentActionsUI = {
     studentId: null,
     warnings: [],
     complaints: [],
+    approvalRequests: [],
     UPDATE_FULL_DETAIL: true,
 
 
-    init(containerId, studentData, warnings = [], complaints = []) {
+    init(containerId, studentData, warnings = [], complaints = [], approvalRequests = []) {
         this.container = document.getElementById(containerId);
         this.student = studentData;
         if (!this.container) return;
         this.studentId = studentData?.studentId;
         this.UPDATE_FULL_DETAIL = this.getConfigurations()?.UPDATE_FULL_DETAIL ?? false;
-        this.warnings = warnings
-        this.complaints = complaints
+        this.warnings = warnings;
+        this.complaints = complaints;
+        this.approvalRequests = approvalRequests;
         this.ensureModalRoot();
         this.render();
         this.bindEvents();
@@ -53,6 +55,8 @@ window.StudentActionsUI = {
         const STUDENT_FEE_UPDATE_ENABLE = this.getConfigurations()?.STUDENT_FEE_UPDATE_ENABLE ?? false;
         const STUDENT_SEAT_UPDATE_ENABLE = this.getConfigurations()?.STUDENT_SEAT_UPDATE_ENABLE ?? false;
         const STUDENT_ADD_COMPLAINT_ENABLE = this.getConfigurations()?.STUDENT_ADD_COMPLAINT_ENABLE ?? false;
+        const STUDENT_VIEW_PENDING_APPROVAL_ENABLE = this.getConfigurations()?.STUDENT_VIEW_PENDING_APPROVAL_ENABLE ?? false;
+
         const showSeat = this.isSeatApplicable();
         const isAdmin = Session.isAdmin();
         const isStudent = Session.isStudent();
@@ -63,7 +67,7 @@ window.StudentActionsUI = {
         const diffDays = getDateDifferenceInDays(new Date(), last.tillDate);
         const hasWarning = this.warnings.length > 0
         const hasComplaint = this.complaints.length > 0
-
+        const hasPendingApproval = this.approvalRequests.length > 0
         let html = this.button("feeHistory", "fa-clock-rotate-left", "Fee Records");
 
         if (isTerminated) {
@@ -119,6 +123,11 @@ window.StudentActionsUI = {
         if (hasComplaint) {
             html += this.button("viewComplaints", "fa-comments", "View Complaints");
         }
+        if (hasPendingApproval) {
+            if ((isAdmin || isManager) || (isStudent && STUDENT_VIEW_PENDING_APPROVAL_ENABLE)) {
+                html += this.button("pendingApproval", "fa-comment-medical", "Pending Approvals");
+            }
+        }
         this.container.innerHTML = html;
     },
 
@@ -164,6 +173,9 @@ window.StudentActionsUI = {
                     break;
                 case "viewComplaints":
                     this.showComplaints();
+                    break;
+                case "pendingApproval":
+                    this.showPendingApproval();
                     break;
             }
         });
@@ -2162,5 +2174,394 @@ showUpdateStatus(currentStatus) {
     </div>
 `;
         this.openModal(html);
+    },
+
+    async showPendingApproval() {
+        const approvalRequests = this.approvalRequests ?? [];
+        const cancelEnabled = this.getConfigurations()?.STUDENT_CANCEL_PENDING_REQUEST_ENABLE ?? false;
+        const html = `
+    <div class="modal-content student-approvals-modal">
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Pending Approvals
+            </h2>
+            <button type="button" onclick="StudentActionsUI.closeModal()">
+                ✕
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+            ${approvalRequests.length === 0 ? `
+                <div class="student-no-data">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>No pending approvals found.</span>
+                </div>
+            ` : `
+
+                <div class="student-approvals-table-wrapper">
+                    <table class="student-approvals-table">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Request Data</th>
+                                <th>Request Type</th>
+                                <th>Requested At</th>
+                                <th>Remark</th>
+                                <th>Requested Status</th>
+                                ${cancelEnabled ? `<th>Action</th>` : ""}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${approvalRequests.map(request => {
+            // =====================================================
+            // REQUEST DATA
+            // =====================================================
+            const jsonData = Object.entries(request)
+                .filter(([key, value]) =>
+                    value !== null &&
+                    value !== "" &&
+                    ![
+                        "id",
+                        "requestedBy",
+                        "requestedAt",
+                        "requestType",
+                        "status",
+                        "studentId",
+                        "batchId",
+                        "seatId"
+                    ].includes(key)
+                )
+                .map(([key, value]) => {
+
+                    const formattedKey = key
+                        .replace(/([a-z])([A-Z])/g, "$1 $2")
+                        .replace(/^./, char => char.toUpperCase());
+
+                    return `${formattedKey}: ${value}`;
+                })
+                .join("\n");
+
+
+            // =====================================================
+            // REQUEST ID
+            // =====================================================
+
+            const requestId =
+                request.requestId ??
+                request.id ??
+                "-";
+
+
+            // =====================================================
+            // REQUEST TYPE
+            // =====================================================
+
+            const requestType =
+                String(request.requestType ?? "-")
+                    .replaceAll("_", " ");
+
+
+            // =====================================================
+            // REQUESTED AT
+            // =====================================================
+
+            const requestedAt =
+                request.requestedAt
+                    ? new Date(request.requestedAt).toLocaleString()
+                    : "-";
+
+
+            // =====================================================
+            // STATUS
+            // =====================================================
+
+            const status =
+                String(request.status ?? "-").toUpperCase();
+
+
+            // =====================================================
+            // REMARKS
+            // =====================================================
+
+            const remarks =
+                request.remarks ?? "-";
+
+
+            // =====================================================
+            // ACTION
+            // =====================================================
+
+            let actionHtml = "";
+
+            /*
+             * CANCELLED
+             * No action for cancelled requests.
+             */
+            if (status !== "CANCELLED") {
+
+                /*
+                 * ADMIN
+                 *
+                 * Only PENDING requests can be approved/rejected.
+                 */
+                if (Session.isAdmin()) {
+
+                    if (status === "PENDING") {
+
+                        actionHtml = `
+                        <div class="approval-action-buttons">
+
+                            <button
+                                type="button"
+                                class="approval-action-btn approve-btn"
+                                title="Approve Request"
+                                onclick="StudentActionsUI.approveRequest(${requestId})">
+                                <i class="fa-solid fa-check"></i>
+                                Approve
+                            </button>
+
+                            <button
+                                type="button"
+                                class="approval-action-btn reject-btn"
+                                title="Reject Request"
+                                onclick="StudentActionsUI.rejectRequest(${requestId})">
+                                <i class="fa-solid fa-xmark"></i>
+                                Reject
+                            </button>
+
+                        </div>
+                    `;
+                    }
+
+                }
+
+                /*
+                 * STUDENT / MANAGER
+                 *
+                 * Only PENDING requests can be cancelled.
+                 */
+                else if (Session.isStudent()) {
+                    debugger;
+                    const requestedByStudent = Number(request.requestedBy) === Number(Session.getUserId());
+                    if (status === "PENDING" && cancelEnabled && requestedByStudent) {
+                        actionHtml = `
+                            <button
+                                type="button"
+                                class="approval-action-btn cancel-btn"
+                                title="Cancel Request"
+                                onclick="StudentActionsUI.cancelRequest(${requestId})">
+                                <i class="fa-solid fa-ban"></i>
+                                Cancel
+                            </button>
+                        `;
+                    }
+                } else if (Session.isManager()) {
+                    if (status === "PENDING") {
+                        actionHtml = `
+                            <button
+                                type="button"
+                                class="approval-action-btn cancel-btn"
+                                title="Cancel Request"
+                                onclick="StudentActionsUI.cancelRequest(${requestId})">
+                                <i class="fa-solid fa-ban"></i>
+                                Cancel
+                            </button>
+                        `;
+                    }
+                }
+            }
+
+
+            // =====================================================
+            // ROW
+            // =====================================================
+
+            return `
+            <tr>
+
+                <!-- REQUEST ID -->
+                <td>
+                    <strong>
+                        ${escapeHtml(String(requestId))}
+                    </strong>
+                </td>
+
+                <!-- REQUEST DATA -->
+                <td>
+                    ${jsonData ? `
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            title="View Request Data"
+                            onclick='viewRequestData(${JSON.stringify(jsonData)})'>
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    ` : "-"}
+                </td>
+
+                <!-- REQUEST TYPE -->
+                <td>
+                    ${escapeHtml(requestType)}
+                </td>
+
+                <!-- REQUESTED AT -->
+                <td>
+                    ${escapeHtml(requestedAt)}
+                </td>
+
+                <!-- REMARK -->
+                <td>
+                    <div class="remarks">
+                        ${escapeHtml(String(remarks))}
+                    </div>
+                </td>
+
+                <!-- STATUS -->
+                <td>
+                    ${renderStatus(status)}
+                </td>
+
+                ${cancelEnabled ? `
+                    <!-- ACTION -->
+                    <td>
+                        ${actionHtml || "-"}
+                    </td>
+                ` : ""}
+
+            </tr>
+        `;
+
+        }).join("")}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            `}
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="StudentActionsUI.closeModal()">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+    `;
+
+        this.openModal(html);
+    },
+
+
+    async approveRequest(id) {
+        const pendingRow = (this.approvalRequests ?? []).find(row => row.id === id);
+        if (!pendingRow) {
+            console.error("Pending row not found");
+        }
+        const from = new Date(pendingRow.fromDate);
+        const till = new Date(pendingRow.tillDate);
+        const diffInDays = Math.floor((till - from) / (1000 * 60 * 60 * 24));
+
+        const warnings = [];
+        if (pendingRow.requestType === "FEES") {
+            if(checkIsPastDate(pendingRow.tillDate)) {
+                warnings.push("⚠️ Warning!\nThe selected Till Date has already passed.");
+            }
+            if (pendingRow.lastFeeTillDate !== pendingRow.fromDate) {
+                warnings.push(
+                    `• Membership gap detected.\n  Last membership till: ${pendingRow.lastFeeTillDate}\n  New membership from: ${pendingRow.fromDate}`
+                );
+            }
+
+            if (diffInDays > 31) {
+                warnings.push(
+                    `⚠️ Warning!• You are updating fees for more than one month (${diffInDays} days).`
+                );
+            }
+
+            if (pendingRow.lastFeePendingAmount > 0) {
+                warnings.push(
+                    `⚠️ Warning!• Previous fee record has a pending amount of ₹${pendingRow.lastFeePendingAmount}.`
+                );
+            }
+        }
+
+        if (pendingRow.pendingAmount > 0) {
+            warnings.push(
+                `• Current pending amount: ₹${pendingRow.pendingAmount}.`
+            );
+        }
+
+        if (warnings.length > 0) {
+            const message =
+                `Please review the following before continuing:\n ${warnings.join("\n\n")} Are you sure you want to continue?`;
+            if (!confirm(message)) {
+                return;
+            }
+        }
+
+        if (!confirm("Approve this request?")) return;
+        try {
+            await Api.post(Endpoints.admin.approveRequest, id);
+            this.approvalRequests = (this.approvalRequests ?? []).filter(item => Number(item.id) !== Number(id));
+            await this.showPendingApproval();
+        } catch (e) {
+            alert(e);
+        }
+    },
+
+    async rejectRequest(id) {
+        const reason = prompt("Enter rejection reason:");
+        if (!reason || !reason.trim()) {
+            alert("Rejection reason is required");
+            return;
+        }
+        try {
+            await Api.patch(Endpoints.admin.rejectRequest, { id, reason });
+            alert("Request rejected successfully");
+            const item = (this.approvalRequests ?? []).find(
+                item => Number(item.id) === Number(id)
+            );
+            if (item) {
+                item.status = "rejected";
+            }
+            await this.showPendingApproval();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to reject request");
+        }
+    },
+
+    async cancelRequest(id) {
+        const reason = prompt("Enter cancellation reason:");
+        if (!reason || !reason.trim()) {
+            alert("Cancellation reason is required");
+            return;
+        }
+        try {
+            await Api.patch(Endpoints.manager.cancel(), { id, reason });
+            alert("Request cancelled successfully");
+            const item = (this.approvalRequests ?? []).find(
+                item => Number(item.id) === Number(id)
+            );
+            if (item) {
+                item.status = "cancelled";
+            }
+            await this.showPendingApproval();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to cancel request");
+        }
     },
 };

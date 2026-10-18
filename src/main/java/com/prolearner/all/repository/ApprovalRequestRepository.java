@@ -37,6 +37,47 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
             long StudentId
     );
 
+    List<ApprovalRequest> findByStudentIdAndStatusInAndRequestTypeNotOrderByRequestedAtDesc(
+            Long studentId,
+            List<PendingRequestStatus> statuses,
+            RequestType requestType
+    );
+
+    @Query(value = """
+    SELECT
+        ar.id,
+        ar.student_id,
+        ar.full_name,
+        ar.date_of_birth,
+        ar.mobile_number,
+        ar.guardian_number,
+        ar.father_name,
+        ar.local_address,
+        ar.permanent_address,
+        ar.aadhaar_number,
+        ar.qualification,
+        ar.preparation_for,
+        ar.batch_id,
+        ar.seat_id,
+        ar.from_date,
+        ar.till_date,
+        ar.submitted_amount,
+        ar.cash_amount,
+        ar.online_amount,
+        ar.discount,
+        ar.pending_amount,
+        ar.payment_mode,
+        ar.transaction_id,
+        ar.remarks,
+        ar.enrollment_status,
+        ar.requested_by
+    FROM library.approval_requests ar
+    WHERE ar.student_id = :studentId
+    ORDER BY ar.requested_at DESC
+    """, nativeQuery = true)
+    List<Object[]> findAllRequestsByStudentId(@Param("studentId") Long studentId);
+
+
     // ====================================================
     // 🔹 SUM BY PAYMENT MODE (FIXED)
     // ====================================================

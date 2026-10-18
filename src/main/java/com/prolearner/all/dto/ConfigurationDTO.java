@@ -58,4 +58,10 @@ public class ConfigurationDTO {
 
     @JsonProperty("STUDENT_ADD_COMPLAINT_ENABLE")
     private Boolean studentAddComplaintEnable;
+
+    @JsonProperty("STUDENT_VIEW_PENDING_APPROVAL_ENABLE")
+    private Boolean studentViewPendingApprovalEnable;
+
+    @JsonProperty("STUDENT_CANCEL_PENDING_REQUEST_ENABLE")
+    private Boolean studentCancelPendingRequestEnable;
 }

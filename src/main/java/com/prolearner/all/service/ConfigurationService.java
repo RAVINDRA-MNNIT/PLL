@@ -63,6 +63,12 @@ public class ConfigurationService {
 
         update("STUDENT_ADD_COMPLAINT_ENABLE",
                 String.valueOf(configuration.getStudentAddComplaintEnable()));
+
+        update("STUDENT_VIEW_PENDING_APPROVAL_ENABLE",
+                String.valueOf(configuration.getStudentViewPendingApprovalEnable()));
+
+        update("STUDENT_CANCEL_PENDING_REQUEST_ENABLE",
+                String.valueOf(configuration.getStudentCancelPendingRequestEnable()));
     }
 
     private void update(String property, String value) {

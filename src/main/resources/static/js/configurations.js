@@ -103,6 +103,8 @@ const Configurations = {
         document.getElementById("studentFeeUpdate").checked = config.STUDENT_FEE_UPDATE_ENABLE;
         document.getElementById("studentSeatUpdate").checked = config.STUDENT_SEAT_UPDATE_ENABLE;
         document.getElementById("studentAddComplaint").checked = config.STUDENT_ADD_COMPLAINT_ENABLE;
+        document.getElementById("studentViewPendingApproval").checked = config.STUDENT_VIEW_PENDING_APPROVAL_ENABLE;
+        document.getElementById("studentCancelPendingRequest").checked = config.STUDENT_CANCEL_PENDING_REQUEST_ENABLE;
     },
 
     async createUser(user) {
@@ -337,6 +339,8 @@ const Configurations = {
             STUDENT_FEE_UPDATE_ENABLE: document.getElementById("studentFeeUpdate").checked,
             STUDENT_SEAT_UPDATE_ENABLE: document.getElementById("studentSeatUpdate").checked,
             STUDENT_ADD_COMPLAINT_ENABLE: document.getElementById("studentAddComplaint").checked,
+            STUDENT_VIEW_PENDING_APPROVAL_ENABLE: document.getElementById("studentViewPendingApproval").checked,
+            STUDENT_CANCEL_PENDING_REQUEST_ENABLE: document.getElementById("studentCancelPendingRequest").checked,
         };
 
         try {
