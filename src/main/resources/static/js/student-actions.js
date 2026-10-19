@@ -2039,142 +2039,495 @@ showUpdateStatus(currentStatus) {
         this.openModal(html);
     },
 
+
+
+
+
+
+
+
     async showComplaints() {
+
         const complaints = this.complaints ?? [];
         const canDeleteComplaint = Session.isAdmin() || Session.isStudent();
+
         const html = `
-    <div class="modal-content student-complaints-modal">
-        <div class="modal-header">
-            <h2>
-                <i class="fa-solid fa-comments"></i>
-                Student Complaints
-            </h2>
-            <button type="button" onclick="StudentActionsUI.closeModal()">
-                ✕
-            </button>
-        </div>
-        <div class="modal-body">
-            ${complaints.length === 0 ? `
-                    <div class="student-no-data">
-                        <i class="fa-solid fa-comment-slash"></i>
-                        <span>No complaints found.</span>
-                    </div>
-                  `
+        <div class="modal-content student-complaints-modal">
+
+            <!-- =====================================================
+                 HEADER
+                 ===================================================== -->
+            <div class="modal-header">
+                <h2>
+                    <i class="fa-solid fa-comments"></i>
+                    Student Complaints
+                </h2>
+
+                <button
+                    type="button"
+                    onclick="StudentActionsUI.closeModal()"
+                    class="modal-close-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+
+            <!-- =====================================================
+                 BODY
+                 ===================================================== -->
+            <div class="modal-body student-complaints-body">
+
+                ${
+            complaints.length === 0
+                ? `
+                            <div class="student-no-data">
+                                <i class="fa-solid fa-comment-slash"></i>
+                                <span>No complaints found.</span>
+                            </div>
+                          `
                 : `
-                    <div class="student-complaints-list">
-                        ${complaints.map((complaint, index) => {
-                    const submittedAt = complaint.submittedAt ? new Date(complaint.submittedAt).toLocaleString() : "-";
-                    const resolvedAt = complaint.resolvedAt ? new Date(complaint.resolvedAt).toLocaleString() : null;
-                    const closedAt = complaint.closedAt ? new Date(complaint.closedAt).toLocaleString() : null;
-                    const status = String(complaint.status ?? "OPEN").toUpperCase();
-                    const statusLabel = status.replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-                    const category = String(complaint.category ?? "-").replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-                    const complaintStatus = String(complaint.status || "OPEN").toUpperCase();
-                    return `
-                                <div class="student-complaint-card">
-                                    <!-- CARD HEADER -->
-                                    <div class="student-complaint-card-header">
-                                        <div class="student-complaint-title">
-                                            <span class="student-complaint-number">
-                                                Complaint #${complaints.length - index}
-                                            </span>
-                                            <span class="student-complaint-category">
-                                                ${category}
-                                            </span>
-                                        </div>
-                                        <div class="student-complaint-header-right">
-                                            <span class="student-complaint-date">
-                                                ${submittedAt}
-                                            </span>
-                                            ${canDeleteComplaint ? `
-                                                        <button type="button" class="student-complaint-delete-btn" title="Delete Complaint" onclick="StudentActionsUI.deleteComplaint(${complaint.id})">
-                                                            <i class="fa-solid fa-trash"></i>
+                            <div class="student-complaints-list">
+
+                                ${
+                    complaints.map((complaint, index) => {
+
+                        const submittedAt =
+                            complaint.submittedAt
+                                ? new Date(
+                                    complaint.submittedAt
+                                ).toLocaleString()
+                                : "-";
+
+                        const resolvedAt =
+                            complaint.resolvedAt
+                                ? new Date(
+                                    complaint.resolvedAt
+                                ).toLocaleString()
+                                : null;
+
+                        const closedAt =
+                            complaint.closedAt
+                                ? new Date(
+                                    complaint.closedAt
+                                ).toLocaleString()
+                                : null;
+
+                        const status =
+                            String(
+                                complaint.status ?? "OPEN"
+                            ).toUpperCase();
+
+                        const statusLabel =
+                            status
+                                .replaceAll("_", " ")
+                                .replace(
+                                    /\b\w/g,
+                                    c => c.toUpperCase()
+                                );
+
+                        const category =
+                            String(
+                                complaint.category ?? "-"
+                            )
+                                .replaceAll("_", " ")
+                                .replace(
+                                    /\b\w/g,
+                                    c => c.toUpperCase()
+                                );
+
+                        /*
+                         * Comments are already included
+                         * in the same API response.
+                         */
+                        const comments =
+                            Array.isArray(complaint.comments)
+                                ? complaint.comments
+                                : [];
+
+                        return `
+
+                                            <!-- =================================================
+                                                 COMPLAINT CARD
+                                                 ================================================= -->
+                                            <div class="student-complaint-card">
+
+                                                <!-- CARD HEADER -->
+                                                <div class="student-complaint-card-header">
+
+                                                    <div class="student-complaint-title">
+
+                                                        <span class="student-complaint-number">
+                                                            Complaint #${complaints.length - index}
+                                                        </span>
+
+                                                        <span class="student-complaint-category">
+                                                            ${escape(category)}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div class="student-complaint-header-right">
+
+                                                        <span class="student-complaint-date">
+                                                            ${escape(submittedAt)}
+                                                        </span>
+
+                                                        ${
+                            canDeleteComplaint
+                                ? `
+                                                                    <button
+                                                                        type="button"
+                                                                        class="student-complaint-delete-btn"
+                                                                        title="Delete Complaint"
+                                                                        onclick="StudentActionsUI.deleteComplaint(${complaint.id})">
+
+                                                                        <i class="fa-solid fa-trash"></i>
+
+                                                                    </button>
+                                                                  `
+                                : ""
+                        }
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- =================================================
+                                                     COMPLAINT DETAILS
+                                                     ================================================= -->
+                                                <div class="student-complaint-card-body">
+
+                                                    <div class="student-complaint-line">
+
+                                                        <span class="student-complaint-label">
+                                                            Category:
+                                                        </span>
+
+                                                        <span class="student-complaint-value">
+                                                            ${escape(category)}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div class="student-complaint-line">
+
+                                                        <span class="student-complaint-label">
+                                                            Complaint:
+                                                        </span>
+
+                                                        <span class="student-complaint-value complaint-description">
+                                                            ${escape(complaint.description ?? "-")}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div class="student-complaint-line">
+
+                                                        <span class="student-complaint-label">
+                                                            Status:
+                                                        </span>
+
+                                                        <span
+                                                            class="student-complaint-value complaint-status-badge status-${status.toLowerCase()}">
+
+                                                            ${escape(statusLabel)}
+
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    ${
+                            complaint.resolution
+                                ? `
+                                                                <div class="student-complaint-line">
+
+                                                                    <span class="student-complaint-label">
+                                                                        Resolution:
+                                                                    </span>
+
+                                                                    <span class="student-complaint-value">
+                                                                        ${escape(complaint.resolution)}
+                                                                    </span>
+
+                                                                </div>
+                                                              `
+                                : ""
+                        }
+
+
+                                                    ${
+                            resolvedAt
+                                ? `
+                                                                <div class="student-complaint-line">
+
+                                                                    <span class="student-complaint-label">
+                                                                        Resolved:
+                                                                    </span>
+
+                                                                    <span class="student-complaint-value">
+                                                                        ${escape(resolvedAt)}
+                                                                    </span>
+
+                                                                </div>
+                                                              `
+                                : ""
+                        }
+
+
+                                                    ${
+                            closedAt
+                                ? `
+                                                                <div class="student-complaint-line">
+
+                                                                    <span class="student-complaint-label">
+                                                                        Closed:
+                                                                    </span>
+
+                                                                    <span class="student-complaint-value">
+                                                                        ${escape(closedAt)}
+                                                                    </span>
+
+                                                                </div>
+                                                              `
+                                : ""
+                        }
+
+                                                </div>
+
+
+                                                <!-- =================================================
+                                                     COMMENTS
+                                                     ================================================= -->
+                                                <div
+                                                    class="student-complaint-comments"
+                                                    style="
+                                                        text-align:left !important;
+                                                        width:100%;
+                                                        box-sizing:border-box;
+                                                    ">
+
+                                                    <!-- COMMENTS HEADER -->
+                                                    <div
+                                                        class="student-complaint-comments-header"
+                                                        style="
+                                                            text-align:left !important;
+                                                        ">
+
+                                                        <i class="fa-solid fa-comments"></i>
+
+                                                        <span>
+                                                            Comments
+                                                        </span>
+
+                                                        <span class="comment-count">
+                                                            ${comments.length}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <!-- COMMENT LIST -->
+                                                    <div
+                                                        class="student-complaint-comments-list"
+                                                        style="
+                                                            text-align:left !important;
+                                                        ">
+
+                                                        ${
+                            comments.length === 0
+                                ? `
+                                                                    <div
+                                                                        class="no-comments"
+                                                                        style="
+                                                                            text-align:left !important;
+                                                                        ">
+
+                                                                        No comments yet.
+
+                                                                    </div>
+                                                                  `
+                                : comments.map(comment => {
+
+                                    const commentDate =
+                                        comment.createdAt
+                                            ? new Date(
+                                                comment.createdAt
+                                            ).toLocaleString()
+                                            : "-";
+
+                                    const userName =
+                                        comment.userName ??
+                                        "Unknown User";
+
+                                    const role =
+                                        String(
+                                            comment.role ??
+                                            ""
+                                        ).toUpperCase();
+
+                                    return `
+
+                                                                        <div
+                                                                            class="student-complaint-comment"
+                                                                            style="
+                                                                                text-align:left !important;
+                                                                            ">
+
+                                                                            <!-- USER + DATE -->
+                                                                            <div
+                                                                                class="comment-header"
+                                                                                style="
+                                                                                    text-align:left !important;
+                                                                                ">
+
+                                                                                <div
+                                                                                    class="comment-user"
+                                                                                    style="
+                                                                                        text-align:left !important;
+                                                                                    ">
+
+                                                                                    <i class="fa-solid fa-user"></i>
+
+                                                                                    <strong>
+                                                                                        ${escape(userName)}
+                                                                                    </strong>
+
+                                                                                    ${
+                                        role
+                                            ? `
+                                                                                                <span class="comment-role">
+                                                                                                    ${escape(role)}
+                                                                                                </span>
+                                                                                              `
+                                            : ""
+                                    }
+
+                                                                                </div>
+
+
+                                                                                <span
+                                                                                    class="comment-date"
+                                                                                    style="
+                                                                                        text-align:right !important;
+                                                                                    ">
+
+                                                                                    ${escape(commentDate)}
+
+                                                                                </span>
+
+                                                                            </div>
+
+
+                                                                            <!-- COMMENT TEXT -->
+                                                                            <div
+                                                                                class="comment-text"
+                                                                                style="
+                                                                                    display:block;
+                                                                                    width:100%;
+                                                                                    margin:8px 0 0 0;
+                                                                                    padding:0 0 0 24px;
+                                                                                    box-sizing:border-box;
+                                                                                    color:#4b5563;
+                                                                                    font-size:14px;
+                                                                                    line-height:1.5;
+                                                                                    text-align:left !important;
+                                                                                    white-space:pre-wrap;
+                                                                                    overflow-wrap:anywhere;
+                                                                                    word-break:break-word;
+                                                                                ">
+
+                                                                                ${escape(comment.comment ?? "")}
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    `;
+
+                                }).join("")
+                        }
+
+                                                    </div>
+
+
+                                                    <!-- =================================================
+                                                         ADD COMMENT
+                                                         ================================================= -->
+                                                    <div
+                                                        class="add-comment-section"
+                                                        style="
+                                                            text-align:left !important;
+                                                        ">
+
+                                                        <textarea
+                                                            class="complaint-comment-input"
+                                                            id="complaintComment_${complaint.id}"
+                                                            placeholder="Write a comment..."
+                                                            rows="2"></textarea>
+
+
+                                                        <button
+                                                            type="button"
+                                                            class="add-comment-btn"
+                                                            onclick="StudentActionsUI.addComplaintComment(${complaint.id})">
+
+                                                            <i class="fa-solid fa-paper-plane"></i>
+
+                                                            Add Comment
+
                                                         </button>
-                                                      `
-                            : ""
-                    }
-                                        </div>
-                                    </div>
-                                    <!-- CARD BODY -->
-                                    <div class="student-complaint-card-body">
-                                        <div class="student-complaint-line">
-                                            <span class="student-complaint-label">
-                                                Category:
-                                            </span>
-                                            <span class="student-complaint-value">
-                                                ${category}
-                                            </span>
-                                        </div>
-                                        <div class="student-complaint-line">
-                                            <span class="student-complaint-label">
-                                                Complaint:
-                                            </span>
-                                            <span class="student-complaint-value">
-                                                ${complaint.description ?? "-"}
-                                            </span>
-                                        </div>
-                                        <div class="student-complaint-line">
-                                            <span class="student-complaint-label">
-                                                Status:
-                                            </span>
-<span class="student-complaint-value complaint-status-badge status-${status.toLowerCase()}">
-    ${statusLabel}
-</span>
-                                       </div>
-                                        ${complaint.resolution ? `
-                                                    <div class="student-complaint-line">
-                                                        <span class="student-complaint-label">
-                                                            Resolution:
-                                                        </span>
-                                                        <span class="student-complaint-value">
-                                                            ${complaint.resolution}
-                                                        </span>
+
                                                     </div>
-                                                  `
-                            : ""
-                    }
-                                        ${resolvedAt ? `
-                                                    <div class="student-complaint-line">
-                                                        <span class="student-complaint-label">
-                                                            Resolved:
-                                                        </span>
-                                                        <span class="student-complaint-value">
-                                                            ${resolvedAt}
-                                                        </span>
-                                                    </div>
-                                                  `
-                            : ""
-                    }
-                                        ${closedAt ? `
-                                                    <div class="student-complaint-line">
-                                                        <span class="student-complaint-label">
-                                                            Closed:
-                                                        </span>
-                                                        <span class="student-complaint-value">
-                                                            ${closedAt}
-                                                        </span>
-                                                    </div>
-                                                  `
-                            : ""
-                    }
-                                    </div>
-                                </div>
-                            `;
-                }).join("")}
-                    </div>
-                  `
+
+                                                </div>
+
+                                            </div>
+                                        `;
+
+                    }).join("")
+                }
+
+                            </div>
+                          `
         }
+
+            </div>
+
+
+            <!-- =====================================================
+                 FOOTER
+                 ===================================================== -->
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="StudentActionsUI.closeModal()">
+
+                    <i class="fa-solid fa-xmark"></i>
+                    Close
+
+                </button>
+
+            </div>
+
         </div>
-        <!-- FOOTER -->
-        <div class="modal-footer">
-            <button type="button" class="secondary-btn" onclick="StudentActionsUI.closeModal()">
-                Close
-            </button>
-        </div>
-    </div>
-`;
+    `;
+
         this.openModal(html);
     },
+
+
+
+
+
+
+
 
     async showPendingApproval() {
         const approvalRequests = this.approvalRequests ?? [];
@@ -2562,6 +2915,42 @@ showUpdateStatus(currentStatus) {
         } catch (e) {
             console.error(e);
             alert("Failed to cancel request");
+        }
+    },
+
+    async addComplaintComment(complaintId) {
+        debugger;
+        const commentInput = document.getElementById(`complaintComment_${complaintId}`);
+        const comment = commentInput?.value?.trim();
+        if (!complaintId) {
+            alert("Unable to add comment. Complaint ID is missing.");
+            return;
+        }
+
+        if (!comment) {
+            alert("Please enter a comment.");
+            commentInput?.focus();
+            return;
+        }
+
+        const request = {
+            userId: Session.getUserId(),
+            userName: Session.getUserName(),
+            role: Session.getRole(),
+            comment: comment
+        };
+
+        try {
+            await Api.post(Endpoints.students.addComplaintComment(complaintId), request);
+            if (commentInput) {
+                commentInput.value = "";
+            }
+            alert("Comment added successfully.");
+            StudentIssues.closeComments();
+            await this.loadCurrentPage();
+        } catch (e) {
+            alert(e?.message || "Failed to add comment. Please try again.");
+
         }
     },
 };

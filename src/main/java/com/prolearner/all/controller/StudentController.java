@@ -152,4 +152,16 @@ public class StudentController {
 
         return studentService.verifyStudent(studentId);
     }
+
+
+    @PostMapping("/complaints/{complaintId}/comments")
+    public ComplaintCommentResponse addComplaintComment(
+            @PathVariable Long complaintId,
+            @RequestBody ComplaintCommentRequest request) {
+
+        return studentService.addComplaintComment(
+                complaintId,
+                request
+        );
+    }
 }

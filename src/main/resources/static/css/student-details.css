@@ -1049,3 +1049,777 @@ body {
     color: #92400e;
     border: 1px solid #fcd34d;
 }
+
+
+
+
+
+
+
+
+/* =========================================================
+   STUDENT COMPLAINT CARD
+   ========================================================= */
+
+.student-complaint-card {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 12px;
+    padding: 0;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+    overflow: hidden;
+
+    /* IMPORTANT */
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   COMPLAINT HEADER
+   ========================================================= */
+
+.student-complaint-card-header {
+    width: 100%;
+    min-height: 42px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 8px 12px;
+    gap: 10px;
+
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+
+    text-align: left !important;
+}
+
+.student-complaint-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 0;
+
+    text-align: left !important;
+}
+
+.student-complaint-number {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 700;
+
+    text-align: left !important;
+}
+
+.student-complaint-category {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 3px 8px;
+
+    border-radius: 5px;
+
+    background: #eaf2ff;
+    color: #2563eb;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-align: left !important;
+}
+
+.student-complaint-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    flex-shrink: 0;
+}
+
+.student-complaint-date {
+    flex-shrink: 0;
+
+    color: #9ca3af;
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    text-align: right !important;
+}
+
+
+/* =========================================================
+   DELETE BUTTON
+   ========================================================= */
+
+.student-complaint-delete-btn {
+    width: 28px;
+    height: 28px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 5px;
+
+    background: transparent;
+    color: #ef4444;
+
+    cursor: pointer;
+}
+
+.student-complaint-delete-btn:hover {
+    background: #fee2e2;
+}
+
+
+/* =========================================================
+   COMPLAINT BODY
+   ========================================================= */
+
+.student-complaint-card-body {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 20px;
+
+    background: #ffffff;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   COMPLAINT INFORMATION ROW
+   ========================================================= */
+
+.student-complaint-line {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: 12px;
+
+    margin: 0 0 10px;
+    padding: 0;
+
+    text-align: left !important;
+}
+
+.student-complaint-line:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   COMPLAINT LABEL
+   ========================================================= */
+
+.student-complaint-label {
+    flex: 0 0 120px;
+
+    margin: 0;
+    padding: 0;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   COMPLAINT VALUE
+
+   THIS IS THE IMPORTANT FIX
+   ========================================================= */
+
+.student-complaint-value {
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    color: #4b5563;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    line-height: 1.5;
+
+    /* FORCE LEFT ALIGNMENT */
+    text-align: left !important;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   COMPLAINT DESCRIPTION
+   ========================================================= */
+
+.complaint-description {
+    display: block;
+
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    text-align: left !important;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.complaint-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    width: auto;
+    min-width: 0;
+
+    padding: 4px 10px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    text-align: left !important;
+}
+
+.complaint-status-badge.status-open {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.complaint-status-badge.status-in_progress {
+    background: #e8f0fe;
+    color: #2563eb;
+}
+
+.complaint-status-badge.status-resolved {
+    background: #d1f2e1;
+    color: #1e7e34;
+}
+
+.complaint-status-badge.status-closed {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+
+/* =========================================================
+   COMMENTS SECTION
+   ========================================================= */
+
+.student-complaint-comments {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #fafbfc;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   COMMENTS HEADER
+   ========================================================= */
+
+.student-complaint-comments-header {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    gap: 8px;
+
+    margin: 0;
+    padding: 10px 20px;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-align: left !important;
+}
+
+.student-complaint-comments-header i {
+    flex-shrink: 0;
+
+    color: #2563eb;
+
+    font-size: 14px;
+}
+
+.comment-count {
+    min-width: 22px;
+    height: 22px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 6px;
+
+    box-sizing: border-box;
+
+    border-radius: 12px;
+
+    background: #e8f0fe;
+    color: #2563eb;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   COMMENT LIST
+   ========================================================= */
+
+.student-complaint-comments-list {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0 20px;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   INDIVIDUAL COMMENT
+   ========================================================= */
+
+.student-complaint-comment {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 10px 0;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    text-align: left !important;
+}
+
+.student-complaint-comment:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   COMMENT USER + DATE
+   ========================================================= */
+
+.comment-header {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin: 0;
+    padding: 0;
+
+    text-align: left !important;
+}
+
+.comment-user {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    min-width: 0;
+
+    text-align: left !important;
+}
+
+.comment-user i {
+    flex-shrink: 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+.comment-user strong {
+    margin: 0;
+    padding: 0;
+
+    color: #111827;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-align: left !important;
+}
+
+.comment-role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 3px 7px;
+
+    border-radius: 5px;
+
+    background: #eaf2ff;
+    color: #2563eb;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   COMMENT DATE
+   ========================================================= */
+
+.comment-date {
+    flex-shrink: 0;
+
+    margin: 0;
+    padding: 0;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+    white-space: nowrap;
+
+    text-align: right !important;
+}
+
+
+/* =========================================================
+   COMMENT TEXT
+
+   THIS IS THE OTHER IMPORTANT FIX
+   ========================================================= */
+
+.comment-text {
+    display: block;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 6px 0 0;
+    padding: 0 0 0 25px;
+
+    color: #4b5563;
+
+    font-size: 13px;
+    font-weight: 400;
+
+    line-height: 1.5;
+
+    /* FORCE LEFT ALIGNMENT */
+    text-align: left !important;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   NO COMMENTS
+   ========================================================= */
+
+.no-comments {
+    width: 100%;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 10px 20px;
+
+    color: #9ca3af;
+
+    font-size: 12px;
+    font-style: italic;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   ADD COMMENT
+   ========================================================= */
+
+.add-comment-section {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: flex-end;
+
+    gap: 8px;
+
+    margin: 0;
+    padding: 10px 20px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    text-align: left !important;
+}
+
+.complaint-comment-input {
+    flex: 1 1 auto;
+
+    min-width: 0;
+    min-height: 38px;
+    max-height: 100px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 8px 10px;
+
+    resize: vertical;
+
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #374151;
+
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+
+    outline: none;
+
+    text-align: left !important;
+}
+
+.complaint-comment-input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+            0 0 0 2px rgba(37, 99, 235, 0.08);
+}
+
+.complaint-comment-input::placeholder {
+    color: #9ca3af;
+
+    text-align: left !important;
+}
+
+
+/* =========================================================
+   ADD COMMENT BUTTON
+   ========================================================= */
+
+.add-comment-btn {
+    flex: 0 0 auto;
+
+    height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    margin: 0;
+    padding: 0 14px;
+
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.add-comment-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    .student-complaint-card-header {
+        padding: 8px 10px;
+    }
+
+    .student-complaint-card-body {
+        padding: 10px;
+    }
+
+    .student-complaint-line {
+        display: block;
+
+        margin-bottom: 9px;
+
+        text-align: left !important;
+    }
+
+    .student-complaint-label {
+        display: block;
+
+        width: 100%;
+
+        margin-bottom: 3px;
+
+        text-align: left !important;
+    }
+
+    .student-complaint-value {
+        display: block;
+
+        width: 100%;
+
+        text-align: left !important;
+    }
+
+    .student-complaint-comments-header {
+        padding: 9px 10px;
+
+        text-align: left !important;
+    }
+
+    .student-complaint-comments-list {
+        padding: 0 10px;
+
+        text-align: left !important;
+    }
+
+    .student-complaint-comment {
+        padding: 9px 0;
+
+        text-align: left !important;
+    }
+
+    .comment-header {
+        align-items: flex-start;
+
+        text-align: left !important;
+    }
+
+    .comment-user {
+        flex-wrap: wrap;
+
+        text-align: left !important;
+    }
+
+    .comment-date {
+        text-align: right !important;
+    }
+
+    .comment-text {
+        padding-left: 20px;
+
+        text-align: left !important;
+    }
+
+    .add-comment-section {
+        flex-direction: row;
+
+        align-items: flex-end;
+
+        padding: 8px 10px;
+    }
+
+    .complaint-comment-input {
+        min-height: 36px;
+
+        text-align: left !important;
+    }
+
+    .add-comment-btn {
+        height: 36px;
+        padding: 0 10px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .student-complaint-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .student-complaint-header-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .comment-text {
+        padding-left: 0;
+
+        text-align: left !important;
+    }
+}

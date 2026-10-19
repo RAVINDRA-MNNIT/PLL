@@ -191,104 +191,295 @@ const StudentIssues = {
     renderComplaints(data = this.complaints) {
         const head = document.getElementById("issuesTableHead");
         const rows = document.getElementById("issuesRows");
+
         if (!head || !rows) {
             console.error("Student Issues table elements not found.");
             return;
         }
+
         head.innerHTML = `
-            <tr>
-                <th>Student ID</th>
-                <th>Student</th>
-                <th>Category</th>
-                <th>Complaint</th>
-                <th>Status</th>
-                <th>Submitted At</th>
-                <th>Action</th>
-            </tr>
-        `;
+        <tr>
+            <th>Student ID</th>
+            <th>Student</th>
+            <th>Category</th>
+            <th>Complaint</th>
+            <th>Status</th>
+            <th>Submitted At</th>
+            <th>Action</th>
+        </tr>
+    `;
+
         if (!data.length) {
             rows.innerHTML = `
-                <tr>
-                    <td
-                        colspan="7"
-                        class="no-data">
-                        <i class="fa-solid fa-comment-slash"></i>
-                        No complaints found.
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td colspan="7" class="no-data">
+                    <i class="fa-solid fa-comment-slash"></i>
+                    No complaints found.
+                </td>
+            </tr>
+        `;
             return;
         }
+
         const isAdmin = Session.isAdmin();
         const isManager = Session.isManager();
-        rows.innerHTML =
-            data.map(complaint => {
-                const category = this.formatText(complaint.category);
-                const status = this.formatText(complaint.status || "OPEN");
-                const submittedAt = complaint.submittedAt ? new Date(complaint.submittedAt).toLocaleString() : "-";
-                const isResolved = String(complaint.status || "").toUpperCase() === "RESOLVED";
-                let actionHtml = "-";
-                if (isAdmin) {
-                    actionHtml = `
-                        <div class="action-buttons">
-                            <button type="button" class="action-btn" title="${
-                            isResolved ? "Complaint Resolved" : "Resolve Complaint"
-                            }"
-                                onclick="StudentIssues.resolveComplaint(${complaint.id})"
-                                ${isResolved ? "disabled": ""
-                            }>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                            <button type="button" class="delete-btn" title="Delete Complaint" onclick="StudentIssues.deleteComplaint(${complaint.id})">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
-                } else if (isManager) {
-                    actionHtml = `
-                        <button type="button" class="action-btn" title="${
-                        isResolved ? "Complaint Resolved" : "Resolve Complaint"
-                        }"
-                            onclick="StudentIssues.resolveComplaint(${complaint.id})"
-                            ${
-                                isResolved ? "disabled": ""
-                            }>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    `;
-                }
-                return `
-                    <tr>
-                        <td>
-                            <a href="/student-details.html?id=${complaint.studentId}" target="_blank" rel="noopener noreferrer">
-                                <strong>${escapeHtml(complaint.studentId)}</strong>
-                            </a>
-                        </td>
-                        <td>
-                            ${this.escape((complaint.fullName ?? "-").toUpperCase())}
-                        </td>
-                        <td>
-                            <span class="category-badge">${this.escape(category)}</span>
-                        </td>
-                        <td class="description-cell">
-                            ${this.escape(complaint.description ?? "-")}
-                        </td>
-                        <td>
-                            <span class="status-badge status-${String(complaint.status || "OPEN").toLowerCase()}">
-                                ${this.escape(status)}
-                            </span>
-                        </td>
-                        <td>
-                            ${this.escape(submittedAt)}
-                        </td>
-                        <td>
-                            ${actionHtml}
-                        </td>
-                    </tr>
-                `;
-            }).join("");
-    },
 
+        rows.innerHTML = data.map(complaint => {
+
+            const category = this.formatText(complaint.category);
+
+            const status = this.formatText(
+                complaint.status || "OPEN"
+            );
+
+            const submittedAt = complaint.submittedAt
+                ? new Date(complaint.submittedAt).toLocaleString()
+                : "-";
+
+            const isResolved =
+                String(complaint.status || "").toUpperCase() === "RESOLVED";
+
+            /*
+             * =====================================================
+             * ACTION BUTTONS
+             * =====================================================
+             */
+
+            let actionHtml = `
+            <div class="action-buttons">
+
+                <!-- COMMENTS -->
+                <button
+                    type="button"
+                    class="action-btn comment-btn"
+                    title="View Comments"
+                    onclick="StudentIssues.viewComments(${complaint.id})">
+
+                    <i class="fa-solid fa-comments"></i>
+
+                </button>
+        `;
+
+            if (isAdmin) {
+
+                actionHtml += `
+                <!-- RESOLVE -->
+                <button
+                    type="button"
+                    class="action-btn"
+                    title="${isResolved ? "Complaint Resolved" : "Resolve Complaint"}"
+                    onclick="StudentIssues.resolveComplaint(${complaint.id})"
+                    ${isResolved ? "disabled" : ""}>
+
+                    <i class="fa-solid fa-check"></i>
+
+                </button>
+
+                <!-- DELETE -->
+                <button
+                    type="button"
+                    class="delete-btn"
+                    title="Delete Complaint"
+                    onclick="StudentIssues.deleteComplaint(${complaint.id})">
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </button>
+            `;
+
+            } else if (isManager) {
+
+                actionHtml += `
+                <!-- RESOLVE -->
+                <button
+                    type="button"
+                    class="action-btn"
+                    title="${isResolved ? "Complaint Resolved" : "Resolve Complaint"}"
+                    onclick="StudentIssues.resolveComplaint(${complaint.id})"
+                    ${isResolved ? "disabled" : ""}>
+
+                    <i class="fa-solid fa-check"></i>
+
+                </button>
+            `;
+            }
+
+            actionHtml += `</div>`;
+
+
+            /*
+             * =====================================================
+             * COMMENTS
+             * =====================================================
+             */
+
+            const comments = Array.isArray(complaint.comments)
+                ? complaint.comments
+                : [];
+
+            let commentsHtml = "";
+
+            if (comments.length > 0) {
+
+                commentsHtml = `
+                <div class="complaint-comments-inline">
+
+                    <div class="complaint-comments-title">
+                        <i class="fa-regular fa-comments"></i>
+                        Comments
+                    </div>
+
+                    <ul class="complaint-comments-list">
+
+                        ${comments.map(comment => {
+
+                    const name =
+                        comment.userName ??
+                        comment.fullName ??
+                        comment.name ??
+                        "Unknown";
+
+                    const role =
+                        comment.role ?? "";
+
+                    const text =
+                        comment.comment ??
+                        comment.description ??
+                        "";
+
+                    const createdAt =
+                        comment.createdAt
+                            ? new Date(comment.createdAt).toLocaleString()
+                            : "-";
+
+                    return `
+                                <li class="complaint-comment-item">
+
+                                    <div class="complaint-comment-main">
+
+                                        <strong>
+                                            ${this.escape(name)}
+                                        </strong>
+
+                                        ${
+                        role
+                            ? `
+                                                    <span class="comment-role">
+                                                        ${this.escape(role)}
+                                                    </span>
+                                                  `
+                            : ""
+                    }
+
+                                        <span class="comment-text">
+                                            ${this.escape(text)}
+                                        </span>
+
+                                    </div>
+
+                                    <span class="comment-date">
+                                        ${this.escape(createdAt)}
+                                    </span>
+
+                                </li>
+                            `;
+
+                }).join("")}
+
+                    </ul>
+
+                </div>
+            `;
+
+            } else {
+
+                commentsHtml = `
+                <div class="complaint-comments-inline no-comments-inline">
+
+                    <i class="fa-regular fa-comments"></i>
+                    No comments yet.
+
+                </div>
+            `;
+            }
+
+
+            /*
+             * =====================================================
+             * COMPLAINT ROW + COMMENT ROW
+             * =====================================================
+             */
+
+            return `
+            <!-- COMPLAINT -->
+            <tr class="complaint-row">
+
+                <td>
+                    <a
+                        href="/student-details.html?id=${complaint.studentId}"
+                        target="_blank"
+                        rel="noopener noreferrer">
+
+                        <strong>
+                            ${escapeHtml(complaint.studentId)}
+                        </strong>
+
+                    </a>
+                </td>
+
+                <td>
+                    ${this.escape(
+                (complaint.fullName ?? "-").toUpperCase()
+            )}
+                </td>
+
+                <td>
+                    <span class="category-badge">
+                        ${this.escape(category)}
+                    </span>
+                </td>
+
+                <td class="description-cell">
+                    ${this.escape(
+                complaint.description ?? "-"
+            )}
+                </td>
+
+                <td>
+                    <span
+                        class="status-badge status-${String(
+                complaint.status || "OPEN"
+            ).toLowerCase()}">
+
+                        ${this.escape(status)}
+
+                    </span>
+                </td>
+
+                <td>
+                    ${this.escape(submittedAt)}
+                </td>
+
+                <td>
+                    ${actionHtml}
+                </td>
+
+            </tr>
+
+            <!-- COMMENTS -->
+            <tr class="complaint-comments-row">
+
+                <td colspan="7">
+
+                    ${commentsHtml}
+
+                </td>
+
+            </tr>
+        `;
+
+        }).join("");
+    },
     /* =========================================================
        RENDER WARNINGS
        ========================================================= */
@@ -515,6 +706,284 @@ const StudentIssues = {
             alert(error?.message || "Failed to delete warning.");
         }
     },
+
+
+
+
+
+
+
+
+
+    viewComments(complaintId) {
+
+        const complaint = (this.complaints ?? [])
+            .find(item => Number(item.id) === Number(complaintId));
+
+        if (!complaint) {
+            alert("Complaint not found.");
+            return;
+        }
+
+        document.getElementById("studentComplaintCommentsModal")?.remove();
+
+        const status = String(
+            complaint.status ?? "OPEN"
+        ).toUpperCase();
+
+        const comments = complaint.comments ?? [];
+
+        const commentsHtml = comments.length === 0
+            ? `
+            <div class="no-comments">
+                <i class="fa-regular fa-comments"></i>
+                No comments yet.
+            </div>
+        `
+            : comments.map(comment => {
+
+                const name =
+                    comment.userName ??
+                    comment.fullName ??
+                    comment.name ??
+                    "Unknown";
+
+                const role = comment.role ?? "";
+
+                const text =
+                    comment.comment ??
+                    comment.description ??
+                    "";
+
+                const createdAt = comment.createdAt
+                    ? new Date(comment.createdAt).toLocaleString()
+                    : "-";
+
+                return `
+                <div class="complaint-comment">
+
+                    <div class="complaint-comment-header">
+
+                        <div class="comment-user">
+                            <strong>
+                                ${this.escape(name)}
+                            </strong>
+
+                            ${role ? `
+                                <span class="comment-role">
+                                    ${this.escape(role)}
+                                </span>
+                            ` : ""}
+                        </div>
+
+                        <span class="comment-date">
+                            ${this.escape(createdAt)}
+                        </span>
+
+                    </div>
+
+                    <div class="complaint-comment-text">
+                        ${this.escape(text)}
+                    </div>
+
+                </div>
+            `;
+
+            }).join("");
+
+        const modal = document.createElement("div");
+
+        modal.id = "studentComplaintCommentsModal";
+        modal.className = "student-issues-modal";
+
+        modal.innerHTML = `
+        <div class="student-issues-modal-content">
+
+            <!-- HEADER -->
+            <div class="student-issues-modal-header">
+
+                <h2>
+                    <i class="fa-solid fa-comments"></i>
+                    Complaint #${complaint.id}
+                </h2>
+
+                <button
+                    type="button"
+                    class="modal-close-btn"
+                    onclick="StudentIssues.closeComments()"
+                    title="Close">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+
+            <!-- BODY -->
+            <div class="student-issues-modal-body">
+
+                <!-- STATUS -->
+                <div class="complaint-status-section">
+
+                    <label for="complaintStatus">
+                        Status
+                    </label>
+
+                    <select
+                        id="complaintStatus"
+                        class="complaint-status-select">
+
+                        <option value="OPEN"
+                            ${status === "OPEN" ? "selected" : ""}>
+                            Open
+                        </option>
+
+                        <option value="IN_PROGRESS"
+                            ${status === "IN_PROGRESS" ? "selected" : ""}>
+                            In Progress
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- COMMENTS -->
+                <div class="complaint-comments-section">
+
+                    <h3>
+                        <i class="fa-regular fa-comments"></i>
+                        Comments
+                    </h3>
+
+                    <div class="complaint-comments-list">
+                        ${commentsHtml}
+                    </div>
+
+                </div>
+
+
+                <!-- ADD COMMENT -->
+                <div class="add-complaint-comment-section">
+
+                    <textarea
+                        id="complaintComment"
+                        class="complaint-comment-input"
+                        rows="4"
+                        placeholder="Enter your comment..."></textarea>
+
+                    <div class="complaint-comment-actions">
+
+                        <button
+                            type="button"
+                            class="primary-btn"
+                            onclick="StudentIssues.addComplaintComment(${complaint.id})"
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Add Comment
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+            <div class="student-issues-modal-footer">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="StudentIssues.closeComments()">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+        // IMPORTANT: attach popup to BODY, not issues container
+        document.body.appendChild(modal);
+
+        requestAnimationFrame(() => {
+            modal.classList.add("show");
+        });
+    },
+
+    closeComments() {
+
+        const modal = document.getElementById(
+            "studentComplaintCommentsModal"
+        );
+
+        if (modal) {
+            modal.remove();
+        }
+    },
+
+    async addComplaintComment(complaintId) {
+
+        const commentInput =
+            document.getElementById("complaintComment");
+
+        const statusSelect =
+            document.getElementById("complaintStatus");
+
+        const comment = commentInput?.value?.trim();
+        const status = statusSelect?.value;
+
+        if (!comment) {
+            alert("Please enter a comment.");
+            return;
+        }
+
+        if (!status) {
+            alert("Please select a status.");
+            return;
+        }
+
+        const request = {
+            userId: Session.getUserId(),
+            userName: Session.getUserName(),
+            role: Session.getRole(),
+            comment: comment,
+            status: status
+        };
+        try {
+            await Api.post(Endpoints.students.addComplaintComment(complaintId), request);
+            alert("Comment added successfully.");
+            StudentIssues.closeComments();
+            await this.loadCurrentPage();
+        } catch (e) {
+            console.error("Failed to add complaint comment:", e);
+            alert("Failed to add comment.");
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* =========================================================
        FORMAT TEXT

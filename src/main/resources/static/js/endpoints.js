@@ -72,6 +72,12 @@ window.Endpoints = {
         resolveComplaint(complaintId) {
             return `/api/students/resolvecomplaint/${complaintId}`;
         },
+
+        addComplaintComment(complaintId) {
+            return `/api/students/complaints/${complaintId}/comments`;
+        },
+
+
     },
 
     // ================= PENDING (UNIFIED SYSTEM) =================

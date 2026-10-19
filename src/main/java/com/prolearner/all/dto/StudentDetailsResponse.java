@@ -24,7 +24,7 @@ public record StudentDetailsResponse(
         BigDecimal allowedDiscount,
         Integer terminationCount,
         List<StudentWarning> warnings,
-        List<StudentComplaint> complaints,
+        List<StudentComplaintResponse> complaints,
         StudentFeeHistoryResponse lastFee,
         List<PendingRequestDTO> approvalRequests
 ) {}

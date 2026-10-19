@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -50,3 +51,4 @@ public class StudentComplaint {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 }
+

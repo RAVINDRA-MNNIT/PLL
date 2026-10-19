@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.*;
@@ -34,6 +34,8 @@ public class StudentService {
     private final StudentComplaintRepository studentComplaintRepo;
     private final SeatService seatService;
     private final ApprovalRequestRepository approvalRequestRepo;
+    private final ComplaintCommentRepository complaintCommentRepo;
+    private final UserRepository userRepo;
 
 
     public StudentService(StudentRepository studentRepo,
@@ -43,7 +45,7 @@ public class StudentService {
                           StudentWarningRepository studentWarningRepo,
                           StudentComplaintRepository studentComplaintRepo,
                           SeatService seatService,
-                          ApprovalRequestRepository approvalRequestRepo) {
+                          ApprovalRequestRepository approvalRequestRepo, ComplaintCommentRepository complaintCommentRepo, UserRepository userRepo) {
         this.studentRepo = studentRepo;
         this.feeRecordRepo = feeRecordRepo;
         this.configurationService = configurationService;
@@ -52,6 +54,8 @@ public class StudentService {
         this.studentComplaintRepo = studentComplaintRepo;
         this.seatService = seatService;
         this.approvalRequestRepo = approvalRequestRepo;
+        this.complaintCommentRepo = complaintCommentRepo;
+        this.userRepo = userRepo;
     }
 
     public StudentListResponse getStudents(
@@ -98,6 +102,7 @@ public class StudentService {
         List<StudentWarning> warnings =
                 studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
 
+
         // =========================================================
         // COMPLAINTS
         // =========================================================
@@ -105,19 +110,98 @@ public class StudentService {
         List<StudentComplaint> complaints =
                 studentComplaintRepo.findByStudentIdOrderBySubmittedAtDesc(studentId);
 
+
+        // =========================================================
+        // COMPLAINT COMMENTS
+        // =========================================================
+
+        List<Long> complaintIds = complaints.stream()
+                .map(StudentComplaint::getId)
+                .toList();
+
+        List<ComplaintComment> complaintComments =
+                complaintIds.isEmpty()
+                        ? List.of()
+                        : complaintCommentRepo
+                        .findByComplaintIdInOrderByCreatedAtAsc(complaintIds);
+
+
+        // =========================================================
+        // GROUP COMMENTS BY COMPLAINT
+        // =========================================================
+
+        Map<Long, List<ComplaintCommentResponse>> commentsByComplaint =
+                complaintComments.stream()
+                        .collect(Collectors.groupingBy(
+                                ComplaintComment::getComplaintId,
+                                LinkedHashMap::new,
+                                Collectors.mapping(
+                                        comment -> ComplaintCommentResponse.builder()
+                                                .userId(comment.getUserId())
+                                                .userName(comment.getUserName())
+                                                .role(comment.getRole())
+                                                .comment(comment.getComment())
+                                                .createdAt(comment.getCreatedAt())
+                                                .build(),
+                                        Collectors.toList()
+                                )
+                        ));
+
+
+        // =========================================================
+        // CONVERT COMPLAINTS TO RESPONSE
+        // =========================================================
+
+        List<StudentComplaintResponse> complaintResponses =
+                complaints.stream()
+                        .map(complaint -> {
+
+                            StudentComplaintResponse response =
+                                    new StudentComplaintResponse();
+
+                            response.setId(complaint.getId());
+                            response.setStudentId(complaint.getStudentId());
+                            response.setFullName(student.getFullName());
+                            response.setMobileNumber(student.getMobileNumber());
+
+                            response.setCategory(complaint.getCategory());
+                            response.setDescription(complaint.getDescription());
+                            response.setStatus(complaint.getStatus());
+                            response.setResolution(complaint.getResolution());
+
+                            response.setSubmittedAt(complaint.getSubmittedAt());
+                            response.setResolvedAt(complaint.getResolvedAt());
+                            response.setClosedAt(complaint.getClosedAt());
+                            response.setCreatedAt(complaint.getCreatedAt());
+                            response.setUpdatedAt(complaint.getUpdatedAt());
+
+                            // Comments belonging ONLY to this complaint
+                            response.setComments(
+                                    commentsByComplaint.getOrDefault(
+                                            complaint.getId(),
+                                            List.of()
+                                    )
+                            );
+
+                            return response;
+                        })
+                        .toList();
+
+
         // =========================================================
         // ALL APPROVAL REQUESTS - ALL STATUSES
         // =========================================================
 
         List<ApprovalRequest> approvalRequests =
-                approvalRequestRepo.findByStudentIdAndStatusInAndRequestTypeNotOrderByRequestedAtDesc(
-                        studentId,
-                        List.of(
-                                PendingRequestStatus.PENDING,
-                                PendingRequestStatus.REJECTED
-                        ),
-                        RequestType.ADMISSION
-                );
+                approvalRequestRepo
+                        .findByStudentIdAndStatusInAndRequestTypeNotOrderByRequestedAtDesc(
+                                studentId,
+                                List.of(
+                                        PendingRequestStatus.PENDING,
+                                        PendingRequestStatus.REJECTED
+                                ),
+                                RequestType.ADMISSION
+                        );
 
         List<PendingRequestDTO> approvalRequestDTOs =
                 approvalRequests.stream()
@@ -162,7 +246,6 @@ public class StudentService {
                             dto.setRequestType(request.getRequestType().name());
                             dto.setRequestedAt(request.getRequestedAt());
 
-                            // Approval request status
                             if (request.getStatus() != null) {
                                 dto.setStatus(request.getStatus().name());
                             }
@@ -170,6 +253,7 @@ public class StudentService {
                             return dto;
                         })
                         .toList();
+
 
         // =========================================================
         // LAST FEE
@@ -202,6 +286,7 @@ public class StudentService {
                     fee.getCreatedAt()
             );
         }
+
 
         // =========================================================
         // ENROLLMENT STATUS
@@ -245,6 +330,7 @@ public class StudentService {
             }
         }
 
+
         // =========================================================
         // RESPONSE
         // =========================================================
@@ -266,7 +352,7 @@ public class StudentService {
                 student.getAllowedDiscount(),
                 student.getTerminationCount(),
                 warnings,
-                complaints,
+                complaintResponses,
                 lastFee,
                 approvalRequestDTOs
         );
@@ -502,11 +588,14 @@ public class StudentService {
         studentWarningRepo.deleteById(warningId);
     }
 
+    @Transactional
     public void deleteComplaint(Long complaintId) {
 
         if (!studentComplaintRepo.existsById(complaintId)) {
             throw new RuntimeException("Complaint not found");
         }
+        // Delete all comments belonging to this complaint
+        complaintCommentRepo.deleteByComplaintId(complaintId);
 
         studentComplaintRepo.deleteById(complaintId);
     }
@@ -516,13 +605,37 @@ public class StudentService {
             int size,
             String search) {
 
-        Pageable pageable =
-                PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size);
 
-        return studentComplaintRepo.searchComplaints(
-                search,
-                pageable
-        );
+        Page<StudentComplaintResponse> complaints =
+                studentComplaintRepo.searchComplaints(
+                        search,
+                        pageable
+                );
+
+        complaints.getContent().forEach(complaint -> {
+
+            List<ComplaintComment> comments =
+                    complaintCommentRepo
+                            .findByComplaintIdOrderByCreatedAtAsc(
+                                    complaint.getId()
+                            );
+
+            List<ComplaintCommentResponse> commentResponses =
+                    comments.stream()
+                            .map(comment -> ComplaintCommentResponse.builder()
+                                    .userId(comment.getUserId())
+                                    .userName(comment.getUserName())
+                                    .role(comment.getRole())
+                                    .comment(comment.getComment())
+                                    .createdAt(comment.getCreatedAt())
+                                    .build())
+                            .toList();
+
+            complaint.setComments(commentResponses);
+        });
+
+        return complaints;
     }
 
 
@@ -581,6 +694,109 @@ public class StudentService {
         response.setPendingCount(pendingCount);
 
         return response;
+    }
+
+
+
+
+
+
+
+
+    public ComplaintCommentResponse addComplaintComment(
+            Long complaintId,
+            ComplaintCommentRequest request) {
+
+        // =========================================================
+        // FIND COMPLAINT
+        // =========================================================
+
+        StudentComplaint complaint = studentComplaintRepo.findById(complaintId)
+                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+
+        ComplaintComment comment = new ComplaintComment();
+
+        // =========================================================
+        // COMPLAINT
+        // =========================================================
+
+        comment.setComplaintId(complaint.getId());
+
+        // =========================================================
+        // COMMENT DETAILS
+        // =========================================================
+
+        comment.setComment(request.getComment());
+        comment.setUserName(request.getUserName());
+        comment.setRole(request.getRole());
+        comment.setCreatedAt(OffsetDateTime.now());
+
+        // =========================================================
+        // AUTHOR
+        // =========================================================
+
+        if ("STUDENT".equalsIgnoreCase(request.getRole())) {
+
+            // -----------------------------------------------------
+            // STUDENT COMMENT
+            // -----------------------------------------------------
+
+            if (request.getUserId() == null) {
+                throw new RuntimeException("Student user ID is required");
+            }
+
+            // For STUDENT:
+            // request.userId = student's login/user ID
+            //
+            // In your current system this is also the student_id.
+            Students student = studentRepo.findByStudentId(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Student not found"));
+
+            // Student → student_id
+            comment.setStudentId(student.getStudentId());
+
+            // Student must NOT use user_id
+            comment.setUserId(null);
+
+        } else {
+
+            // -----------------------------------------------------
+            // ADMIN / MANAGER COMMENT
+            // -----------------------------------------------------
+
+            if (request.getUserId() == null) {
+                throw new RuntimeException("User ID is required");
+            }
+
+            User user = userRepo.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Admin / Manager → user_id
+            comment.setUserId(user.getId());
+
+            // Admin / Manager must NOT use student_id
+            comment.setStudentId(null);
+        }
+
+        // =========================================================
+        // SAVE
+        // =========================================================
+
+        ComplaintComment saved = complaintCommentRepo.save(comment);
+
+        // =========================================================
+        // RESPONSE
+        // =========================================================
+
+        return new ComplaintCommentResponse(
+                saved.getComplaintId(),
+                saved.getUserId(),
+                saved.getStudentId(),
+                saved.getUserName(),
+                saved.getRole(),
+                saved.getComment(),
+                saved.getCreatedAt()
+        );
     }
 }
 
