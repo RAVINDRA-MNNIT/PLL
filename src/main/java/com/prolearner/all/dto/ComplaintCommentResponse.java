@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 public class ComplaintCommentResponse {
-
     private Long complaintId;
     private Long userId;
     private Long studentId;
