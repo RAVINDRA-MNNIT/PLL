@@ -776,6 +776,33 @@ public class StudentService {
 
             // Admin / Manager must NOT use student_id
             comment.setStudentId(null);
+
+
+
+            // -------------------------
+            // UPDATE STATUS
+            // -------------------------
+
+            String status = request.getStatus();
+
+            if (status != null && !status.trim().isEmpty()) {
+
+                status = status.trim().toUpperCase();
+
+                if (!Set.of("OPEN", "IN_PROGRESS", "RESOLVED")
+                        .contains(status)) {
+
+                    throw new IllegalArgumentException(
+                            "Invalid complaint status: " + status
+                    );
+                }
+
+                complaint.setStatus(status);
+
+                if ("RESOLVED".equals(status)) {
+                    complaint.setResolvedAt(OffsetDateTime.now());
+                }
+            }
         }
 
         // =========================================================
