@@ -2946,8 +2946,8 @@ showUpdateStatus(currentStatus) {
                 commentInput.value = "";
             }
             alert("Comment added successfully.");
-            StudentIssues.closeComments();
-            await this.loadCurrentPage();
+            StudentActionsUI.closeModal();
+            await StudentDetailsPage.loadStudent(this.studentId);
         } catch (e) {
             alert(e?.message || "Failed to add comment. Please try again.");
 
