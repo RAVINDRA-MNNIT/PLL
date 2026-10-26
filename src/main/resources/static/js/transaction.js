@@ -1,4 +1,7 @@
 const Transactions = {
+    selectedExpenseCategory: "",
+    expenses: [],
+
     async load() {
         const container = document.getElementById("transactionContainer");
         if (!container) {
@@ -34,6 +37,7 @@ const Transactions = {
 
     initialize() {
         this.loadMonths();
+        this.loadExpenseCategoryFilter();
         const expenseDate = document.getElementById("expenseDate");
         if (expenseDate) {
             const now = new Date();
@@ -56,6 +60,7 @@ const Transactions = {
     showIncome() {
         this.activateMainTab("income");
         document.getElementById("monthFilter").style.display = "";
+        document.getElementById("expenseCategoryFilter").style.display = "none";
         document.getElementById("incomeView").style.display = "block";
         document.getElementById("profitView").style.display = "none";
         document.getElementById("expenseView").style.display = "none";
@@ -65,6 +70,7 @@ const Transactions = {
     showProfit() {
         this.activateMainTab("profit");
         document.getElementById("monthFilter").style.display = "";
+        document.getElementById("expenseCategoryFilter").style.display = "none";
         document.getElementById("incomeView").style.display = "none";
         document.getElementById("profitView").style.display = "block";
         document.getElementById("expenseView").style.display = "none";
@@ -73,6 +79,7 @@ const Transactions = {
 
     showExpense() {
         this.activateMainTab("expense");
+        document.getElementById("expenseCategoryFilter").style.display = "none";
         document.getElementById("incomeView").style.display = "none";
         document.getElementById("profitView").style.display = "none";
         document.getElementById("expenseView").style.display = "block";
@@ -88,6 +95,7 @@ const Transactions = {
        Income
     ======================================================= */
     showDailyIncome() {
+        document.getElementById("expenseCategoryFilter").style.display = "none";
         document.getElementById("dailyIncomeBtn").classList.add("active");
         document.getElementById("monthlyIncomeBtn").classList.remove("active");
         document.getElementById("dailyIncomeView").style.display = "block";
@@ -96,6 +104,7 @@ const Transactions = {
     },
 
     showMonthlyIncome() {
+        document.getElementById("expenseCategoryFilter").style.display = "none";
         document.getElementById("dailyIncomeBtn").classList.remove("active");
         document.getElementById("monthlyIncomeBtn").classList.add("active");
         document.getElementById("dailyIncomeView").style.display = "none";
@@ -118,15 +127,18 @@ const Transactions = {
         }
 
         if (expenseView?.style.display !== "none") {
+            const categoryFilter = document.getElementById("expenseCategoryFilterSelect");
+            if (categoryFilter) {
+                categoryFilter.value = "";
+            }
+            this.selectedExpenseCategory = "";
             this.loadExpenses();
             return;
         }
-
         if (profitView?.style.display !== "none") {
             this.loadProfit();
         }
     },
-
 
 
     async loadDailyIncome() {
@@ -257,7 +269,13 @@ const Transactions = {
        Expense
     ======================================================= */
     showNewExpense() {
+        this.loadExpenseCategories();
         this.activateExpenseTab("newExpenseBtn");
+        const totalDisplay = document.querySelector(".expense-total-display");
+
+        if (totalDisplay) {
+            totalDisplay.style.display = "none";
+        }
         document.getElementById("newExpenseView").style.display = "";
         document.getElementById("expenseListView").style.display = "none";
         document.getElementById("monthFilter").style.display = "none";
@@ -265,6 +283,12 @@ const Transactions = {
 
     showExpenses() {
         this.activateExpenseTab("expenseListBtn");
+        const totalDisplay = document.querySelector(".expense-total-display");
+
+        if (totalDisplay) {
+            totalDisplay.style.display = "";
+        }
+        document.getElementById("expenseCategoryFilter").style.display = "";
         document.getElementById("newExpenseView").style.display = "none";
         document.getElementById("expenseListView").style.display = "";
         document.getElementById("monthFilter").style.display = "";
@@ -285,15 +309,17 @@ const Transactions = {
         try {
             Session.isAdmin();
             const month = document.getElementById("incomeMonth").value;
-            const response = await Api.get(Endpoints.admin.getExpense(month));
-            this.renderExpenses(response);
+            this.expenses = await Api.get(Endpoints.admin.getExpense(month));
+            this.renderExpenses(this.expenses);
         } catch (error) {
             console.log(error);
         }
     },
     renderExpenses(expenses) {
         const tbody = document.getElementById("expenseRows");
-        if (!tbody) {return;}
+        if (!tbody) {
+            return;
+        }
         if (!expenses || expenses.length === 0) {
             tbody.innerHTML = `
             <tr>
@@ -302,6 +328,10 @@ const Transactions = {
                 </td>
             </tr>
         `;
+            const totalElement = document.getElementById("expenseTotal");
+            if (totalElement) {
+                totalElement.textContent = formatCurrency(0);
+            }
             return;
         }
         let html = "";
@@ -319,12 +349,24 @@ const Transactions = {
                     </span>
                 </td>
                 <td>
-                       ${this.renderExpenseActions(expense)}
+                    ${this.renderExpenseActions(expense)}
                 </td>
             </tr>
         `;
         });
+
         tbody.innerHTML = html;
+        // Calculate total from the currently displayed list
+        const total = expenses.reduce((sum, expense) => {
+            if (String(expense.status).toUpperCase() === "REJECTED") {
+                return sum;
+            }
+            return sum + Number(expense.amount || 0);
+        }, 0);
+        const totalElement = document.getElementById("expenseTotal");
+        if (totalElement) {
+            totalElement.textContent = formatCurrency(total);
+        }
     },
 
     renderExpenseActions(expense) {
@@ -441,6 +483,53 @@ const Transactions = {
             expenseDate.value = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
         }
     },
+
+
+    loadExpenseCategories() {
+        const select = document.getElementById("expenseCategory");
+        if (!select) {
+            return;
+        }
+        select.innerHTML = `
+            <option value="">Select Category</option>
+        `;
+
+        expenseCategories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            select.appendChild(option);
+        });
+    },
+
+    loadExpenseCategoryFilter() {
+        const select = document.getElementById("expenseCategoryFilterSelect");
+        if (!select) {
+            return;
+        }
+        select.innerHTML = `
+            <option value="">ALL</option>
+        `;
+        expenseCategories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            select.appendChild(option);
+        });
+    },
+
+    onCategoryChange() {
+        const category = document.getElementById("expenseCategoryFilterSelect")?.value || "";
+        this.selectedExpenseCategory = category;
+        const filteredExpenses = category === ""
+            ? this.expenses
+            : this.expenses.filter(expense =>
+                expense.expenseCategory === category
+            );
+
+        this.renderExpenses(filteredExpenses);
+    },
+
 
     /* =======================================================
        Month Dropdown

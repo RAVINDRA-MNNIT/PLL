@@ -279,3 +279,19 @@
         grid-template-columns: 1fr;
     }
 }
+
+.transaction-sub-tabs {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.expense-total-display {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    white-space: nowrap;
+}

@@ -4,9 +4,23 @@
     <!-- ===================================================== -->
     <section class="card transaction-card">
         <div class="transaction-header">
+
             <h2>Transactions</h2>
-            <!-- Month Filter -->
+
+            <!-- Filters + Tabs -->
             <div class="transaction-tabs">
+
+                <!-- Category Filter -->
+                <div id="expenseCategoryFilter" class="month-filter">
+                    <label>Category</label>
+                    <select
+                            id="expenseCategoryFilterSelect"
+                            onchange="Transactions.onCategoryChange()">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <!-- Month Filter -->
                 <div id="monthFilter" class="month-filter">
                     <label>Month</label>
                     <select
@@ -14,25 +28,33 @@
                             onchange="Transactions.onMonthChange()">
                     </select>
                 </div>
+
+                <!-- Income -->
                 <button
                         id="incomeTabBtn"
                         class="transaction-tab"
                         onclick="Transactions.showIncome()">
                     Income
                 </button>
+
+                <!-- Expenses -->
                 <button
                         id="expenseTabBtn"
                         class="transaction-tab"
                         onclick="Transactions.showExpense()">
                     Expenses
                 </button>
+
+                <!-- Profit -->
                 <button
                         id="profitTabBtn"
                         class="transaction-tab"
                         onclick="Transactions.showProfit()">
                     Profit
                 </button>
+
             </div>
+
         </div>
     </section>
 
@@ -163,6 +185,10 @@
                             id="expenseListBtn" class="transaction-tab" onclick="Transactions.showExpenses()">
                         All Expenses
                     </button>
+                    <div class="expense-total-display" style="display: none;">
+                        <span>Total:</span>
+                        <strong id="expenseTotal">₹0</strong>
+                    </div>
                 </div>
             </div>
 
@@ -179,15 +205,6 @@
                         <label>Category</label>
                         <select id="expenseCategory">
                             <option value="">Select Category</option>
-                            <option value="SWEEPER">SWEEPER</option>
-                            <option value="NEWSPAPER">NEWSPAPER</option>
-                            <option value="AC">AC</option>
-                            <option value="SALARY">SALARY</option>
-                            <option value="ELECTRICITY">ELECTRICITY</option>
-                            <option value="INTERNET">INTERNET</option>
-                            <option value="STATIONERY">STATIONERY</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
-                            <option value="OTHER">OTHER</option>
                         </select>
                     </div>
                     <div class="form-group">
