@@ -159,7 +159,12 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
         ar.enrollment_status AS "enrollmentStatus",
 
         s.date_of_admission AS "dateOfAdmission",
-
+    
+        s.date_of_birth AS "lastDateOfBirth",
+        s.father_name AS "lastFatherName",
+        s.aadhaar_number AS "lastAadhaarNumber",
+        s.local_address AS "lastLocalAddress",
+        s.permanent_address AS "lastPermanentAddress",
 
         -- =================================================
         -- PERSONAL DETAILS

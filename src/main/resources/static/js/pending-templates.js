@@ -167,10 +167,10 @@ window.PendingTemplates = {
                         <strong>${escapeHtml(item.studentId)}</strong>
                     </a>
                 </td>
-                <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber)}</td>
-                <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber)}</td>
+                <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber, item.lastDateOfBirth, item.lastFatherName, item.lastAadhaarNumber, item.lastLocalAddress, item.lastPermanentAddress)}</td>
+                <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber, item.dateOfBirth, item.fatherName, item.aadhaarNumber, item.localAddress, item.permanentAddress)}</td>
                 <td>${item.requestedBy ?? "-"}</td>
-            <td>${renderRequestedAt(item.requestedAt)}</td>=
+            <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>${actions}</td>
             </tr>
         `;
@@ -415,7 +415,7 @@ allRow(item, actions)
             }
 
         } else if (isManager) {
-  
+
             if (shouldShowEdit) {
                 html += `
                     <button class="icon-btn view"
@@ -467,11 +467,16 @@ renderStatus(status) {
         return new Date(value).toLocaleDateString("en-IN");
     },
 
-    formatDetails(name, mobile, guardianNumber) {
+    formatDetails(name, mobile, guardianNumber, dob, fatherName, aadhaarNumber, localAddress, permanentAddress) {
         return `
             <div><strong>Name:</strong> ${name}</div>
             <div><strong>Mobile:</strong> ${mobile}</div>
             <div><strong>Guardian number:</strong> ${guardianNumber}</div>
+            <div><strong>DOB:</strong> ${dob}</div>
+            <div><strong>Father name:</strong> ${fatherName}</div>
+            <div><strong>Aadhar number:</strong> ${aadhaarNumber}</div>
+            <div><strong>Local address:</strong> ${localAddress}</div>
+            <div><strong>Permanent address:</strong> ${permanentAddress}</div>
         `;
     },
 
