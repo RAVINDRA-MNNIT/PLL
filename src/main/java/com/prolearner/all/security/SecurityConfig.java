@@ -2,62 +2,151 @@ package com.prolearner.all.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    // =============================================================
+    // PASSWORD ENCODER
+    // =============================================================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // =============================================================
+    // SECURITY FILTER CHAIN
+    // =============================================================
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
-            .csrf(csrf -> csrf.disable())
 
-            .authorizeHttpRequests(auth -> auth
+                // =====================================================
+                // CSRF
+                // =====================================================
+                .csrf(csrf -> csrf.disable())
 
-                // Public pages/resources
-                .requestMatchers(
-                    "/",
-                    "/login.html"
-                ).permitAll()
+                // =====================================================
+                // AUTHORIZATION
+                // =====================================================
+                .authorizeHttpRequests(auth -> auth
 
-                // Login page needs these before authentication
-                .requestMatchers(
-                    "/api/users",
-                    "/api/users/**",
-                    "/api/auth/**"
-                ).permitAll()
+                        // =================================================
+                        // PUBLIC ROOT / LOGIN PAGES
+                        // =================================================
+                        .requestMatchers(
+                                "/",
+                                "/login.html",
+                                "/student-login.html"
+                        ).permitAll()
 
-                // HTML pages
-                // Authorization is currently handled by /api/auth/me
-                // and your application session.
-                .requestMatchers(
-                    "/manager.html",
-                    "/admin.html",
-                    "/admission.html"
-                ).permitAll()
+                        // =================================================
+                        // PUBLIC STATIC RESOURCES
+                        // =================================================
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/img/**",
+                                "/fonts/**",
+                                "/favicon.ico"
+                        ).permitAll()
 
-                // Manager lookup APIs
-                .requestMatchers(
-                    "/api/lookups/**"
-                ).permitAll()
+                        // =================================================
+                        // PUBLIC HTML PAGES / HTML FRAGMENTS
+                        // =================================================
+                        //
+                        // These pages can be loaded by the browser.
+                        // Their API calls are still protected separately.
+                        //
+                        .requestMatchers(
+                                "/admin.html",
+                                "/manager.html",
+                                "/admission.html",
+                                "/pending-approvals.html",
+                                "/transaction.html",
+                                "/student-details.html",
+                                "/student-issues.html",
+                                "/student-id-card.html",
+                                "/verify-student.html",
+                                "/studentStrength.html",
+                                "/fee.html",
+                                "/configuration.html",
+                                "/batches.html",
+                                "/student.html"
+                        ).permitAll()
 
-                // Admission API
-                // Your controller/service must verify the manager session.
-                .requestMatchers(
-                    "/api/members/applications"
-                ).permitAll()
+                        // =================================================
+                        // PUBLIC AUTH APIs
+                        // =================================================
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/student/login",
+                                "/api/auth/logout"
+                        ).permitAll()
 
-                .anyRequest().permitAll()
-            );
+                        // =================================================
+                        // CURRENT USER
+                        // =================================================
+                        .requestMatchers(
+                                "/api/auth/me"
+                        ).authenticated()
+
+                        // =================================================
+                        // PUBLIC USER LOOKUP
+                        // =================================================
+                        //
+                        // Login page can load the user list.
+                        // Other methods remain protected.
+                        //
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/users"
+                        ).permitAll()
+
+                        // =================================================
+                        // LOOKUP APIs
+                        // =================================================
+                        .requestMatchers(
+                                "/api/lookups/**"
+                        ).permitAll()
+
+                        // =================================================
+                        // PUBLIC ADMISSION APPLICATION
+                        // =================================================
+                        .requestMatchers(
+                                "/api/members/applications"
+                        ).permitAll()
+
+                        // =================================================
+                        // EVERYTHING ELSE
+                        // =================================================
+                        //
+                        // All other API endpoints require authentication.
+                        //
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+
+                // =============================================================
+                // JWT FILTER
+                // =============================================================
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }

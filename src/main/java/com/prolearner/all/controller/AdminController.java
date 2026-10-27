@@ -2,19 +2,18 @@ package com.prolearner.all.controller;
 
 import com.prolearner.all.dto.*;
 import com.prolearner.all.entity.Transaction;
+import com.prolearner.all.entity.Students;
 import com.prolearner.all.service.*;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import com.prolearner.all.entity.Students;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,16 +24,40 @@ public class AdminController {
     private final ConfigurationService configurationService;
     private final BatchService batchService;
 
-
-    public AdminController(AdminService as,
-                           TransactionService transactionService,
-                           ConfigurationService configurationService,
-                           PendingService pendingService,
-                           BatchService batchService) {
+    public AdminController(
+            AdminService as,
+            TransactionService transactionService,
+            ConfigurationService configurationService,
+            PendingService pendingService,
+            BatchService batchService
+    ) {
         this.adminService = as;
         this.transactionService = transactionService;
         this.configurationService = configurationService;
         this.batchService = batchService;
+    }
+
+    // ====================================================
+    // LOGGED-IN USER ID
+    // ====================================================
+
+    private Long getLoggedInUserId(Authentication authentication) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+
+            throw new IllegalStateException(
+                    "User is not authenticated."
+            );
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+
+        return Long.valueOf(principal.toString());
     }
 
     // ====================================================
@@ -43,9 +66,11 @@ public class AdminController {
 
     @PostMapping("/admission")
     public Students admission(
-            @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body,
+            Authentication authentication
     ) {
-        Long userId = 2L; // TODO: replace with logged-in user
+        Long userId = getLoggedInUserId(authentication);
+
         return adminService.admission(body, userId);
     }
 
@@ -55,9 +80,11 @@ public class AdminController {
 
     @PostMapping("/updatefee")
     public void updateFee(
-            @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body,
+            Authentication authentication
     ) {
-        Long userId = 2L; // TODO: replace with logged-in user
+        Long userId = getLoggedInUserId(authentication);
+
         adminService.updateFee(body, userId);
     }
 
@@ -68,10 +95,11 @@ public class AdminController {
     @PostMapping("/updatestudent/{type}")
     public void updateStudent(
             @PathVariable String type,
-            @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body,
+            Authentication authentication
     ) {
-        //Long userId = 2L; // TODO: from auth
-        adminService.updateStudent(type, body);
+        Long userId = getLoggedInUserId(authentication);
+        adminService.updateStudent(type, body, userId);
     }
 
     // ====================================================
@@ -80,9 +108,11 @@ public class AdminController {
 
     @PostMapping("/pending/approve")
     public void approve(
-            @RequestBody Long requestId
+            @RequestBody Long requestId,
+            Authentication authentication
     ) {
-        Long adminId = 2L; // TODO: replace with logged-in admin
+        Long adminId = getLoggedInUserId(authentication);
+
         adminService.approve(requestId, adminId);
     }
 
@@ -92,10 +122,16 @@ public class AdminController {
 
     @PatchMapping("/pending/reject")
     public void reject(
-            @RequestBody CancelRequestDTO request
+            @RequestBody CancelRequestDTO request,
+            Authentication authentication
     ) {
-        Long adminId = 2L;
-        adminService.reject(request.getId(), request.getReason(), adminId);
+        Long adminId = getLoggedInUserId(authentication);
+
+        adminService.reject(
+                request.getId(),
+                request.getReason(),
+                adminId
+        );
     }
 
     // ====================================================
@@ -103,9 +139,16 @@ public class AdminController {
     // ====================================================
 
     @PostMapping("/expense/save")
-    public void saveExpense(@RequestBody TransactionRequest request) {
-        Long adminId = 2L;
-        transactionService.saveExpense(request, adminId);
+    public void saveExpense(
+            @RequestBody TransactionRequest request,
+            Authentication authentication
+    ) {
+        Long adminId = getLoggedInUserId(authentication);
+
+        transactionService.saveExpense(
+                request,
+                adminId
+        );
     }
 
     // ====================================================
@@ -116,26 +159,46 @@ public class AdminController {
     public List<Transaction> expenses(
             @RequestParam String month
     ) {
-        Long managerId = 1L;
         return transactionService.getExpenses(month);
     }
 
     // ====================================================
-    // 🔹 Get Expenses Request
+    // 🔹 Approve Expense
     // ====================================================
 
     @PostMapping("/expense/approve")
-    public void approveExpense(@RequestBody Long requestId) {
-        Long adminId = 2L;
-        transactionService.approveExpense(requestId, adminId);
+    public void approveExpense(
+            @RequestBody Long requestId,
+            Authentication authentication
+    ) {
+        Long adminId = getLoggedInUserId(authentication);
+
+        transactionService.approveExpense(
+                requestId,
+                adminId
+        );
     }
 
+    // ====================================================
+    // 🔹 Reject Expense
+    // ====================================================
 
     @PostMapping("/expense/reject")
-    public void rejectExpense(@RequestBody Long requestId) {
-        Long adminId = 2L;
-        transactionService.rejectExpense(requestId, adminId);
+    public void rejectExpense(
+            @RequestBody Long requestId,
+            Authentication authentication
+    ) {
+        Long adminId = getLoggedInUserId(authentication);
+
+        transactionService.rejectExpense(
+                requestId,
+                adminId
+        );
     }
+
+    // ====================================================
+    // 🔹 Get Daily Income
+    // ====================================================
 
     @GetMapping("/income/daily")
     public List<Transaction> getDailyIncome(
@@ -144,12 +207,20 @@ public class AdminController {
         return transactionService.getDailyIncome(month);
     }
 
+    // ====================================================
+    // 🔹 Get Monthly Income
+    // ====================================================
+
     @GetMapping("/income/monthly")
     public MonthlyIncomeSummary getMonthlyIncome(
             @RequestParam YearMonth month
     ) {
         return transactionService.getMonthlyIncome(month);
     }
+
+    // ====================================================
+    // 🔹 Get Profit Summary
+    // ====================================================
 
     @GetMapping("/profit/summary")
     public ProfitSummary getProfitSummary(
@@ -159,47 +230,55 @@ public class AdminController {
     }
 
     // ====================================================
-    // 🔹 Save General configuration
+    // 🔹 Save General Configuration
     // ====================================================
 
     @PutMapping("/configuration/general")
     public void saveGeneralConfiguration(
             @RequestBody ConfigurationDTO configuration
     ) {
-        configurationService.saveGeneralConfiguration(configuration);
+        configurationService.saveGeneralConfiguration(
+                configuration
+        );
     }
 
     // ====================================================
-    // 🔹 Save Manager configuration
+    // 🔹 Save Manager Configuration
     // ====================================================
 
     @PutMapping("/configuration/manager")
     public void saveManagerConfiguration(
             @RequestBody ConfigurationDTO configuration
     ) {
-        configurationService.saveManagerConfiguration(configuration);
+        configurationService.saveManagerConfiguration(
+                configuration
+        );
     }
 
     // ====================================================
-    // 🔹 Save Student configuration
+    // 🔹 Save Student Configuration
     // ====================================================
 
     @PutMapping("/configuration/student")
     public void saveStudentConfiguration(
             @RequestBody ConfigurationDTO configuration
     ) {
-        configurationService.saveStudentConfiguration(configuration);
+        configurationService.saveStudentConfiguration(
+                configuration
+        );
     }
 
     // ====================================================
-    // 🔹 Save Student configuration
+    // 🔹 Get Users
     // ====================================================
 
     @GetMapping("/get/users")
     public void getUsers(
             @RequestBody ConfigurationDTO configuration
     ) {
-        configurationService.saveStudentConfiguration(configuration);
+        configurationService.saveStudentConfiguration(
+                configuration
+        );
     }
 
     // ====================================================
@@ -245,10 +324,14 @@ public class AdminController {
     @PostMapping("/transactions/cleanup")
     public void clearTransactions(
             @RequestParam("beforeDate")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
             LocalDate beforeDate
     ) {
-        adminService.clearTransactionsBefore(beforeDate);
+        adminService.clearTransactionsBefore(
+                beforeDate
+        );
     }
 
     // ====================================================
@@ -285,7 +368,13 @@ public class AdminController {
             @PathVariable Long id,
             @RequestParam Long replaceWithBatchId
     ) {
-        batchService.delete(id, replaceWithBatchId);
-        return ResponseEntity.noContent().build();
+        batchService.delete(
+                id,
+                replaceWithBatchId
+        );
+
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

@@ -113,4 +113,40 @@ public class AuthService {
                 false
         );
     }
+
+    public LoginResponse getCurrentUser(Long userId) {
+
+        User user = userRepository
+                .findByIdAndActiveTrue(userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "User not found or inactive."
+                        )
+                );
+
+        return new LoginResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getRole(),
+                user.getSuperAdmin()
+        );
+    }
+
+    public LoginResponse getCurrentStudent(Long studentId) {
+
+        Students student = studentRepository
+                .findById(studentId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Student not found."
+                        )
+                );
+
+        return new LoginResponse(
+                student.getId(),
+                student.getFullName(),
+                UserRole.STUDENT,
+                false
+        );
+    }
 }

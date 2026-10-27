@@ -1,28 +1,18 @@
 package com.prolearner.all.controller;
-
-import java.util.List;
-import java.util.Map;
-
 import com.prolearner.all.dto.TransactionRequest;
-import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.service.*;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prolearner.all.dto.CancelRequestDTO;
 import com.prolearner.all.entity.ApprovalRequest;
-import com.prolearner.all.enums.RequestType;
 import com.prolearner.all.dto.PendingRequestDTO;
-import com.prolearner.all.dto.CancelRequestDTO;
-
-
 
 @RestController
 @RequestMapping("/api/manager")
@@ -31,11 +21,27 @@ public class ManagerController {
     private final ManagerService service;
     private final TransactionService transactionService;
 
-
-
-    public ManagerController(ManagerService service, TransactionService transactionService) {
+    public ManagerController(
+            ManagerService service,
+            TransactionService transactionService
+    ) {
         this.service = service;
         this.transactionService = transactionService;
+    }
+
+    // ====================================================
+    // 🔹 Get Logged-In User ID
+    // ====================================================
+
+    private Long getLoggedInUserId(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User is not authenticated.");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
+        }
+        return Long.valueOf(principal.toString());
     }
 
     // ====================================================
@@ -44,14 +50,16 @@ public class ManagerController {
 
     @PostMapping("/approvalrequest/create/{type}")
     public ApprovalRequest create(
-        @PathVariable String type,
-        @RequestBody PendingRequestDTO body
+            @PathVariable String type,
+            @RequestBody PendingRequestDTO body,
+            Authentication authentication
     ) {
-        Long userId = 1L; // TODO: replace with logged-in user
-        if (body.getRequestedBy() != null) {
-            userId = body.getRequestedBy();
-        }
-        return service.create(type, body, userId);
+        Long userId = getLoggedInUserId(authentication);
+        return service.create(
+                type,
+                body,
+                userId
+        );
     }
 
     // ====================================================
@@ -60,13 +68,15 @@ public class ManagerController {
 
     @PutMapping("/approvalrequest/update")
     public ApprovalRequest update(
-            @RequestBody PendingRequestDTO body
+            @RequestBody PendingRequestDTO body,
+            Authentication authentication
     ) {
-        Long userId = 1L; // TODO: replace with logged-in user
-        if (body.getRequestedBy() != null) {
-            userId = body.getRequestedBy();
-        }
-        return service.update(body.getId(), body, userId);
+        Long userId = getLoggedInUserId(authentication);
+        return service.update(
+                body.getId(),
+                body,
+                userId
+        );
     }
 
     // ====================================================
@@ -75,8 +85,12 @@ public class ManagerController {
 
     @PatchMapping("/approvalrequest/cancel")
     public void cancel(
-            @RequestBody CancelRequestDTO request) {
-        service.cancel(request.getId(), request.getReason());
+            @RequestBody CancelRequestDTO request
+    ) {
+        service.cancel(
+                request.getId(),
+                request.getReason()
+        );
     }
 
     // ====================================================
@@ -84,14 +98,30 @@ public class ManagerController {
     // ====================================================
 
     @PostMapping("/expense/save")
-    public void saveExpense(@RequestBody TransactionRequest request) {
-        Long managerId = 1L;
-        transactionService.saveExpensePending(request, managerId);
+    public void saveExpense(
+            @RequestBody TransactionRequest request,
+            Authentication authentication
+    ) {
+        Long managerId = getLoggedInUserId(authentication);
+        transactionService.saveExpensePending(
+                request,
+                managerId
+        );
     }
 
+    // ====================================================
+    // 🔹 Cancel Expense
+    // ====================================================
+
     @PostMapping("/expense/cancel")
-    public void cancelExpense(@RequestBody Long requestId) {
-        Long managerId = 1L;
-        transactionService.cancelExpense(requestId, managerId);
+    public void cancelExpense(
+            @RequestBody Long requestId,
+            Authentication authentication
+    ) {
+        Long managerId = getLoggedInUserId(authentication);
+        transactionService.cancelExpense(
+                requestId,
+                managerId
+        );
     }
 }

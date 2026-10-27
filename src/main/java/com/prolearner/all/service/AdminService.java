@@ -71,8 +71,8 @@ public class AdminService {
     // 🔹 Update Details Request
     // =========================================================
 
-    public void updateStudent(String type, PendingRequestDTO body) {
-        adminCommandService.updateStudent(type, body);
+    public void updateStudent(String type, PendingRequestDTO body, Long userId) {
+        adminCommandService.updateStudent(type, body, userId);
     }
 
 

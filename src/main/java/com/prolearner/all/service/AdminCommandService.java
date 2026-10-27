@@ -210,7 +210,7 @@ public class AdminCommandService {
                             SourceType.ADMISSION,
                             "",
                             r.getRequestedAt(),
-                            1L,
+                            r.getRequestedBy(),
                             adminId
                     );
 
@@ -263,7 +263,7 @@ public class AdminCommandService {
                         SourceType.FEE,
                         "",
                         r.getRequestedAt(),
-                        1L,
+                        r.getRequestedBy(),
                         adminId);
                 // Update Fee
                 feeRecordRepository.save(fee);
@@ -330,8 +330,8 @@ public class AdminCommandService {
                             SourceType.BATCH_ADJUSTMENT,
                             r.getTransactionId(),
                             r.getRequestedAt(),
-                            2L,
-                            2L);
+                            adminId,
+                            adminId);
                 }
                 if (!Objects.equals(lastBatchId, r.getBatchId())) {
                     student.setAllowedDiscount(BigDecimal.valueOf(0));
@@ -359,8 +359,8 @@ public class AdminCommandService {
                             SourceType.FEE,
                             r.getTransactionId(),
                             r.getRequestedAt(),
-                            2L,
-                            2L);
+                            adminId,
+                            adminId);
                 }
             } else {
                 throw new IllegalStateException("Invalid type request");
@@ -373,12 +373,12 @@ public class AdminCommandService {
     // 🔹 Update Student Details Request
     // =========================================================
 
-    public void updateStudent(String type, PendingRequestDTO body) {
+    public void updateStudent(String type, PendingRequestDTO body, Long userId) {
         Long studentId = body.getStudentId();
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         if (RequestType.ENROLLMENT.name().equals(type)) {
-            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(),2L);
+            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(), userId);
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
         } else if (RequestType.DETAILS.name().equals(type)) {
@@ -438,8 +438,8 @@ public class AdminCommandService {
                         SourceType.BATCH_ADJUSTMENT,
                         body.getTransactionId(),
                         OffsetDateTime.now(),
-                        2L,
-                        2L);
+                        userId,
+                        userId);
             }
             // Update Fee
             feeRecordRepository.save(lastFee);
@@ -464,8 +464,8 @@ public class AdminCommandService {
                         SourceType.FEE,
                         body.getTransactionId(),
                         OffsetDateTime.now(),
-                        2L,
-                        2L);
+                        userId,
+                        userId);
             }
         } else if (RequestType.DISCOUNT.name().equals(type)) {
             student.setAllowedDiscount(body.getDiscount());

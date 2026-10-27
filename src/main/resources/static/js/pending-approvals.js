@@ -65,16 +65,12 @@ window.PendingApprovals = {
     // ================= API =================
 
     async load(url) {
-        const response = await fetch(url, {
-            credentials: "same-origin"
-        });
-
-        if (!response.ok) {
-            console.error("API failed:", url);
+        try {
+            return await Api.get(url);
+        } catch (error) {
+            console.error("API failed:", url, error);
             return [];
         }
-
-        return response.json();
     },
 
 async loadData() {

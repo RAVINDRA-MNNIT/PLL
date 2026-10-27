@@ -13,7 +13,6 @@ form.addEventListener("submit", login);
 
 async function login(event) {
     event.preventDefault();
-
     error.innerText = "";
     const studentId = studentIdInput.value.trim();
     const password = passwordInput.value.trim();
@@ -49,7 +48,12 @@ async function login(event) {
     }
 
     try {
-        await Api.post(Endpoints.auth.studentLogin, payload);
+        const response = await Api.post(Endpoints.auth.studentLogin, payload);
+        // Store JWT returned by backend
+        if (!response?.token) {
+            throw new Error("Login successful but authentication token was not received.");
+        }
+        localStorage.setItem("jwtToken", response.token);
         await loadConfiguration();
         window.location.href = `/student-details.html?id=${studentId}`;
     } catch (e) {
