@@ -5,7 +5,6 @@ window.Api = {
     // =========================================================
 
     async request(url, options = {}) {
-debugger;
         try {
 
             window.Loader.start();
@@ -13,7 +12,6 @@ debugger;
             // -------------------------------------------------
             // GET JWT TOKEN
             // -------------------------------------------------
-debugger;
             const token = localStorage.getItem("jwtToken");
 
             // -------------------------------------------------
@@ -36,15 +34,11 @@ debugger;
             // -------------------------------------------------
             // SEND REQUEST
             // -------------------------------------------------
-            console.log("API URL =", url);
-            console.log("JWT =", token);
-            console.log("AUTHORIZATION =", headers["Authorization"]);
             const response = await fetch(url, {
                 credentials: "same-origin",
                 ...options,
                 headers
             });
-            debugger;
 
             // =================================================
             // UNAUTHORIZED

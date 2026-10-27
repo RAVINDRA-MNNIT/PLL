@@ -8,20 +8,16 @@ window.Session = {
     // =========================================================
 
     async loadCurrentUser() {
-        debugger;
         if (this.currentUser) {
             return this.currentUser;
         }
-        debugger;
         try {
 
             this.currentUser =
                 await Api.get(Endpoints.auth.currentUser);
-            debugger;
             return this.currentUser;
 
         } catch (error) {
-            debugger;
             console.error(
                 "Unable to load current user.",
                 error

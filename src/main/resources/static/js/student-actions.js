@@ -2697,7 +2697,6 @@ showUpdateStatus(currentStatus) {
                  * Only PENDING requests can be cancelled.
                  */
                 else if (Session.isStudent()) {
-                    debugger;
                     const requestedByStudent = Number(request.requestedBy) === Number(Session.getUserId());
                     if (status === "PENDING" && cancelEnabled && requestedByStudent) {
                         actionHtml = `
@@ -2919,7 +2918,6 @@ showUpdateStatus(currentStatus) {
     },
 
     async addComplaintComment(complaintId) {
-        debugger;
         const commentInput = document.getElementById(`complaintComment_${complaintId}`);
         const comment = commentInput?.value?.trim();
         if (!complaintId) {
