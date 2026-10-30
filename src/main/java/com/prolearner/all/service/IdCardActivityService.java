@@ -266,8 +266,8 @@ public class IdCardActivityService {
 
 
     // =========================================================
-// MARK SELECTED CARDS AS PRINTED
-// =========================================================
+    // MARK SELECTED CARDS AS PRINTED
+    // =========================================================
     @Transactional
     public Map<String, Object> markPrintedBulk(
             List<Long> studentIds,
