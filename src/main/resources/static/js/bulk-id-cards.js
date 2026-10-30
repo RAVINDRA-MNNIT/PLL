@@ -571,6 +571,7 @@ const BulkIdCards = {
         .library-name {
             font-size: 9pt;
             font-weight: 900;
+            color: black;
         }
 
         .card-title {
@@ -592,11 +593,12 @@ const BulkIdCards = {
             flex: 1;
             flex-direction: column;
             justify-content: space-evenly;
-            gap: 0.5mm;
+            gap: 0.3mm;
             margin: 0;
             padding: 3mm 3mm 3mm 7mm;
-            font-size: 4.1pt;
-            line-height: 1.25;
+            font-size: 6.5pt;
+            font-weight: 700;
+            line-height: 1.0;
         }
 
         .instructions-list li {
