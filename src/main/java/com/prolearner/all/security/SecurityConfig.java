@@ -85,7 +85,8 @@ public class SecurityConfig {
                                 "/fee.html",
                                 "/configuration.html",
                                 "/batches.html",
-                                "/student.html"
+                                "/student.html",
+                                "/bulk-id-cards.html"
                         ).permitAll()
 
                         // =================================================
@@ -129,6 +130,24 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/members/applications"
                         ).permitAll()
+
+                        // =================================================
+                        // USER MANAGEMENT APIs — ADMIN ONLY
+                        // =================================================
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/users/addUser"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/users/deleteUser/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/users/updateUser"
+                        ).hasRole("ADMIN")
 
                         // =================================================
                         // EVERYTHING ELSE

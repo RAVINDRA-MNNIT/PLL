@@ -26,6 +26,8 @@ public interface StudentRepository extends JpaRepository<Students,Long> {
 
     Optional<Students> findByStudentId(Long studentId);
 
+    List<Students> findAllByStudentIdIn(List<Long> studentIds);
+
     @Query("""
 SELECT new com.prolearner.all.dto.StudentListItem(
     s.studentId,
@@ -272,4 +274,7 @@ ORDER BY
             @Param("studentId") Long studentId,
             @Param("discontinuedDate") LocalDate discontinuedDate
     );
+
+
+
 }

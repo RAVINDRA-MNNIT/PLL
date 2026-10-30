@@ -1,0 +1,152 @@
+<!-- Pro Learner's Digital Library: Bulk Student ID Cards view -->
+<link rel="stylesheet" href="/css/bulk-id-cards.css">
+
+<div class="bulk-id-cards-page">
+    <header class="id-cards-page-header">
+        <div>
+            <p class="id-cards-eyebrow">PRO LEARNER'S DIGITAL LIBRARY</p>
+            <h1>Student ID Cards</h1>
+            <p class="id-cards-subtitle">Generate, preview, and print student ID cards.</p>
+        </div>
+    </header>
+    <section class="id-cards-panel" aria-labelledby="printModeHeading">
+        <div class="panel-heading">
+            <div>
+                <h2 id="printModeHeading">Generate ID Cards</h2>
+                <p>Choose how you want to prepare student cards.</p>
+            </div>
+        </div>
+        <fieldset class="print-mode-options">
+            <legend>Print mode</legend>
+            <label class="mode-option">
+                <input type="radio" name="printMode" value="INSTANT" checked>
+                <span class="mode-option-copy"><strong>Instant Print</strong><small>Enter IDs and open the print dialog after generation.</small></span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="printMode" value="LATER">
+                <span class="mode-option-copy"><strong>Print Later</strong><small>Generate cards and optionally save the IDs for later.</small></span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="printMode" value="RANGE">
+                <span class="mode-option-copy"><strong>ID Range</strong><small>Generate cards for a continuous range of student IDs.</small></span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="printMode" value="STATUS">
+                <span class="mode-option-copy"><strong>Check Student ID Status</strong><small>Check whether a student's ID card is not issued, printed, or issued.</small></span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="printMode" value="RECENT">
+                <span class="mode-option-copy"><strong>Recent Activities</strong><small>View recently printed and issued student ID cards.</small></span>
+            </label>
+        </fieldset>
+
+        <div id="studentIdsSection" class="input-section">
+            <label for="studentIds">Student IDs</label>
+            <textarea id="studentIds" rows="3" placeholder="Enter IDs separated by commas, spaces, or new lines (e.g. 101, 102, 103)"></textarea>
+            <p class="field-help">Enter numeric Student IDs. Up to 500 cards can be generated at a time.</p>
+        </div>
+
+        <div id="studentRangeSection" class="input-section" style="display:none">
+            <div class="range-fields">
+                <div>
+                    <label for="fromStudentId">From Student ID</label>
+                    <input id="fromStudentId" type="number" min="1" inputmode="numeric" placeholder="e.g. 101">
+                </div>
+                <div>
+                    <label for="toStudentId">To Student ID</label>
+                    <input id="toStudentId" type="number" min="1" inputmode="numeric" placeholder="e.g. 120">
+                </div>
+            </div>
+            <p class="field-help">The range can contain up to 500 Student IDs.</p>
+        </div>
+
+        <div id="cardError" class="card-error" role="alert" aria-live="polite" style="display:none"></div>
+
+        <div class="selection-actions">
+            <button type="button" id="generateCardsButton" class="primary-button">Generate ID Cards</button>
+            <button type="button" id="saveIdCardsButton" class="secondary-button" style="display:none">Save for Later</button>
+            <button type="button" id="clearCardsButton" class="secondary-button">Clear</button>
+        </div>
+    </section>
+
+    <section id="printLaterSection" class="id-cards-panel print-later-panel" style="display:none" aria-labelledby="printLaterHeading">
+        <div class="panel-heading panel-heading-wrap">
+            <div>
+                <h2 id="printLaterHeading">Print Later</h2>
+                <p>Saved Student IDs stay here until you remove them.</p>
+            </div>
+            <div class="later-actions">
+                <button type="button" id="selectAllLaterButton" class="text-button">Select all</button>
+                <button type="button" id="clearSelectionLaterButton" class="text-button">Clear selection</button>
+                <button type="button" id="clearAllLaterButton" class="text-button">Clear all saved IDs</button>
+            </div>
+        </div>
+        <div id="savedStudentIdsList" class="saved-student-ids-list">
+            <div class="empty-saved-state">No Student IDs saved for later printing.</div>
+        </div>
+        <div id="savedPrintActions" class="saved-print-actions" style="display:none">
+            <button type="button" id="printSavedCardsButton" class="primary-button">Print Selected ID Cards</button>
+        </div>
+    </section>
+
+    <!-- =========================================================
+     CHECK STUDENT ID STATUS
+    ========================================================= -->
+    <section id="studentStatusSection" class="id-cards-panel" style="display:none" aria-labelledby="studentStatusHeading">
+        <div class="panel-heading">
+            <div>
+                <h2 id="studentStatusHeading">Check Student ID Status</h2>
+                <p>Check whether a student's ID card has been printed or issued.</p>
+            </div>
+        </div>
+        <div class="input-section">
+            <label for="statusStudentId">Student ID</label>
+            <div class="range-fields">
+                <div>
+                    <input id="statusStudentId" type="number" min="1" placeholder="Enter Student ID">
+                </div>
+                <div>
+                    <button type="button" id="checkStudentStatusButton" class="primary-button">Check Status</button>
+                </div>
+            </div>
+        </div>
+        <div id="studentStatusResult" aria-live="polite"></div>
+    </section>
+
+    <!-- =========================================================
+         RECENT ID CARD ACTIVITIES
+    ========================================================= -->
+    <section id="recentActivitiesSection" class="id-cards-panel" style="display:none" aria-labelledby="recentActivitiesHeading">
+        <div class="panel-heading panel-heading-wrap">
+            <div>
+                <h2 id="recentActivitiesHeading">Recent ID Card Activities</h2>
+                <p>Review and manage student ID card activities.</p>
+            </div>
+            <div class="recent-activity-toolbar">
+                <button type="button" id="generateSelectedIdCardsButton" class="primary-button" disabled>Generate ID Card</button>
+                <button type="button" id="markSelectedPrintedButton" class="primary-button" disabled>Mark Printed</button>
+                <button type="button" id="markSelectedIssuedButton" class="secondary-button" disabled>Mark Issued</button>
+                <button type="button" id="deleteSelectedActivitiesButton" class="danger-button" disabled>Delete</button>
+                <button type="button" id="refreshRecentActivitiesButton" class="secondary-button">Refresh</button>
+            </div>
+        </div>
+        <div id="recentActivitiesList">
+            <div class="empty-state">Select Recent Activities to load records.</div>
+        </div>
+    </section>
+    <section class="id-card-preview-section" aria-labelledby="idCardsPreviewHeading">
+        <div class="preview-heading">
+            <div>
+                <p class="id-cards-eyebrow">OUTPUT</p>
+                <h2 id="idCardsPreviewHeading">Print Preview</h2>
+                <p>Review the generated cards before printing.</p>
+            </div>
+            <div id="idCardsActions" class="preview-actions" style="display:none">
+                <button type="button" id="printIdCardsButton" class="primary-button" style="display:none">Print ID Cards</button>
+            </div>
+        </div>
+        <div id="idCardsPrintArea" class="id-cards-print-area">
+            <div class="empty-state">Enter Student IDs to generate ID cards.</div>
+        </div>
+    </section>
+</div>

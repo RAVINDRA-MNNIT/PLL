@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Data
@@ -89,4 +90,13 @@ public class Students {
 
     @Column(name = "termination_count", nullable = false)
     private Integer terminationCount = 0;
+
+    @Column(name = "id_card_status", nullable = false)
+    private String idCardStatus = "NOT_ISSUED";
+
+    @Column(name = "card_printed_at")
+    private OffsetDateTime cardPrintedAt;
+
+    @Column(name = "card_issued_at")
+    private OffsetDateTime cardIssuedAt;
 }

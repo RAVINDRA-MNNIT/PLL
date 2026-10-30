@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/verifyStudent.css">
     <link rel="stylesheet" href="/css/student-id-card.css">
     <link rel="stylesheet" href="/css/student-issues.css">
+    <link rel="stylesheet" href="/css/bulk-id-cards.css">
 </head>
 <body>
 <div id="pageLoading">
@@ -48,6 +49,9 @@
         </div>
         <div class="nav-item" onclick="switchView('complaints')">
             Complaints & Warnings
+        </div>
+        <div class="nav-item" onclick="switchView('idCards')">
+            Print Student ID
         </div>
     </aside>
     <main class="main">
@@ -203,6 +207,16 @@
                 </section>
             </div>
         </div>
+        <!-- Print Student ID-->
+        <div id="idCardsView" style="display:none">
+            <div id="idCardsContainer">
+                <section class="card">
+                    <p style="color:var(--muted)">
+                        Loading Verify Student...
+                    </p>
+                </section>
+            </div>
+        </div>
         <!-- Complaints and Warnings -->
         <div id="complaintsView" style="display:none">
             <div id="complaintsViewContainer">
@@ -263,6 +277,7 @@
 <script src="/js/verifyStudent.js"></script>
 <script src="/js/student-id-card.js"></script>
 <script src="/js/student-issues.js"></script>
+<script src="/js/bulk-id-cards.js"></script>
 <!-- 🔹 ROOT CONTROLLER (last) -->
 <script src="/js/manager.js"></script>
 </body>

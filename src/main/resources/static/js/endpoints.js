@@ -77,7 +77,21 @@ window.Endpoints = {
             return `/api/students/complaints/${complaintId}/comments`;
         },
 
+        bulkIdCards() {
+            return `/api/id-card-activities/bulk-id-cards`;
+        },
 
+        printLater() {
+            return `/api/id-card-activities/print-later`;
+        },
+
+        removePrintLater(studentId) {
+            return `/api/id-card-activities/print-later/${studentId}`;
+        },
+
+        idCardActivity() {
+            return `/api/id-card-activities`;
+        },
     },
 
     // ================= PENDING (UNIFIED SYSTEM) =================

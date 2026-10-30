@@ -1,0 +1,576 @@
+/* =========================================================
+   PRO LEARNER'S DIGITAL LIBRARY — BULK ID CARDS
+   All screen styles are scoped to this view.
+   ========================================================= */
+.bulk-id-cards-page {
+    --idc-primary: #1d4ed8;
+    --idc-primary-dark: #1e40af;
+    --idc-ink: #172033;
+    --idc-muted: #64748b;
+    --idc-border: #dbe3ef;
+    --idc-surface: #ffffff;
+    --idc-page: #f4f7fb;
+    color: var(--idc-ink);
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+}
+.bulk-id-cards-page *, .bulk-id-cards-page *::before, .bulk-id-cards-page *::after { box-sizing: border-box; }
+.bulk-id-cards-page .id-cards-page-header { display:flex; justify-content:space-between; align-items:center; margin:0 0 22px; }
+.bulk-id-cards-page h1, .bulk-id-cards-page h2, .bulk-id-cards-page p { margin-top:0; }
+.bulk-id-cards-page h1 { margin-bottom:7px; font-size:clamp(1.5rem, 2.5vw, 2rem); line-height:1.2; }
+.bulk-id-cards-page h2 { margin-bottom:6px; font-size:1.15rem; }
+.bulk-id-cards-page .id-cards-eyebrow { margin:0 0 7px; color:var(--idc-primary); font-size:.72rem; font-weight:800; letter-spacing:.12em; }
+.bulk-id-cards-page .id-cards-subtitle, .bulk-id-cards-page .panel-heading p, .bulk-id-cards-page .preview-heading p { margin-bottom:0; color:var(--idc-muted); font-size:.92rem; }
+.bulk-id-cards-page .id-cards-panel, .bulk-id-cards-page .id-card-preview-section { margin-bottom:22px; padding:22px; background:var(--idc-surface); border:1px solid var(--idc-border); border-radius:16px; box-shadow:0 4px 18px rgba(15,23,42,.04); }
+.bulk-id-cards-page .panel-heading, .bulk-id-cards-page .preview-heading { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:20px; }
+.bulk-id-cards-page .panel-heading-wrap { flex-wrap:wrap; }
+.bulk-id-cards-page .print-mode-options { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0 0 22px; padding:0; border:0; }
+.bulk-id-cards-page .print-mode-options legend { margin-bottom:10px; color:var(--idc-muted); font-size:.8rem; font-weight:700; }
+.bulk-id-cards-page .mode-option { display:flex; align-items:flex-start; gap:10px; min-height:88px; padding:14px; border:1px solid var(--idc-border); border-radius:12px; cursor:pointer; background:#fff; }
+.bulk-id-cards-page .mode-option:has(input:checked) { border-color:var(--idc-primary); background:#eff6ff; box-shadow:inset 0 0 0 1px var(--idc-primary); }
+.bulk-id-cards-page .mode-option input { margin:3px 0 0; accent-color:var(--idc-primary); }
+.bulk-id-cards-page .mode-option-copy { display:flex; flex-direction:column; gap:5px; }
+.bulk-id-cards-page .mode-option-copy strong { font-size:.9rem; }
+.bulk-id-cards-page .mode-option-copy small { color:var(--idc-muted); font-size:.78rem; line-height:1.45; }
+.bulk-id-cards-page .input-section { margin:0 0 18px; }
+.bulk-id-cards-page label { display:block; margin-bottom:7px; font-size:.86rem; font-weight:700; }
+.bulk-id-cards-page textarea, .bulk-id-cards-page input[type="number"] { display:block; width:100%; min-height:43px; padding:11px 12px; color:var(--idc-ink); background:#fff; border:1px solid #cbd5e1; border-radius:9px; font:inherit; }
+.bulk-id-cards-page textarea { min-height:95px; resize:vertical; }
+.bulk-id-cards-page textarea:focus, .bulk-id-cards-page input[type="number"]:focus { outline:3px solid rgba(37,99,235,.13); border-color:var(--idc-primary); }
+.bulk-id-cards-page .field-help { margin:7px 0 0; color:var(--idc-muted); font-size:.78rem; }
+.bulk-id-cards-page .range-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.bulk-id-cards-page .selection-actions, .bulk-id-cards-page .preview-actions, .bulk-id-cards-page .saved-print-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.bulk-id-cards-page .primary-button, .bulk-id-cards-page .secondary-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:10px 16px; border:1px solid transparent; border-radius:9px; font:inherit; font-size:.86rem; font-weight:700; cursor:pointer; }
+.bulk-id-cards-page .primary-button { color:#fff; background:var(--idc-primary); }
+.bulk-id-cards-page .primary-button:hover { background:var(--idc-primary-dark); }
+.bulk-id-cards-page .secondary-button { color:#334155; background:#fff; border-color:#cbd5e1; }
+.bulk-id-cards-page .secondary-button:hover { background:#f8fafc; }
+.bulk-id-cards-page .text-button { padding:8px 0; color:#b91c1c; background:transparent; border:0; font:inherit; font-size:.83rem; font-weight:700; cursor:pointer; }
+.bulk-id-cards-page .card-error { margin:0 0 16px; padding:11px 13px; color:#991b1b; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; font-size:.86rem; }
+.bulk-id-cards-page .preview-heading { align-items:flex-end; }
+.bulk-id-cards-page .id-cards-print-area { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); align-items:start; gap:18px; min-height:120px; padding:18px; background:#f1f5f9; border:1px dashed #cbd5e1; border-radius:12px; }
+.bulk-id-cards-page .empty-state, .bulk-id-cards-page .empty-saved-state { grid-column:1/-1; display:flex; align-items:center; justify-content:center; min-height:90px; padding:20px; color:var(--idc-muted); text-align:center; font-size:.9rem; }
+.bulk-id-cards-page .student-id-card { position:relative; display:flex; flex-direction:column; width:100%; max-width:260px; aspect-ratio:53.98 / 85.6; margin:0 auto; overflow:hidden; color:#172033; background:#fff; border:1px solid #d4dbe7; border-radius:9px; box-shadow:0 4px 12px rgba(15,23,42,.12); }
+.bulk-id-cards-page .id-card-header { padding:7% 5% 5%; color:#fff; text-align:center; background:#173f7a; }
+.bulk-id-cards-page .library-name { font-size:clamp(10px,1.05vw,14px); font-weight:900; letter-spacing:.04em; }
+.bulk-id-cards-page .library-title { margin-top:2px; font-size:clamp(8px,.8vw,11px); font-weight:700; letter-spacing:.12em; }
+.bulk-id-cards-page .card-title { margin-top:6px; padding-top:5px; border-top:1px solid rgba(255,255,255,.45); font-size:clamp(7px,.7vw,9px); font-weight:800; letter-spacing:.1em; }
+.bulk-id-cards-page .id-card-body { display:flex; flex:1; flex-direction:column; align-items:center; padding:5% 6% 3%; }
+.bulk-id-cards-page .photo-section { display:flex; justify-content:center; width:100%; margin-bottom:5%; }
+.bulk-id-cards-page .student-photo { display:flex; align-items:center; justify-content:center; width:36%; aspect-ratio:5 / 6; overflow:hidden; color:#64748b; background:#e8edf5; border:2px solid #d4deeb; border-radius:4px; font-size:8px; font-weight:700; }
+.bulk-id-cards-page .student-photo img { display:block; width:100%; height:100%; object-fit:cover; }
+.bulk-id-cards-page .student-basic-info { width:100%; text-align:center; overflow-wrap:anywhere; }
+.bulk-id-cards-page .student-id { margin-bottom:4%; color:#174780; font-size:clamp(10px,1vw,13px); }
+.bulk-id-cards-page .student-name { margin-bottom:5%; font-size:clamp(9px,.9vw,12px); font-weight:800; line-height:1.25; }
+.bulk-id-cards-page .student-field { margin-top:4%; font-size:clamp(8px,.75vw,10px); line-height:1.25; }
+.bulk-id-cards-page .id-card-footer { padding:5% 3%; color:#fff; background:#173f7a; text-align:center; font-size:clamp(6px,.65vw,8px); font-weight:700; }
+.bulk-id-cards-page .saved-student-ids-list { display:flex; flex-direction:column; gap:8px; }
+.bulk-id-cards-page .saved-student-id-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 13px; border:1px solid var(--idc-border); border-radius:9px; background:#fff; }
+.bulk-id-cards-page .saved-student-id-left, .bulk-id-cards-page .saved-student-id-actions { display:flex; align-items:center; gap:10px; }
+.bulk-id-cards-page .saved-student-id-left input { accent-color:var(--idc-primary); }
+.bulk-id-cards-page .saved-student-id-number { font-size:.87rem; font-weight:700; }
+.bulk-id-cards-page .saved-student-id-actions button { padding:6px 9px; border:1px solid #cbd5e1; border-radius:7px; background:#fff; color:#334155; cursor:pointer; }
+.bulk-id-cards-page .saved-student-id-actions .remove-single-button { color:#b91c1c; }
+.bulk-id-cards-page .saved-print-actions { justify-content:flex-end; margin-top:14px; }
+
+/* Printing: isolate the cards from dashboard layout and use equal page-top margins. */
+@page {
+    size: A4 portrait;
+    margin: 5mm 0 0 0;
+}
+
+@media print {
+    html,
+    body {
+        width: 210mm !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    body {
+        position: relative !important;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    .bulk-id-cards-page .id-card-preview-section,
+    .bulk-id-cards-page .id-card-preview-section * {
+        visibility: visible !important;
+    }
+
+    .bulk-id-cards-page .id-cards-page-header,
+    .bulk-id-cards-page .id-cards-panel,
+    .bulk-id-cards-page .preview-heading,
+    .bulk-id-cards-page .empty-state,
+    .bulk-id-cards-page .preview-actions {
+        display: none !important;
+    }
+
+    /* Remove dashboard positioning and spacing from the printable view. */
+    .bulk-id-cards-page {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        display: block !important;
+        width: 210mm !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        transform: none !important;
+        background: #fff !important;
+    }
+
+    .bulk-id-cards-page .id-card-preview-section {
+        position: static !important;
+        display: block !important;
+        width: 210mm !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        break-before: auto !important;
+        page-break-before: auto !important;
+    }
+
+    .bulk-id-cards-page .id-cards-print-area {
+        display: grid !important;
+        grid-template-columns: repeat(3, 53.98mm) !important;
+        grid-auto-rows: 85.60mm !important;
+        column-gap: 3mm !important;
+        row-gap: 3mm !important;
+        justify-content: center !important;
+        align-content: start !important;
+        align-items: start !important;
+        box-sizing: border-box !important;
+        width: 210mm !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        break-before: auto !important;
+        page-break-before: auto !important;
+    }
+
+    .bulk-id-cards-page .student-id-card {
+        display: flex !important;
+        width: 53.98mm !important;
+        height: 85.60mm !important;
+        min-width: 53.98mm !important;
+        max-width: 53.98mm !important;
+        margin: 0 !important;
+        aspect-ratio: auto !important;
+        border: 0.25mm solid #cbd5e1 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    .bulk-id-cards-page .id-card-header {
+        padding: 5mm 2mm 2mm !important;
+    }
+
+    .bulk-id-cards-page .library-name { font-size: 10pt !important; }
+    .bulk-id-cards-page .library-title { font-size: 7pt !important; }
+    .bulk-id-cards-page .card-title { font-size: 6.5pt !important; }
+
+    .bulk-id-cards-page .id-card-body {
+        padding: 3mm 2.5mm 2mm !important;
+    }
+
+    .bulk-id-cards-page .photo-section { margin-bottom: 3mm !important; }
+
+    .bulk-id-cards-page .student-photo {
+        width: 25mm !important;
+        height: 30mm !important;
+        flex: 0 0 30mm !important;
+        font-size: 7pt !important;
+    }
+
+    .bulk-id-cards-page .student-id {
+        font-size: 9pt !important;
+        margin-bottom: 2mm !important;
+    }
+
+    .bulk-id-cards-page .student-name {
+        font-size: 8pt !important;
+        margin-bottom: 2mm !important;
+    }
+
+    .bulk-id-cards-page .student-field {
+        margin-top: 2mm !important;
+        font-size: 7pt !important;
+    }
+
+    .bulk-id-cards-page .id-card-footer {
+        padding: 2mm 1mm !important;
+        font-size: 5.5pt !important;
+    }
+}
+
+@media (max-width:760px) {
+    .bulk-id-cards-page .id-cards-panel, .bulk-id-cards-page .id-card-preview-section { padding:16px; }
+    .bulk-id-cards-page .print-mode-options { grid-template-columns:1fr; }
+    .bulk-id-cards-page .mode-option { min-height:0; }
+    .bulk-id-cards-page .range-fields { grid-template-columns:1fr; gap:12px; }
+    .bulk-id-cards-page .preview-heading { align-items:flex-start; flex-direction:column; }
+    .bulk-id-cards-page .id-cards-print-area { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; padding:10px; }
+    .bulk-id-cards-page .saved-student-id-item { align-items:flex-start; flex-direction:column; }
+    .bulk-id-cards-page .saved-student-id-actions { align-self:flex-end; }
+}
+
+/* Print Later action buttons only */
+.bulk-id-cards-page .later-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.bulk-id-cards-page .later-actions .text-button {
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .bulk-id-cards-page .panel-heading-wrap {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .bulk-id-cards-page .later-actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}
+
+/* Save for Later — match Generate ID Cards button */
+.bulk-id-cards-page #saveIdCardsButton {
+    background-color: #1d4ed8 !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.bulk-id-cards-page #saveIdCardsButton:hover {
+    background-color: #1e40af !important;
+    border-color: #1e40af !important;
+}
+
+.bulk-id-cards-page #saveIdCardsButton:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   RECENT ACTIVITY ACTION BUTTONS
+========================================================= */
+
+.recent-activity-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 280px;
+}
+
+.recent-activity-actions .text-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #334155;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Mark Printed */
+.recent-activity-actions button[data-action="printed"] {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #93c5fd;
+}
+
+.recent-activity-actions button[data-action="printed"]:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+/* Mark Issued */
+.recent-activity-actions button[data-action="issued"] {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #86efac;
+}
+
+.recent-activity-actions button[data-action="issued"]:hover {
+    background: #d1fae5;
+    border-color: #4ade80;
+}
+
+/* Delete */
+.recent-activity-actions button[data-action="delete"] {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+
+.recent-activity-actions button[data-action="delete"]:hover {
+    background: #fee2e2;
+    border-color: #f87171;
+}
+
+/* Disabled buttons */
+.recent-activity-actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #cbd5e1;
+}
+
+/* Keyboard accessibility */
+.recent-activity-actions button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Keep the activity table usable on smaller screens */
+.recent-activities-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.recent-activities-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-activities-table th,
+.recent-activities-table td {
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+
+/* ==========================================
+   STUDENT ID CARD STATUS RESULT
+========================================== */
+
+.student-status-result-card {
+    width: 100%;
+    max-width: 620px;
+    margin: 24px 0;
+    padding: 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
+    box-sizing: border-box;
+}
+
+/* HEADER */
+
+.student-status-result-card .status-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.student-status-result-card .status-card-eyebrow {
+    display: block;
+    margin-bottom: 6px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.student-status-result-card .status-card-header h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* STATUS BADGE */
+
+.student-status-result-card .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.student-status-result-card .status-badge.not-issued {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.student-status-result-card .status-badge.printed {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.student-status-result-card .status-badge.issued {
+    color: #047857;
+    background: #d1fae5;
+}
+
+/* STUDENT INFORMATION */
+
+.student-status-result-card .status-student-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 0;
+}
+
+.student-status-result-card .status-avatar {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    background: #334f9c;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.student-status-result-card .status-student-info h4 {
+    margin: 0 0 5px;
+    color: #172033;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.student-status-result-card .status-student-info p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.student-status-result-card .status-student-info strong {
+    color: #334155;
+}
+
+/* TIMELINE */
+
+.student-status-result-card .status-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+.student-status-result-card .status-timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 55px;
+}
+
+.student-status-result-card .status-timeline-icon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.student-status-result-card .printed-icon {
+    color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.student-status-result-card .issued-icon {
+    color: #047857;
+    background: #d1fae5;
+}
+
+.student-status-result-card .status-timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.student-status-result-card .status-timeline-content span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.student-status-result-card .status-timeline-content strong {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+    .student-status-result-card {
+        padding: 17px;
+    }
+
+    .student-status-result-card .status-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .student-status-result-card .status-card-header h3 {
+        font-size: 18px;
+    }
+
+    .student-status-result-card .status-student-info h4 {
+        font-size: 14px;
+    }
+
+    .student-status-result-card .status-timeline-content strong {
+        font-size: 12px;
+    }
+}
