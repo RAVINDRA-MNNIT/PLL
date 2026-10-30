@@ -68,7 +68,11 @@ const BulkIdCards = {
         const refreshActivitiesButton = document.getElementById("refreshRecentActivitiesButton");
         const generateSelectedButton = document.getElementById("generateSelectedIdCardsButton");
         const checkStatusButton = document.getElementById("checkStudentStatusButton");
+        const printBackButton = document.getElementById("printBackIdCardsButton");
 
+        if (printBackButton) {
+            printBackButton.onclick = () => this.printBackCards();
+        }
 
         if (checkStatusButton) {
             checkStatusButton.onclick = () => this.checkStudentIdStatus();
@@ -224,6 +228,7 @@ const BulkIdCards = {
         const printButton = document.getElementById("printIdCardsButton");
         const actions = document.getElementById("idCardsActions");
         const printArea = document.getElementById("idCardsPrintArea");
+        const printBackButton = document.getElementById("printBackIdCardsButton");
 
         const isPrintLater = mode === "LATER";
         const isRecent = mode === "RECENT";
@@ -238,6 +243,7 @@ const BulkIdCards = {
             if (clearButton) clearButton.style.display = "none";
             if (printButton) {
                 printButton.style.display = hasCards ? "inline-flex" : "none";
+                printBackButton.style.display = hasCards ? "inline-flex" : "none";
             }
             if (actions) {
                 actions.style.display = hasCards ? "flex" : "none";
@@ -247,7 +253,7 @@ const BulkIdCards = {
 
         // Status mode: hide all card actions
         if (isStatus) {
-            [generateButton, saveButton, clearButton, printButton].forEach(button => {
+            [generateButton, saveButton, clearButton, printButton, printBackButton].forEach(button => {
                 if (button) button.style.display = "none";
             });
             if (actions) actions.style.display = "none";
@@ -272,6 +278,7 @@ const BulkIdCards = {
         // Print: visible only when cards exist
         if (printButton) {
             printButton.style.display = hasCards ? "inline-flex" : "none";
+            printBackButton.style.display = hasCards ? "inline-flex" : "none";
         }
 
         if (actions) {
@@ -443,6 +450,179 @@ const BulkIdCards = {
             </p>
         `;
         }
+    },
+
+    // =========================================================
+// PRINT ONLY BACK SIDE OF ID CARDS
+// Does not modify existing preview or front-side printing.
+// =========================================================
+    printBackCards() {
+
+        // Open a separate print window
+        const printWindow = window.open("", "_blank");
+
+        if (!printWindow) {
+            alert("Please allow pop-ups for this website.");
+            return;
+        }
+
+        const instructions = [
+            "This ID card is strictly non-transferable.",
+            "Students must carry their ID card while using library facilities.",
+            "Maintain silence and discipline inside the library.",
+            "Keep your study area clean and tidy.",
+            "Do not damage library furniture, books, or other property.",
+            "Food and beverages are not allowed inside the study area.",
+            "Follow the library's assigned seating arrangements and timings.",
+            "Any damage or loss of library property may attract a penalty.",
+            "Fees once paid are strictly non-refundable and non-adjustable under any circumstances.",
+            "In case of loss of the ID card, a replacement fee of ₹50 will be charged for issuing a new ID card."
+        ];
+
+        const backCard = () => `
+        <article class="back-card">
+            <header class="back-header">
+                <div class="library-name">
+                    PRO LEARNER'S DIGITAL LIBRARY
+                </div>
+                <div class="instructions-title">
+                    GENERAL INSTRUCTIONS
+                </div>
+            </header>
+
+            <ol class="instructions-list">
+                ${instructions.map(item =>
+            `<li>${this.escapeHtml(item)}</li>`
+        ).join("")}
+            </ol>
+        </article>
+    `;
+
+        const cardsPerSheet = 9;
+        const sheets = [];
+
+        for (let i = 0; i < 9; i += cardsPerSheet) {
+
+            const count = Math.min(
+                cardsPerSheet,
+                students.length - i
+            );
+
+            const cards = Array.from(
+                { length: count },
+                () => backCard()
+            ).join("");
+
+            sheets.push(`
+            <section class="back-sheet">
+                <div class="back-grid">
+                    ${cards}
+                </div>
+            </section>
+        `);
+        }
+
+        const printCss = `
+        @page {
+            size: A4 portrait;
+            margin: 5mm 0 0 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 210mm;
+            background: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .back-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 53.98mm);
+            grid-auto-rows: 85.60mm;
+            gap: 3mm;
+            justify-content: center;
+            align-content: start;
+        }
+
+        .back-card {
+            display: flex;
+            flex-direction: column;
+            width: 53.98mm;
+            height: 85.60mm;
+            overflow: hidden;
+            border: .25mm solid #cbd5e1;
+            background: white;
+            color: #172033;
+            break-inside: avoid;
+        }
+
+        .back-header {
+            padding: 5mm 2mm 3mm;
+            color: white;
+            background: #173f7a;
+            text-align: center;
+        }
+
+        .library-name {
+            font-size: 9pt;
+            font-weight: 900;
+        }
+
+        .card-title {
+            margin-top: 2mm;
+            padding-top: 2mm;
+            border-top: .2mm solid white;
+            font-size: 6.5pt;
+            font-weight: 800;
+        }
+
+        .instructions-title {
+            margin-top: 2mm;
+            font-size: 7pt;
+            font-weight: 800;
+        }
+
+        .instructions-list {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: space-evenly;
+            gap: 0.5mm;
+            margin: 0;
+            padding: 3mm 3mm 3mm 7mm;
+            font-size: 4.1pt;
+            line-height: 1.25;
+        }
+
+        .instructions-list li {
+            padding-left: .5mm;
+        }
+    `;
+
+        printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Student ID Card - Back Side</title>
+            <style>${printCss}</style>
+        </head>
+        <body>
+            ${sheets.join("")}
+        </body>
+        </html>
+    `);
+
+        printWindow.document.close();
+
+        printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+        };
     },
 
 
