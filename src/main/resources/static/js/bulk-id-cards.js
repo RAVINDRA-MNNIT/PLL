@@ -931,8 +931,8 @@ const BulkIdCards = {
             return [];
         }
         const totalIds = toId - fromId + 1;
-        if (totalIds > 500) {
-            this.showError("You can generate a maximum of 500 ID cards at a time.");
+        if (totalIds > 50) {
+            this.showError("You can generate a maximum of 50 ID cards at a time.");
             return [];
         }
         return Array.from({ length: totalIds }, (_, index) => fromId + index);
