@@ -1,10 +1,12 @@
 package com.prolearner.all.dto;
 
+import com.prolearner.all.entity.StudentWarning;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,6 +39,7 @@ public class StudentVerificationResponse {
     private String enrollmentStatus;
 
     private Long pendingCount;
+    private List<StudentWarning> warnings;
 
     public StudentVerificationResponse(
             Long studentId,

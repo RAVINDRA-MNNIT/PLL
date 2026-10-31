@@ -690,8 +690,10 @@ public class StudentService {
 
         long pendingCount =
                 approvalRequestRepo.countPendingRequests(studentId);
+        List<StudentWarning> warningList = studentWarningRepo.findByStudentIdOrderByIssuedAtDesc(studentId);
 
         response.setPendingCount(pendingCount);
+        response.setWarnings(warningList);
 
         return response;
     }

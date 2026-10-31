@@ -1,18 +1,15 @@
 package com.prolearner.all.controller;
 import com.prolearner.all.dto.TransactionRequest;
+import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.service.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.prolearner.all.dto.CancelRequestDTO;
 import com.prolearner.all.entity.ApprovalRequest;
 import com.prolearner.all.dto.PendingRequestDTO;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/manager")
@@ -123,5 +120,16 @@ public class ManagerController {
                 requestId,
                 managerId
         );
+    }
+
+    // ====================================================
+    // 🔹 Get Expenses Request
+    // ====================================================
+
+    @GetMapping("/expense")
+    public List<Transaction> expenses(
+            @RequestParam String month
+    ) {
+        return transactionService.getExpenses(month);
     }
 }

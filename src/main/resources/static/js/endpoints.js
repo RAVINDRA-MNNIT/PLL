@@ -129,9 +129,6 @@ window.Endpoints = {
         rejectRequest: `/api/admin/pending/reject`,
         approveRequest: `/api/admin/pending/approve`,
         saveExpense: `/api/admin/expense/save`,
-        getExpense(month) {
-            return `/api/admin/expense?month=${month}`;
-        },
         approveExpense: `/api/admin/expense/approve`,
         rejectExpense: `/api/admin/expense/reject`,
         getDailyIncome(month) {
@@ -184,6 +181,10 @@ window.Endpoints = {
 
         cancel() {
             return `/api/manager/approvalrequest/cancel`;
+        },
+
+        getExpense(month) {
+            return `/api/manager/expense?month=${month}`;
         },
 
         saveExpense: `/api/manager/expense/save`,

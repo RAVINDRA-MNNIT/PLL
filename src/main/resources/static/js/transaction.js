@@ -309,7 +309,7 @@ const Transactions = {
         try {
             Session.isAdmin();
             const month = document.getElementById("incomeMonth").value;
-            this.expenses = await Api.get(Endpoints.admin.getExpense(month));
+            this.expenses = await Api.get(Endpoints.manager.getExpense(month));
             this.renderExpenses(this.expenses);
         } catch (error) {
             console.log(error);

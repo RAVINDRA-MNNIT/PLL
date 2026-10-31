@@ -60,16 +60,6 @@ const VerifyStudent = {
     async getStudentWarning() {
         if (this.currentStudentWarning !== null && this.currentStudentWarning !== []) {
             await this.showAddWarning();
-            return
-        }
-        try {
-            this.currentStudentWarning = await Api.get(Endpoints.students.getStudentWarning(this.currentStudent?.studentId));
-            await this.showAddWarning();
-        } catch (error) {
-            alert(
-                error.message ||
-                "Something went wrong."
-            );
         }
     },
 
@@ -84,7 +74,8 @@ const VerifyStudent = {
         try {
             const student = await Api.get(Endpoints.students.verifyStudent(membershipId));
             this.currentStudent = student;
-            this.currentStudentWarning = null;
+            debugger;
+            this.currentStudentWarning = student.warnings ?? [];
             this.render(student);
         } catch (error) {
             console.error(error);
@@ -114,6 +105,7 @@ const VerifyStudent = {
         if (!result) {
             return;
         }
+        debugger;
         this.setValue("resultLibraryName", getConfigurations()?.LIBRARY_NAME ?? "-");
         this.setValue("resultStudentName", student.fullName ?? "-");
         this.setValue("resultStudentId", student.studentId ?? "-");
@@ -122,6 +114,23 @@ const VerifyStudent = {
         this.setValue("resultTillDate", student.tillDate ? formatDate(student.tillDate) : "-");
         this.setValue("resultMobile", student.mobileNumber ?? "-");
         this.setValue("resultPendingApproval", student.pendingCount ?? "0");
+        const warningCount = this.currentStudentWarning?.length ?? 0;
+
+        this.setValue("resultWarnings", warningCount);
+
+        const warningsRow = document.getElementById("resultWarningsRow");
+
+        if (warningsRow) {
+            const color = warningCount > 0 ? "red" : "#6b7280";
+            warningsRow.querySelectorAll("span, strong").forEach(element => {
+                element.style.setProperty("color", color, "important");
+                element.style.setProperty(
+                    "font-weight",
+                    warningCount > 0 ? "bold" : "normal",
+                    "important"
+                );
+            });
+        }
         const status = String(student.enrollmentStatus ?? "-").toUpperCase();
         const statusElement = document.getElementById("resultStatus");
         if (statusElement) {
