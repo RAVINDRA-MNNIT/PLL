@@ -74,7 +74,6 @@ const VerifyStudent = {
         try {
             const student = await Api.get(Endpoints.students.verifyStudent(membershipId));
             this.currentStudent = student;
-            debugger;
             this.currentStudentWarning = student.warnings ?? [];
             this.render(student);
         } catch (error) {
@@ -105,7 +104,6 @@ const VerifyStudent = {
         if (!result) {
             return;
         }
-        debugger;
         this.setValue("resultLibraryName", getConfigurations()?.LIBRARY_NAME ?? "-");
         this.setValue("resultStudentName", student.fullName ?? "-");
         this.setValue("resultStudentId", student.studentId ?? "-");
@@ -303,23 +301,16 @@ const VerifyStudent = {
         // --------------------------------
         // STATUS
         // --------------------------------
-        if (issues.some(issue => issue.type === "STATUS")) {
-            const status = String(student.enrollmentStatus ?? "").toUpperCase();
-            if ((status === "EXPIRED") || (status === "DISCONTINUED")){
-                actions.push({
-                    type: "UPDATE_FEE",
-                    label: "Update Fee",
-                    icon: "fa-calendar-plus",
-                    className: "primary"
-                });
-            } else {
-                actions.push({
-                    type: "VIEW_DETAILS",
-                    label: "View Details",
-                    icon: "fa-user",
-                    className: "primary"
-                });
-            }
+        const diffDays = getDateDifferenceInDays(new Date(), student.tillDate)
+        const DAYS_BEFORE_NEXT_FEE_SUBMIT = getConfigurations().DAYS_BEFORE_NEXT_FEE_SUBMIT ?? 3
+        const shouldShowUpdateFee = (diffDays <= DAYS_BEFORE_NEXT_FEE_SUBMIT);
+        if (shouldShowUpdateFee) {
+            actions.push({
+                type: "UPDATE_FEE",
+                label: "Update Fee",
+                icon: "fa-calendar-plus",
+                className: "primary"
+            });
         }
 
         // --------------------------------
