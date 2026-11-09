@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.prolearner.all.enums.PendingRequestStatus.APPROVED;
 
@@ -175,6 +172,7 @@ public class TransactionQueryService {
                             dailyProfitCash.add(dailyProfitOnline)
                     );
                 })
+                .sorted(Comparator.comparing(DailyProfit::date).reversed())
                 .toList();
 
         return new ProfitSummary(

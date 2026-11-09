@@ -26,37 +26,19 @@ public class IdCardActivityController {
     @PostMapping("/bulk-id-cards")
     public ResponseEntity<List<BulkIdCardResponse>> getBulkIdCards(
             @RequestBody List<Long> studentIds) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        return ResponseEntity.ok(
-                activityService.getBulkIdCards(studentIds, ownerId)
-        );
+        return ResponseEntity.ok(activityService.getBulkIdCards(studentIds));
     }
 
     @PostMapping("/print-later")
     public ResponseEntity<List<PrintLaterResponse>> saveForLater(
             @Valid @RequestBody BulkPrintLaterRequest request) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        List<PrintLaterResponse> savedIds =
-                activityService.saveForLaterBulk(
-                        request.getStudentIds(),
-                        ownerId
-                );
-
+        List<PrintLaterResponse> savedIds = activityService.saveForLaterBulk(request.getStudentIds());
         return ResponseEntity.ok(savedIds);
     }
 
     @GetMapping("/print-later")
     public ResponseEntity<List<PrintLaterResponse>> getPrintLater() {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        List<PrintLaterResponse> records =
-                activityService.getPrintLaterIds(ownerId);
-
+        List<PrintLaterResponse> records = activityService.getPrintLaterIds();
         return ResponseEntity.ok(records);
     }
 
@@ -67,15 +49,8 @@ public class IdCardActivityController {
     @DeleteMapping("/print-later/{studentId}")
     public ResponseEntity<Map<String, String>> removeSavedStudentId(
             @PathVariable Long studentId) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        activityService.removeSavedStudentId(studentId, ownerId);
-
-        return ResponseEntity.ok(Map.of(
-                "message",
-                "Student ID removed from Print Later successfully."
-        ));
+        activityService.removeSavedStudentId(studentId);
+        return ResponseEntity.ok(Map.of("message", "Student ID removed from Print Later successfully."));
     }
 
     // =========================================================
@@ -84,11 +59,7 @@ public class IdCardActivityController {
     // =========================================================
     @DeleteMapping("/print-later")
     public ResponseEntity<Map<String, Object>> clearAllSavedStudentIds() {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        int clearedCount = activityService.clearAllSavedStudentIds(ownerId);
-
+        int clearedCount = activityService.clearAllSavedStudentIds();
         return ResponseEntity.ok(Map.of(
                 "message",
                 "Saved Student IDs cleared successfully.",
@@ -97,52 +68,24 @@ public class IdCardActivityController {
         ));
     }
 
-    private Long getAuthenticatedOwnerId() {
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null
-                || !authentication.isAuthenticated()
-                || authentication.getPrincipal().equals("anonymousUser")) {
-            throw new org.springframework.security.access.AccessDeniedException(
-                    "User is not authenticated."
-            );
-        }
-
-        return Long.valueOf(authentication.getName());
-    }
-
     // =========================================================
     // GET ALL ID CARD ACTIVITIES FOR AUTHENTICATED OWNER
     // GET /api/id-card-activities
     // =========================================================
     @GetMapping
     public ResponseEntity<List<IdCardActivityResponse>> getAllActivities() {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        List<IdCardActivityResponse> activities =
-                activityService.getAllActivities(ownerId);
-
+        List<IdCardActivityResponse> activities = activityService.getAllActivities();
         return ResponseEntity.ok(activities);
     }
 
     // =========================================================
-// MARK PRINTED — BULK
-// POST /api/id-card-activities/mark-printed/bulk
-// =========================================================
+    // MARK PRINTED — BULK
+    // POST /api/id-card-activities/mark-printed/bulk
+    // =========================================================
     @PostMapping("/mark-printed/bulk")
     public ResponseEntity<Map<String, Object>> markPrintedBulk(
             @Valid @RequestBody BulkPrintLaterRequest request) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        return ResponseEntity.ok(
-                activityService.markPrintedBulk(
-                        request.getStudentIds(),
-                        ownerId
-                )
-        );
+        return ResponseEntity.ok(activityService.markPrintedBulk(request.getStudentIds()));
     }
 
     // =========================================================
@@ -152,15 +95,7 @@ public class IdCardActivityController {
     @PostMapping("/mark-issued/bulk")
     public ResponseEntity<Map<String, Object>> markIssuedBulk(
             @Valid @RequestBody BulkPrintLaterRequest request) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        return ResponseEntity.ok(
-                activityService.markIssuedBulk(
-                        request.getStudentIds(),
-                        ownerId
-                )
-        );
+        return ResponseEntity.ok(activityService.markIssuedBulk(request.getStudentIds()));
     }
 
     // =========================================================
@@ -170,24 +105,13 @@ public class IdCardActivityController {
     @PostMapping("/bulk")
     public ResponseEntity<Map<String, Object>> deleteActivitiesBulk(
             @Valid @RequestBody BulkPrintLaterRequest request) {
-
-        Long ownerId = getAuthenticatedOwnerId();
-
-        return ResponseEntity.ok(
-                activityService.deleteActivitiesBulk(
-                        request.getStudentIds(),
-                        ownerId
-                )
-        );
+        return ResponseEntity.ok(activityService.deleteActivitiesBulk(request.getStudentIds()));
     }
 
     @GetMapping("/{studentId}/id-card-status")
     public ResponseEntity<StudentIdCardStatusResponse> getStudentIdCardStatus(
             @PathVariable Long studentId) {
-
-        StudentIdCardStatusResponse response =
-                activityService.getStudentIdCardStatus(studentId);
-
+        StudentIdCardStatusResponse response = activityService.getStudentIdCardStatus(studentId);
         return ResponseEntity.ok(response);
     }
 

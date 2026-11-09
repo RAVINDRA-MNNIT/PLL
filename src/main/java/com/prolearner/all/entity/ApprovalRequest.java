@@ -181,6 +181,8 @@ public class ApprovalRequest {
     @Column(name = "cancelled_at")
     private OffsetDateTime cancelledAt;
 
+    @Column(name = "requested_by_role", length = 50)
+    private String requestedByRole;
 
     // =========================================================
     // GETTERS
@@ -306,6 +308,8 @@ public class ApprovalRequest {
         return cancelledAt;
     }
 
+    public String getRequestedByRole() { return requestedByRole; }
+
     // =========================================================
     // SETTERS
     // =========================================================
@@ -430,4 +434,5 @@ public class ApprovalRequest {
         this.cancelledAt = cancelledAt;
     }
 
+    public void setRequestedByRole(String requestedByRole) { this.requestedByRole = requestedByRole; }
 }

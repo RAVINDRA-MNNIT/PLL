@@ -29,11 +29,11 @@ public class IdCardActivity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "student_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", referencedColumnName = "student_id", nullable = false)
     private Students student;
 
-    @Column(name = "owner_id", nullable = false)
+    @Column(name = "owner_id", nullable = true)
     private Long ownerId;
 
     @Column(name = "printed_at")

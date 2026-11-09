@@ -3,6 +3,7 @@ import com.prolearner.all.dto.TransactionRequest;
 import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.service.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import com.prolearner.all.dto.CancelRequestDTO;
@@ -41,6 +42,17 @@ public class ManagerController {
         return Long.valueOf(principal.toString());
     }
 
+    private String getLoggedInUserRole(Authentication authentication) {
+        return authentication.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(role -> role.startsWith("ROLE_"))
+                .map(role -> role.substring(5))
+                .findFirst()
+                .orElse(null);
+    }
+
+
     // ====================================================
     // 🔹 Create Request
     // ====================================================
@@ -52,15 +64,12 @@ public class ManagerController {
             Authentication authentication
     ) {
         Long userId = getLoggedInUserId(authentication);
-        return service.create(
-                type,
-                body,
-                userId
-        );
+        String userRole = getLoggedInUserRole(authentication);
+        return service.create(type, body, userId, userRole);
     }
 
     // ====================================================
-    // 🔹 Update Request
+    // UPDATE REQUEST
     // ====================================================
 
     @PutMapping("/approvalrequest/update")
@@ -69,13 +78,9 @@ public class ManagerController {
             Authentication authentication
     ) {
         Long userId = getLoggedInUserId(authentication);
-        return service.update(
-                body.getId(),
-                body,
-                userId
-        );
+        String userRole = getLoggedInUserRole(authentication);
+        return service.update(body.getId(), body, userId, userRole);
     }
-
     // ====================================================
     // 🔹 Cancel Request
     // ====================================================

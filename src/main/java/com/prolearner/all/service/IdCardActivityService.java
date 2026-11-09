@@ -1,3 +1,4 @@
+
 package com.prolearner.all.service;
 
 import com.prolearner.all.dto.BulkIdCardResponse;
@@ -16,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,28 +32,22 @@ public class IdCardActivityService {
         this.studentRepository = studentRepository;
     }
 
+    // =========================================================
+    // GET BULK ID CARDS
+    // =========================================================
     @Transactional
     public List<BulkIdCardResponse> getBulkIdCards(
-            List<Long> studentIds,
-            Long ownerId) {
+            List<Long> studentIds) {
 
         if (studentIds == null || studentIds.isEmpty()) {
             return List.of();
         }
 
-        if (ownerId == null) {
-            throw new IllegalArgumentException(
-                    "Authenticated owner ID is required."
-            );
-        }
-
-        // Remove duplicate Student IDs
         List<Long> uniqueStudentIds = studentIds.stream()
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
 
-        // Fetch students using their business-facing Student IDs
         List<Students> students =
                 studentRepository.findAllByStudentIdIn(uniqueStudentIds);
 
@@ -61,28 +55,23 @@ public class IdCardActivityService {
             return List.of();
         }
 
-        // Find existing activities for this owner and these students
-        List<Long> databaseStudentIds = students.stream()
-                .map(Students::getId)
-                .toList();
-
+        // Find existing shared activities using business Student IDs
         List<IdCardActivity> existingActivities =
-                activityRepository.findAllByOwnerIdAndStudent_IdIn(
-                        ownerId,
-                        databaseStudentIds
+                activityRepository.findAllByStudent_StudentIdIn(
+                        uniqueStudentIds
                 );
 
         Set<Long> existingStudentIds = existingActivities.stream()
-                .map(activity -> activity.getStudent().getId())
+                .map(activity -> activity.getStudent().getStudentId())
                 .collect(Collectors.toSet());
 
         // Create activity records only for students without one
         List<IdCardActivity> newActivities = students.stream()
-                .filter(student -> !existingStudentIds.contains(student.getId()))
+                .filter(student ->
+                        !existingStudentIds.contains(student.getStudentId()))
                 .map(student -> {
                     IdCardActivity activity = new IdCardActivity();
                     activity.setStudent(student);
-                    activity.setOwnerId(ownerId);
                     activity.setPrintLater(false);
                     return activity;
                 })
@@ -92,7 +81,6 @@ public class IdCardActivityService {
             activityRepository.saveAll(newActivities);
         }
 
-        // Return the student details as before
         return students.stream()
                 .map(student -> new BulkIdCardResponse(
                         student.getStudentId(),
@@ -103,10 +91,12 @@ public class IdCardActivityService {
                 .toList();
     }
 
+    // =========================================================
+    // SAVE SELECTED STUDENTS FOR LATER
+    // =========================================================
     @Transactional
     public List<PrintLaterResponse> saveForLaterBulk(
-            List<Long> studentIds,
-            Long ownerId) {
+            List<Long> studentIds) {
 
         if (studentIds == null || studentIds.isEmpty()) {
             throw new IllegalArgumentException(
@@ -114,13 +104,6 @@ public class IdCardActivityService {
             );
         }
 
-        if (ownerId == null) {
-            throw new IllegalArgumentException(
-                    "Authenticated owner ID is required."
-            );
-        }
-
-        // Remove duplicate and null IDs
         List<Long> uniqueStudentIds = studentIds.stream()
                 .filter(Objects::nonNull)
                 .distinct()
@@ -132,12 +115,11 @@ public class IdCardActivityService {
             );
         }
 
-        // Fetch students
         List<Students> students =
-                studentRepository.findAllById(uniqueStudentIds);
+                studentRepository.findAllByStudentIdIn(uniqueStudentIds);
 
         Set<Long> foundStudentIds = students.stream()
-                .map(Students::getId)
+                .map(Students::getStudentId)
                 .collect(Collectors.toSet());
 
         List<Long> missingIds = uniqueStudentIds.stream()
@@ -145,64 +127,60 @@ public class IdCardActivityService {
                 .toList();
 
         if (!missingIds.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Student IDs not found: " + missingIds
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Students not found: " + missingIds
             );
         }
 
-        // Fetch existing activities for this owner
         List<IdCardActivity> existingActivities =
-                activityRepository.findAllByOwnerIdAndStudent_IdIn(
-                        ownerId,
+                activityRepository.findAllByStudent_StudentIdIn(
                         uniqueStudentIds
                 );
 
         Map<Long, IdCardActivity> activityByStudentId =
                 existingActivities.stream()
                         .collect(Collectors.toMap(
-                                activity -> activity.getStudent().getId(),
-                                Function.identity()
+                                activity ->
+                                        activity.getStudent().getStudentId(),
+                                activity -> activity
                         ));
 
         List<IdCardActivity> activitiesToSave = new ArrayList<>();
 
         for (Students student : students) {
 
+            Long businessStudentId = student.getStudentId();
+
             IdCardActivity activity =
-                    activityByStudentId.get(student.getId());
+                    activityByStudentId.get(businessStudentId);
 
             if (activity == null) {
                 activity = new IdCardActivity();
                 activity.setStudent(student);
-                activity.setOwnerId(ownerId);
             }
 
             activity.setPrintLater(true);
             activitiesToSave.add(activity);
         }
 
-        // Save requested IDs
         activityRepository.saveAll(activitiesToSave);
 
-        // Return ALL saved IDs for this owner, including previously saved IDs
-        return activityRepository
-                .findByOwnerIdAndPrintLaterTrueOrderByUpdatedAtDesc(ownerId)
-                .stream()
-                .map(activity -> new PrintLaterResponse(
-                        activity.getStudent().getId(),
-                        activity.getPrintLater()
-                ))
-                .toList();
+        // Return all shared Print Later records
+        return getPrintLaterIds();
     }
 
+    // =========================================================
+    // GET PRINT LATER IDS
+    // =========================================================
     @Transactional(readOnly = true)
-    public List<PrintLaterResponse> getPrintLaterIds(Long ownerId) {
+    public List<PrintLaterResponse> getPrintLaterIds() {
 
         return activityRepository
-                .findByOwnerIdAndPrintLaterTrueOrderByUpdatedAtDesc(ownerId)
+                .findByPrintLaterTrueOrderByUpdatedAtDesc()
                 .stream()
                 .map(activity -> new PrintLaterResponse(
-                        activity.getStudent().getId(),
+                        activity.getStudent().getStudentId(),
                         activity.getPrintLater()
                 ))
                 .toList();
@@ -212,7 +190,8 @@ public class IdCardActivityService {
     // REMOVE ONE SAVED ID
     // =========================================================
     @Transactional
-    public void removeSavedStudentId(Long studentId, Long ownerId) {
+    public void removeSavedStudentId(Long studentId) {
+
         if (studentId == null || studentId <= 0) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -220,12 +199,10 @@ public class IdCardActivityService {
             );
         }
 
-        int updated = activityRepository.removeSavedStudentId(
-                studentId,
-                ownerId
-        );
+        int deleted =
+                activityRepository.removeSavedStudentId(studentId);
 
-        if (updated == 0) {
+        if (deleted == 0) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
                     "Student ID is not saved for later printing."
@@ -234,27 +211,24 @@ public class IdCardActivityService {
     }
 
     // =========================================================
-    // CLEAR ALL SAVED IDS FOR AUTHENTICATED OWNER
+    // DELETE ALL PRINT LATER RECORDS
     // =========================================================
     @Transactional
-    public int clearAllSavedStudentIds(Long ownerId) {
-        return activityRepository.clearSavedStudentIds(ownerId);
+    public int clearAllSavedStudentIds() {
+        return activityRepository.clearSavedStudentIds();
     }
 
+    // =========================================================
+    // GET ALL ACTIVITIES
+    // =========================================================
     @Transactional(readOnly = true)
-    public List<IdCardActivityResponse> getAllActivities(Long ownerId) {
-
-        if (ownerId == null) {
-            throw new IllegalArgumentException(
-                    "Authenticated owner ID is required."
-            );
-        }
+    public List<IdCardActivityResponse> getAllActivities() {
 
         return activityRepository
-                .findByOwnerIdOrderByUpdatedAtDesc(ownerId)
+                .findAllByOrderByUpdatedAtDesc()
                 .stream()
                 .map(activity -> new IdCardActivityResponse(
-                        activity.getStudent().getId(),
+                        activity.getStudent().getStudentId(),
                         activity.getPrintLater(),
                         activity.getPrintedAt(),
                         activity.getIssuedAt(),
@@ -264,48 +238,43 @@ public class IdCardActivityService {
                 .toList();
     }
 
-
     // =========================================================
     // MARK SELECTED CARDS AS PRINTED
     // =========================================================
     @Transactional
     public Map<String, Object> markPrintedBulk(
-            List<Long> studentIds,
-            Long ownerId) {
+            List<Long> studentIds) {
 
         List<IdCardActivity> activities =
-                getRequestedActivities(studentIds, ownerId);
+                getRequestedActivities(studentIds);
 
         LocalDateTime activityNow = LocalDateTime.now();
         OffsetDateTime studentNow = OffsetDateTime.now();
+
         List<Long> updatedIds = new ArrayList<>();
         List<Long> skippedIds = new ArrayList<>();
-
         List<Students> updatedStudents = new ArrayList<>();
 
         for (IdCardActivity activity : activities) {
 
             Students student = activity.getStudent();
+            Long businessStudentId = student.getStudentId();
 
             if (activity.getIssuedAt() != null) {
-                // Never downgrade an already issued card.
-                skippedIds.add(student.getId());
+                skippedIds.add(businessStudentId);
                 continue;
             }
 
-            // Update ID card activity
             activity.setPrintedAt(activityNow);
             activity.setUpdatedAt(activityNow);
 
-            // Update student table
             student.setIdCardStatus("PRINTED");
             student.setCardPrintedAt(studentNow);
 
             updatedStudents.add(student);
-            updatedIds.add(student.getId());
+            updatedIds.add(businessStudentId);
         }
 
-        // Save both tables
         activityRepository.saveAll(activities);
         studentRepository.saveAll(updatedStudents);
 
@@ -319,46 +288,42 @@ public class IdCardActivityService {
     }
 
     // =========================================================
-// MARK SELECTED CARDS AS ISSUED
-// =========================================================
+    // MARK SELECTED CARDS AS ISSUED
+    // =========================================================
     @Transactional
     public Map<String, Object> markIssuedBulk(
-            List<Long> studentIds,
-            Long ownerId) {
+            List<Long> studentIds) {
 
         List<IdCardActivity> activities =
-                getRequestedActivities(studentIds, ownerId);
+                getRequestedActivities(studentIds);
 
         LocalDateTime activityNow = LocalDateTime.now();
         OffsetDateTime studentNow = OffsetDateTime.now();
+
         List<Long> updatedIds = new ArrayList<>();
         List<Long> skippedIds = new ArrayList<>();
-
         List<Students> updatedStudents = new ArrayList<>();
 
         for (IdCardActivity activity : activities) {
 
             Students student = activity.getStudent();
+            Long businessStudentId = student.getStudentId();
 
-            // A card must be printed before it can be issued.
             if (activity.getPrintedAt() == null) {
-                skippedIds.add(student.getId());
+                skippedIds.add(businessStudentId);
                 continue;
             }
 
-            // Update ID card activity
             activity.setIssuedAt(activityNow);
             activity.setUpdatedAt(activityNow);
 
-            // Update student table
             student.setIdCardStatus("ISSUED");
             student.setCardIssuedAt(studentNow);
 
             updatedStudents.add(student);
-            updatedIds.add(student.getId());
+            updatedIds.add(businessStudentId);
         }
 
-        // Save both tables
         activityRepository.saveAll(activities);
         studentRepository.saveAll(updatedStudents);
 
@@ -372,24 +337,26 @@ public class IdCardActivityService {
     }
 
     // =========================================================
-// DELETE SELECTED ACTIVITY RECORDS
-// =========================================================
+    // DELETE SELECTED ACTIVITY RECORDS
+    // =========================================================
     @Transactional
     public Map<String, Object> deleteActivitiesBulk(
-            List<Long> studentIds,
-            Long ownerId) {
+            List<Long> studentIds) {
 
         List<IdCardActivity> activities =
-                getRequestedActivities(studentIds, ownerId);
+                getRequestedActivities(studentIds);
 
         List<Long> deletedIds = activities.stream()
-                .map(activity -> activity.getStudent().getId())
+                .map(activity -> activity.getStudent().getStudentId())
                 .toList();
 
         activityRepository.deleteAll(activities);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Selected activity records deleted successfully.");
+        result.put(
+                "message",
+                "Selected activity records deleted successfully."
+        );
         result.put("deletedCount", deletedIds.size());
         result.put("deletedStudentIds", deletedIds);
 
@@ -397,18 +364,10 @@ public class IdCardActivityService {
     }
 
     // =========================================================
-// VALIDATE AND FETCH ACTIVITIES FOR CURRENT OWNER
-// =========================================================
+    // VALIDATE AND FETCH ACTIVITIES BY STUDENT IDs
+    // =========================================================
     private List<IdCardActivity> getRequestedActivities(
-            List<Long> studentIds,
-            Long ownerId) {
-
-        if (ownerId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Authenticated owner ID is required."
-            );
-        }
+            List<Long> studentIds) {
 
         if (studentIds == null || studentIds.isEmpty()) {
             throw new ResponseStatusException(
@@ -430,13 +389,10 @@ public class IdCardActivityService {
                 .toList();
 
         List<IdCardActivity> activities =
-                activityRepository.findAllByOwnerIdAndStudent_IdIn(
-                        ownerId,
-                        uniqueIds
-                );
+                activityRepository.findAllByStudent_StudentIdIn(uniqueIds);
 
         Set<Long> foundIds = activities.stream()
-                .map(activity -> activity.getStudent().getId())
+                .map(activity -> activity.getStudent().getStudentId())
                 .collect(Collectors.toSet());
 
         List<Long> missingIds = uniqueIds.stream()
@@ -446,17 +402,23 @@ public class IdCardActivityService {
         if (!missingIds.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND,
-                    "Activity records not found for this owner: " + missingIds
+                    "Activity records not found for Student IDs: " + missingIds
             );
         }
 
         return activities;
     }
 
-    public StudentIdCardStatusResponse getStudentIdCardStatus(Long studentId) {
+    // =========================================================
+    // GET STUDENT ID CARD STATUS
+    // =========================================================
+    @Transactional(readOnly = true)
+    public StudentIdCardStatusResponse getStudentIdCardStatus(
+            Long studentId) {
 
         Students student = studentRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new RuntimeException(
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
                         "Student not found with ID: " + studentId
                 ));
 

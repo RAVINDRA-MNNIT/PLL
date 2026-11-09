@@ -135,6 +135,7 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
         ar.status AS "status",
         ar.requested_at AS "requestedAt",
         ar.requested_by AS "requestedBy",
+        ar.requested_by_role AS "requestedByRole",
         ar.reviewed_by AS "reviewedBy",
         ar.reviewed_at AS "reviewedAt",
         ar.cancelled_at AS "cancelledAt",

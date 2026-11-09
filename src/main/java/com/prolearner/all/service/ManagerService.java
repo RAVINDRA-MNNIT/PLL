@@ -27,8 +27,10 @@ public class ManagerService {
     public ApprovalRequest create(
             String typeStr,
             PendingRequestDTO body,
-            Long userId) {
-        return commandService.create(typeStr, body, userId);
+            Long userId,
+            String role
+    ) {
+        return commandService.create(typeStr, body, userId, role);
     }
 
     // ====================================================
@@ -38,8 +40,10 @@ public class ManagerService {
     public ApprovalRequest update(
             Long id,
             PendingRequestDTO body,
-            Long userId) {
-        return commandService.update(id, body, userId);
+            Long userId,
+            String role
+    ) {
+        return commandService.update(id, body, userId, role);
     }
 
     // ====================================================

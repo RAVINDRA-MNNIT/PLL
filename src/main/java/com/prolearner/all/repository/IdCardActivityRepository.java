@@ -1,77 +1,55 @@
+
 package com.prolearner.all.repository;
+
 import com.prolearner.all.entity.IdCardActivity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface IdCardActivityRepository
         extends JpaRepository<IdCardActivity, Long> {
 
-    // Find a student's activity record for a particular owner
-    Optional<IdCardActivity> findByStudent_IdAndOwnerId(
-            Long studentId,
-            Long ownerId
+    // =========================================================
+    // GET ALL PRINT LATER RECORDS
+    // =========================================================
+    List<IdCardActivity> findByPrintLaterTrueOrderByUpdatedAtDesc();
+
+    // =========================================================
+    // GET ALL ACTIVITY RECORDS
+    // =========================================================
+    List<IdCardActivity> findAllByOrderByUpdatedAtDesc();
+
+    // =========================================================
+    // FIND ACTIVITIES USING BUSINESS-FACING STUDENT IDs
+    // =========================================================
+    List<IdCardActivity> findAllByStudent_StudentIdIn(
+            List<Long> studentIds
     );
 
-    // Get all Print Later records for an owner
-    List<IdCardActivity> findByOwnerIdAndPrintLaterTrueOrderByUpdatedAtDesc(
-            Long ownerId
-    );
-
-    // Check whether the student already has a record for this owner
-    boolean existsByStudent_IdAndOwnerId(
-            Long studentId,
-            Long ownerId
-    );
-
-    // Get all ID card activity records belonging to an owner
-    List<IdCardActivity> findByOwnerId(Long ownerId);
-
-    // Delete one owner's Print Later record for a student
-    void deleteByStudent_IdAndOwnerId(
-            Long studentId,
-            Long ownerId
-    );
-
-    List<IdCardActivity> findAllByOwnerIdAndStudent_IdIn(Long ownerId, List<Long> uniqueStudentIds);
-    List<IdCardActivity> findByOwnerIdOrderByUpdatedAtDesc(Long ownerId);
-
+    // =========================================================
+    // DELETE ONE PRINT LATER RECORD
+    // =========================================================
     @Modifying
     @Query("""
-        UPDATE IdCardActivity a
-        SET a.printLater = false
-        WHERE a.student.id = :studentId
-          AND a.ownerId = :ownerId
+        DELETE FROM IdCardActivity a
+        WHERE a.student.studentId = :studentId
           AND a.printLater = true
         """)
     int removeSavedStudentId(
-            @Param("studentId") Long studentId,
-            @Param("ownerId") Long ownerId
+            @Param("studentId") Long studentId
     );
 
+    // =========================================================
+    // DELETE ALL PRINT LATER RECORDS
+    // =========================================================
     @Modifying
     @Query("""
-        UPDATE IdCardActivity a
-        SET a.printLater = false
-        WHERE a.ownerId = :ownerId
-          AND a.printLater = true
+        DELETE FROM IdCardActivity a
+        WHERE a.printLater = true
         """)
-    int clearSavedStudentIds(
-            @Param("ownerId") Long ownerId
-    );
-
-    List<IdCardActivity> findAllByOwnerIdAndStudent_IdIn(
-            Long ownerId,
-            Collection<Long> studentIds
-    );
-
-    void deleteAllByOwnerIdAndStudent_IdIn(
-            Long ownerId,
-            Collection<Long> studentIds
-    );
+    int clearSavedStudentIds();
 }

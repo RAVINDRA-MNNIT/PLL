@@ -47,7 +47,8 @@ public class ManagerCommandService {
     public ApprovalRequest create(
             String typeStr,
             PendingRequestDTO body,
-            Long userId
+            Long userId,
+            String role
     ) {
 
         RequestType type = RequestType.from(typeStr);
@@ -62,7 +63,7 @@ public class ManagerCommandService {
                 );
             }
             studentIdService.deleteOldAdmissionRequest(allocation.getReusableStudentId());
-            return admissionSubmit(newRequest, body, allocation.getStudentId(), userId);
+            return admissionSubmit(newRequest, body, allocation.getStudentId(), userId, role);
         } else if (type == RequestType.DETAILS) {
             newRequest.setFullName(body.getFullName());
             newRequest.setMobile(body.getMobileNumber());
@@ -82,7 +83,7 @@ public class ManagerCommandService {
             if (body.getPermanentAddress() != null) {
                 newRequest.setPermanentAddress(body.getPermanentAddress());
             }
-            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.SEAT) {
             Students student = studentRepo.findByStudentId(body.getStudentId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -92,13 +93,13 @@ public class ManagerCommandService {
             }
             seatService.updateSeat(null, body.getSeatId(), body.getStudentId());
             newRequest.setSeatId(body.getSeatId());
-            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.ENROLLMENT) {
             newRequest.setEnrollmentStatus(body.getEnrollmentStatus());
             newRequest.setRemarks(body.getRemarks());
-            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.FEES) {
-            return handleFees(newRequest, body, type, userId, false);
+            return handleFees(newRequest, body, type, userId, role, false);
         } else if (type == RequestType.BATCH) {
             newRequest.setBatchId(body.getBatchId());
             newRequest.setSeatId(body.getSeatId());
@@ -114,7 +115,7 @@ public class ManagerCommandService {
                 newRequest.setRemarks(body.getRemarks());
             }
             newRequest.setPaymentMode(body.getPaymentMode());
-            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.PENDING_FEES) {
             Students student = studentRepo.findByStudentId(body.getStudentId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -125,7 +126,7 @@ public class ManagerCommandService {
             newRequest.setPendingAmount(BigDecimal.ZERO);
             newRequest.setTransactionId(body.getTransactionId());
             newRequest.setRemarks(body.getRemarks());
-            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, false);
+            return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         }
         else {
             throw new IllegalStateException("Only Admission, Seat, Details and Enrollment update handled");
@@ -139,7 +140,8 @@ public class ManagerCommandService {
     public ApprovalRequest update(
             Long id,
             PendingRequestDTO body,
-            Long userId
+            Long userId,
+            String role
     ) {
         ApprovalRequest r = approvalRequestRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Request not found"));
@@ -155,9 +157,9 @@ public class ManagerCommandService {
                     );
                 }
             }
-            return admissionSubmit(r, body, null, userId);
+            return admissionSubmit(r, body, null, userId, role);
         } else if (r.getRequestType() == RequestType.FEES) {
-            return handleFees(r, body, RequestType.FEES, userId, true);
+            return handleFees(r, body, RequestType.FEES, userId, role,true);
         }
         else {
             throw new IllegalStateException("Only Admission handled");
@@ -202,15 +204,21 @@ public class ManagerCommandService {
     public ApprovalRequest admissionSubmit(ApprovalRequest request,
                                            PendingRequestDTO body,
                                            Long studentId,
-                                           Long userId) {
+                                           Long userId,
+                                           String role) {
         Long previousSeatId = request.getSeatId();
         // Request metadata
         request.setRequestType(RequestType.ADMISSION);
         if (studentId != null) {
             request.setStudentId(studentId);
         }
+        if (request.getRequestedBy() == null) {
+            request.setRequestedBy(userId);
+        }
+        if (request.getRequestedByRole() == null || request.getRequestedByRole().isEmpty()) {
+            request.setRequestedByRole(role);
+        }
         request.setStatus(PendingRequestStatus.PENDING);
-        request.setRequestedBy(userId);
         request.setRequestedAt(OffsetDateTime.now());
         // STUDENT
         request.setFullName(body.getFullName());
@@ -259,6 +267,7 @@ public class ManagerCommandService {
                                                                    RequestType requestType,
                                                                    Long studentId,
                                                                    Long userId,
+                                                                   String role,
                                                                    Boolean isUpdateRequest) {
         if (isUpdateRequest == false) {
             ApprovalRequest oldRequest = approvalRequestRepo.findByStudentIdAndRequestTypeAndStatus(studentId, requestType, PendingRequestStatus.PENDING);
@@ -266,15 +275,20 @@ public class ManagerCommandService {
                 throw new IllegalStateException("A request related to this student is already in pending!, \n\nyou can cancel that to create new one or ask admin to approve/reject that.");
             }
         }
+        if (request.getRequestedBy() == null) {
+            request.setRequestedBy(userId);
+        }
+        if (request.getRequestedByRole() == null || request.getRequestedByRole().isEmpty()) {
+            request.setRequestedByRole(role);
+        }
         request.setRequestType(requestType);
         request.setStudentId(studentId);
         request.setStatus(PendingRequestStatus.PENDING);
-        request.setRequestedBy(userId);
         request.setRequestedAt(OffsetDateTime.now());
         return approvalRequestRepo.save(request);
     }
 
-    public ApprovalRequest handleFees(ApprovalRequest request, PendingRequestDTO body, RequestType type, Long userId, Boolean isUpdateRequest) {
+    public ApprovalRequest handleFees(ApprovalRequest request, PendingRequestDTO body, RequestType type, Long userId, String role, Boolean isUpdateRequest) {
         Students student = studentRepo.findByStudentId(body.getStudentId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         FeeRecord lastFee = student.getLastFee();
@@ -301,6 +315,6 @@ public class ManagerCommandService {
         request.setTransactionId(body.getTransactionId());
         request.setRemarks(body.getRemarks());
         
-        return handleCommonRequestParamForUpdate(request, type, body.getStudentId(), userId, isUpdateRequest);
+        return handleCommonRequestParamForUpdate(request, type, body.getStudentId(), userId, role ,isUpdateRequest);
     }
 }

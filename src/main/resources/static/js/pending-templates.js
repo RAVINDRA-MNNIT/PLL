@@ -95,7 +95,7 @@ window.PendingTemplates = {
                 </td>
                 <td>₹${item.discount ?? 0}</td>
                 <td>₹${item.pendingAmount ?? 0}</td>
-                <td>${item.requestedBy ?? "-"}</td>
+                <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>${actions}</td>
             </tr>
@@ -133,7 +133,7 @@ window.PendingTemplates = {
                 <td>${(item.lastFullName ?? "-").toUpperCase()}</td>
                 <td>${item.lastFeeSeatNumber ?? "-"}</td>
                 <td>${item.seatNumber ?? "-"}</td>
-                <td>${item.requestedBy ?? "-"}</td>
+                <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>${actions}</td>
             </tr>
@@ -169,7 +169,7 @@ window.PendingTemplates = {
                 </td>
                 <td>${this.formatDetails(item.lastFullName?.toUpperCase(), item.lastMobileNumber, item.lastGuardianNumber, item.lastDateOfBirth, item.lastFatherName, item.lastAadhaarNumber, item.lastLocalAddress, item.lastPermanentAddress)}</td>
                 <td>${this.formatDetails(item.fullName?.toUpperCase(), item.mobileNumber, item.guardianNumber, item.dateOfBirth, item.fatherName, item.aadhaarNumber, item.localAddress, item.permanentAddress)}</td>
-                <td>${item.requestedBy ?? "-"}</td>
+                <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>${actions}</td>
             </tr>
@@ -209,7 +209,7 @@ window.PendingTemplates = {
                 <td>${this.renderStatus(item.lastEnrollmentStatus)}</td>
                 <td>${this.renderStatus(item.enrollmentStatus)}</td>
                 <td>${this.formatDate(item.lastFeeTillDate)}</td>
-                <td>${item.requestedBy ?? "-"}</td>
+                <td>${this.getRequestedByDisplay(item)}</td>
                 <td>${renderRequestedAt(item.requestedAt)}</td>
                 <td>${actions}</td>
             </tr>
@@ -251,7 +251,7 @@ window.PendingTemplates = {
                 ${item.paymentMode ?? "-"}
                 ${item.transactionId ? `<br>${item.transactionId}` : ""}
             </td>
-            <td>${item.requestedBy ?? "-"}</td>
+            <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
                 <div class="remarks">${item.remarks ?? "-"}</div>  
@@ -305,7 +305,7 @@ window.PendingTemplates = {
                 ${item.paymentMode ?? "-"}
                 ${item.transactionId ? `<br>${item.transactionId}` : ""}
             </td>
-            <td>${item.requestedBy ?? "-"}</td>
+            <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
                 <div class="remarks">${item.remarks ?? "-"}</div>  
@@ -491,5 +491,22 @@ renderStatus(status) {
 
     viewRequestData(comment) {
         alert(comment)
+    },
+
+    getRequestedByDisplay(item) {
+        const role = item.requestedByRole;
+        const id = item.requestedBy ?? '-';
+        // For any other role, show the role followed by the name in brackets
+        debugger;
+        if (item.requestedBy === Session.getUserId()) {
+            return `<div>You</div>`;
+        } else {
+            if (role.toUpperCase() === "STUDENT") {
+                return `<div>${id}</div>`;
+            }
+            else {
+                return `<div>${role}</div> <div>(${id})</div>`;
+            }
+        }
     }
 };
