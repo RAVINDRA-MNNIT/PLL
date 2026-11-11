@@ -307,6 +307,8 @@ SELECT
     ar.id AS "requestId",
     ar.student_id AS "studentId",
     ar.request_type AS "requestType",
+    ar.requested_by AS "requestedBy",
+    ar.requested_by_role AS "requestedByRole",
     ar.status,
     ar.remarks,
     concat_ws('\n',

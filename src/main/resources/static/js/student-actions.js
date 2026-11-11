@@ -248,9 +248,10 @@ window.StudentActionsUI = {
                         <td>${r.batchName ?? "-"}</td>
                         <td>${r.seatNumber ?? "-"}</td>
                         <td>
-                            ${formatDate(r.fromDate)}<br>
+                            ${formatDate(r.tillDate)}<br>
                             <small>to</small><br>
-                            ${formatDate(r.tillDate)}
+                            ${formatDate(r.fromDate)}
+                            
                         </td>
                         <td>${r.paymentMode ?? "-"}</td>
                         ${

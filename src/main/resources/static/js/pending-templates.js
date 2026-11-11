@@ -324,6 +324,7 @@ window.PendingTemplates = {
                 <th>Student ID</th>
                 <th>Request Data</th>
                 <th>Request Type</th>
+                <th>Requested By</th>
                 <th>Requested At</th>
                 <th>Remark</th>
                 <th>Requested Status</th>
@@ -352,6 +353,7 @@ allRow(item, actions)
             </td>
 
             <td>${item.requestType || "-"}</td>
+            <td>${this.getRequestedByDisplay(item)}</td>
             <td>${renderRequestedAt(item.requestedAt)}</td>
             <td>
                 <div class="remarks">${item.remarks ?? "-"}</div>  
