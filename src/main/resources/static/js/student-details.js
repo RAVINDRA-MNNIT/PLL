@@ -41,16 +41,14 @@ initialize() {
     async loadStudent(studentId) {
         await Session.loadCurrentUser();
         if (Session.getUser() == null) {
-            await Api.postWithoutResponse(Endpoints.auth.logout);
-            window.location.href = "/student.html";
+            await Session.logout();
             return
         }
         else if (Session.isStudent()) {
             const loggedInStudentId = Number(Session.getUserId());
             const requestedStudentId = Number(studentId);
             if (loggedInStudentId !== requestedStudentId) {
-                await Api.postWithoutResponse(Endpoints.auth.logout);
-                window.location.href = "/student.html";
+                await Session.logout();
                 return;
             }
         }
@@ -107,8 +105,7 @@ initialize() {
             icon.className = "fa-solid fa-right-from-bracket";
             text.textContent = "Logout";
             btn.onclick = async () => {
-                await Api.postWithoutResponse(Endpoints.auth.logout);
-                window.location.href = "/student.html";
+                await Session.logout();
             };
         } else {
             dob = formatDate(student.dateOfBirth);

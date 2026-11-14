@@ -6,7 +6,6 @@
 document.addEventListener("DOMContentLoaded", initializeManager);
 
 async function initializeManager() {
-
     try {
         // ==========================
         // Authentication
@@ -19,6 +18,7 @@ async function initializeManager() {
         }
 
         if (!Session.requireRole("MANAGER")) {
+            await Session.logout();
             return;
         }
 

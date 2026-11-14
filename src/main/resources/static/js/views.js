@@ -159,7 +159,7 @@ async function loadPendingApprovalSubview() {
         );
 
         if (response.status === 401) {
-            redirectToLogin();
+            Session.redirectToLogin();
             return;
         }
 

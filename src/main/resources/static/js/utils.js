@@ -6,11 +6,6 @@
 /**
  * Redirect to login page.
  */
-function redirectToLogin() {
-
-    window.location.replace("/login.html");
-
-}
 
 /**
  * Escape HTML.
@@ -133,31 +128,6 @@ function formatCurrency(amount) {
 
 }
 
-/**
- * GET request returning JSON.
- */
-async function fetchJson(url) {
-
-    const response = await fetch(url, {
-        method: "GET",
-        credentials: "same-origin",
-        cache: "no-store"
-    });
-
-    if (response.status === 401) {
-        redirectToLogin();
-        return null;
-    }
-
-    if (!response.ok) {
-        throw new Error(
-            `HTTP ${response.status}`
-        );
-    }
-
-    return await response.json();
-
-}
 
 /**
  * GET request returning HTML.
@@ -171,7 +141,7 @@ async function fetchHtml(url) {
     });
 
     if (response.status === 401) {
-        redirectToLogin();
+        Session.redirectToLogin();
         return null;
     }
 

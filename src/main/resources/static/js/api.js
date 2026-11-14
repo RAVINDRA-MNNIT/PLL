@@ -49,16 +49,7 @@ window.Api = {
                 localStorage.removeItem("currentUser");
 
                 // Clear frontend session if available
-                if (window.Session) {
-                    window.Session.clear();
-                }
-
-                // Don't redirect if already on login page
-                if (!window.location.pathname.endsWith("/login.html")) {
-
-                    window.location.replace("/login.html");
-
-                }
+                Session.redirectToLogin();
 
                 throw new Error(
                     "Your session has expired. Please login again."

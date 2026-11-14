@@ -11,13 +11,13 @@ async function initializeAdmin() {
         // Authentication
         // ==========================
         const user = await Session.loadCurrentUser();
-
         if (!user) {
             Session.redirectToLogin();
             return;
         }
 
-        if (!Session.requireRole("ADMIN")) {
+        if (!Session.isAdmin()) {
+            await Session.logout();
             return;
         }
 
