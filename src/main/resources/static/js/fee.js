@@ -8,6 +8,7 @@ window.FeeForm = {
     allowedDiscount: null,
     currentBatchId: null,
     requestedBy: null,
+    availableBalance: null,
 
     setStudent(id) {
         this.studentId = id;
@@ -85,6 +86,12 @@ window.FeeForm = {
     },
 
   populate(data) {
+        debugger;
+        if (data.availableBalance > 0) {
+            if(confirm(`This student has available balance of ₹${data.availableBalance}, Do you want to adjust this in fees?`)) {
+                this.availableBalance = data.availableBalance;
+            }
+        }
       this.requestedBy = data.requestedBy;
       this.currentPending = Number(data.pendingAmount ?? 0);
       this.prevPending = Number(data.lastFeePendingAmount ?? 0);
@@ -136,7 +143,7 @@ window.FeeForm = {
           document.getElementById("pendingAmountGroup").style.display = "none";
       }
     document.getElementById("pendingAmount").value = data.pendingAmount ?? "";
-    FeeForm.allowedDiscount = data.allowedDiscount ?? 0;
+    FeeForm.allowedDiscount = (data.allowedDiscount ?? 0);
     document.getElementById("paymentMode").value = this.isEdit() ? (data.paymentMode ?? "CASH") : "CASH";
       document.getElementById("onlineAmount").value = data.onlineAmount ?? "0";
       document.getElementById("transactionId").value = FeeForm.isEdit() ? (data.transactionId ?? "") : "";
@@ -311,6 +318,7 @@ window.FeeForm = {
         this.currentFrom = null;
         this.currentTill = null;
         this.currentPending = null;
+        this.availableBalance = null;
     },
 
     //////////////////////////////////////////////////////
@@ -325,11 +333,11 @@ window.FeeForm = {
         const pending = Number(document.getElementById("pendingAmount")?.value || 0);
         const submittedAmount = document.getElementById("submittedAmount");
         const membershipDays = calculateMembershipDays(fromDate, tillDate);
-
+debugger;
         if (FeeForm.currentBatchId !== batchId) {
-            document.getElementById("discount").value = 0;
+            document.getElementById("discount").value = FeeForm.availableBalance ?? 0;
         } else {
-            document.getElementById("discount").value = calculateTotalFee(FeeForm.allowedDiscount, membershipDays);
+            document.getElementById("discount").value = calculateTotalFee(FeeForm.allowedDiscount, membershipDays) + FeeForm.availableBalance ?? 0;
         }
         const discount = Number(document.getElementById("discount")?.value || 0);
         if (!batch || !submittedAmount) {
@@ -353,6 +361,16 @@ window.FeeForm = {
         const finalAmount = Math.max(0, (totalFee - (discount + pending)));
         submittedAmount.value = Math.round(finalAmount);
         FeeForm.calculateSplitPayment();
+
+        if (FeeForm.availableBalance > 0) {
+            document.getElementById("paymentRemarks").value = `Adjustments:-
+            Previous Pending: ₹${prevPending}
+            Current Pending Amount: ₹${currentPendingAmount}
+            Total Fee according to membership duration: ₹${totalFee}
+            Previous Available Balance Adjusted: ₹${FeeForm.availableBalance}
+            Submitted Amount: ₹${Math.round(finalAmount)}
+            Note:- All available balance will be exhausted in this transaction after that available amount for this student will be 0`;
+        }
     },
 
     calculateSplitPayment() {
@@ -537,7 +555,7 @@ function validateFeeForm() {
         }
     }
     // Pay Amount
-    if (payAmount <= 0) {
+    if (payAmount <= 0 && (FeeForm.availableBalance == null || FeeForm.availableBalance <=0)) {
         errors.push("Please enter a valid Submitted Amount.");
     }
     if (discount < 0) {

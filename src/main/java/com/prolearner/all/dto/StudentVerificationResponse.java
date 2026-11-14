@@ -17,6 +17,7 @@ public class StudentVerificationResponse {
     private String mobileNumber;
 
     private BigDecimal allowedDiscount;
+    private BigDecimal availableBalance;
 
     private Long batchId;
     private String batchName;
@@ -46,6 +47,7 @@ public class StudentVerificationResponse {
             String fullName,
             String mobileNumber,
             BigDecimal allowedDiscount,
+            BigDecimal availableBalance,
             Long batchId,
             String batchName,
             String batchAlias,
@@ -66,7 +68,7 @@ public class StudentVerificationResponse {
         this.mobileNumber = mobileNumber;
 
         this.allowedDiscount = allowedDiscount;
-
+        this.availableBalance = availableBalance;
         this.batchId = batchId;
         this.batchName = batchName;
         this.batchAlias = batchAlias;

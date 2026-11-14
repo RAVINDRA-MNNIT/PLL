@@ -2,6 +2,8 @@ package com.prolearner.all.controller;
 import com.prolearner.all.dto.TransactionRequest;
 import com.prolearner.all.entity.Transaction;
 import com.prolearner.all.service.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 import com.prolearner.all.dto.CancelRequestDTO;
 import com.prolearner.all.entity.ApprovalRequest;
 import com.prolearner.all.dto.PendingRequestDTO;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/manager")
@@ -136,5 +140,14 @@ public class ManagerController {
             @RequestParam String month
     ) {
         return transactionService.getExpenses(month);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalStateException(
+            IllegalStateException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
     }
 }

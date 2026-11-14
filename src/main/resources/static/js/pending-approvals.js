@@ -277,15 +277,35 @@ async viewEdit(requestId) {
 
     async approveRequest(id) {
         const pendingRow = this.pendingRowsData.find(row => row.requestId === id);
+        var adjustmentAmount = 0;
         if (!pendingRow) {
             console.error("Pending row not found");
         }
         const from = new Date(pendingRow.fromDate);
         const till = new Date(pendingRow.tillDate);
         const diffInDays = Math.floor((till - from) / (1000 * 60 * 60 * 24));
-
+debugger;
         const warnings = [];
-        if (pendingRow.requestType == "FEES") {
+        if (pendingRow.requestType === "ENROLLMENT") {
+            const lastFeeTillDate = new Date(pendingRow.lastFeeTillDate);
+            const requestedAt = new Date(pendingRow.requestedAt);
+            if (lastFeeTillDate > requestedAt) {
+                const diffDays = getDateDifferenceInDays(requestedAt, lastFeeTillDate)
+                if (diffDays > 10) {
+                    const totalMembershipDays = calculateMembershipDays(pendingRow.lastFeeFromDate, pendingRow.lastFeeTillDate)
+                    const perDayFee = (pendingRow.lastFeeSubmittedAmount ?? 0) / totalMembershipDays;
+                    const totalAmountLeft = Math.round(diffDays * perDayFee);
+                    var message = `Do you want to add future adjustment amount ₹${totalAmountLeft} for this student?`
+                    if (pendingRow.adjustmentAmount > 0) {
+                        message = `We have a request to adjustment of amount, Do you want to add future adjustment amount ₹${totalAmountLeft} for this student?`
+                    }
+                    if (confirm(message)) {
+                        adjustmentAmount = totalAmountLeft;
+                    }
+                }
+            }
+        }
+        if (pendingRow.requestType === "FEES") {
             if(checkIsPastDate(pendingRow.tillDate)) {
                 warnings.push("⚠️ Warning!\nThe selected Till Date has already passed.");
             }
@@ -324,7 +344,10 @@ async viewEdit(requestId) {
 
         if (!confirm("Approve this request?")) return;
         try {
-            await Api.post(Endpoints.admin.approveRequest, id);
+            await Api.post(
+                Endpoints.admin.approveRequest(id, adjustmentAmount)
+            );
+
             await this.refresh();
         } catch (e) {
             alert(e);

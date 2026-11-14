@@ -9,6 +9,7 @@ public record StudentListItem(
         String fullName,
         String mobileNumber,
         BigDecimal allowedDiscount,
+        BigDecimal availableBalance,
         Long batchId,
         String batchName,
         Long seatId,

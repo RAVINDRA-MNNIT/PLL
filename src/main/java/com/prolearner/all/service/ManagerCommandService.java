@@ -66,7 +66,7 @@ public class ManagerCommandService {
             return admissionSubmit(newRequest, body, allocation.getStudentId(), userId, role);
         } else if (type == RequestType.DETAILS) {
             newRequest.setFullName(body.getFullName());
-            newRequest.setMobile(body.getMobileNumber());
+            newRequest.setMobileNumber(body.getMobileNumber());
             newRequest.setGuardianNumber(body.getGuardianNumber());
             if (body.getDateOfBirth() != null) {
                 newRequest.setDateOfBirth(body.getDateOfBirth());
@@ -96,6 +96,7 @@ public class ManagerCommandService {
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.ENROLLMENT) {
             newRequest.setEnrollmentStatus(body.getEnrollmentStatus());
+            newRequest.setAdjustmentAmount(body.getAdjustmentAmount());
             newRequest.setRemarks(body.getRemarks());
             return handleCommonRequestParamForUpdate(newRequest, type, body.getStudentId(), userId, role, false);
         } else if (type == RequestType.FEES) {
@@ -223,7 +224,7 @@ public class ManagerCommandService {
         // STUDENT
         request.setFullName(body.getFullName());
         request.setDateOfBirth(body.getDateOfBirth());
-        request.setMobile(body.getMobileNumber());
+        request.setMobileNumber(body.getMobileNumber());
         request.setGuardianNumber(body.getGuardianNumber());
         request.setFatherName(body.getFatherName());
         // ADDRESS

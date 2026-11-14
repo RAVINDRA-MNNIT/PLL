@@ -23,6 +23,7 @@ public record StudentDetailsResponse(
         String enrollmentStatus,
         BigDecimal allowedDiscount,
         Integer terminationCount,
+        BigDecimal availableBalance,
         List<StudentWarning> warnings,
         List<StudentComplaintResponse> complaints,
         StudentFeeHistoryResponse lastFee,

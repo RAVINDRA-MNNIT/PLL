@@ -214,7 +214,7 @@ public class StudentService {
 
                             dto.setFullName(request.getFullName());
                             dto.setDateOfBirth(request.getDateOfBirth());
-                            dto.setMobile(request.getMobileNumber());
+                            dto.setMobileNumber(request.getMobileNumber());
                             dto.setGuardianNumber(request.getGuardianNumber());
                             dto.setFatherName(request.getFatherName());
 
@@ -351,6 +351,7 @@ public class StudentService {
                 enrollmentStatus.name(),
                 student.getAllowedDiscount(),
                 student.getTerminationCount(),
+                student.getAvailableBalance(),
                 warnings,
                 complaintResponses,
                 lastFee,

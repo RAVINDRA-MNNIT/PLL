@@ -148,6 +148,7 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
 
         s.full_name AS "lastFullName",
         s.allowed_Discount AS "allowedDiscount",
+        s.available_balance AS "availableBalance",
         ar.full_name AS "fullName",
 
         s.mobile_number AS "lastMobileNumber",
@@ -214,6 +215,7 @@ public interface ApprovalRequestRepository extends JpaRepository<ApprovalRequest
         ar.payment_mode AS "paymentMode",
         ar.transaction_id AS "transactionId",
         ar.remarks AS "remarks",
+        ar.adjustment_amount AS "adjustmentAmount",
 
 
         -- =================================================

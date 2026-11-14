@@ -99,4 +99,7 @@ public class Students {
 
     @Column(name = "card_issued_at")
     private OffsetDateTime cardIssuedAt;
+
+    @Column(name = "available_balance", precision = 12, scale = 2, nullable = false)
+    private BigDecimal availableBalance = BigDecimal.ZERO;
 }

@@ -141,7 +141,7 @@ public class AdminCommandService {
     // 🔹 Approve Request
     // ====================================================
 
-    public void approve(ApprovalRequest r, Long adminId) {
+    public void approve(ApprovalRequest r, Long adminId, Long adjustmentAmount) {
         if (r.getStatus() != PendingRequestStatus.PENDING) {
             throw new IllegalStateException("Only pending request can be approved");
         }
@@ -255,6 +255,7 @@ public class AdminCommandService {
                     seatService.removeReservedSeat(r.getSeatId());
                 }
                 student.setEnrollmentStatus(EnrollmentStatus.ACTIVE.name());
+                student.setAvailableBalance(BigDecimal.ZERO);
                 // Update Transaction
                 updateTransaction(studentId,
                         r.getSubmittedAmount(),
@@ -291,6 +292,7 @@ public class AdminCommandService {
                 }
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
+                student.setAvailableBalance(BigDecimal.valueOf(adjustmentAmount));
                 updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedAt().toLocalDate(), r.getRequestedBy());
             }  else if (RequestType.BATCH.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
@@ -379,6 +381,7 @@ public class AdminCommandService {
         Students student = studentRepo.findByStudentId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         if (RequestType.ENROLLMENT.name().equals(type)) {
+            student.setAvailableBalance(body.getAdjustmentAmount());
             updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(), userId);
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
@@ -644,6 +647,9 @@ public class AdminCommandService {
                                   OffsetDateTime transactionDate,
                                   Long managerId,
                                   Long adminId) {
+        if (amount.compareTo(BigDecimal.ZERO) == 0) {
+            return;
+        }
         Long createdBy = adminId;
         if (managerId != null) {
             createdBy = managerId;

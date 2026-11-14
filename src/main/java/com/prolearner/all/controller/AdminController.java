@@ -108,12 +108,12 @@ public class AdminController {
 
     @PostMapping("/pending/approve")
     public void approve(
-            @RequestBody Long requestId,
+            @RequestParam Long requestId,
+            @RequestParam Long adjustmentAmount,
             Authentication authentication
     ) {
         Long adminId = getLoggedInUserId(authentication);
-
-        adminService.approve(requestId, adminId);
+        adminService.approve(requestId, adminId, adjustmentAmount);
     }
 
     // ====================================================

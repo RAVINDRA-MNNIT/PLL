@@ -1271,7 +1271,7 @@ const BulkIdCards = {
                     </div>
 
                     <div class="id-card-footer">
-                        <span>Pro Learner's Digital Library</span>
+                        <span><strong>Website: pll.up.railway.app</strong></span>
                     </div>
                 </div>
             `;

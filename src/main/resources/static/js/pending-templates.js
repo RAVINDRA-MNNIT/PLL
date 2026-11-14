@@ -499,7 +499,6 @@ renderStatus(status) {
         const role = item.requestedByRole;
         const id = item.requestedBy ?? '-';
         // For any other role, show the role followed by the name in brackets
-        debugger;
         if (item.requestedBy === Session.getUserId()) {
             return `<div>You</div>`;
         } else {

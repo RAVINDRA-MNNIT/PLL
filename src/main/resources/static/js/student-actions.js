@@ -1276,7 +1276,25 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveEnrollmentStatus() {
+        debugger;
+        var adjustmentAmount = 0
         const status = document.getElementById("newEnrollmentStatus")?.value;
+        if (Session.isStudent() === false && status.toUpperCase() === "DISCONTINUED") {
+            const last = this.student?.lastFee;
+            const tillDate = new Date(last.tillDate);
+            const requestedAt = new Date();
+            if (tillDate > requestedAt) {
+                const diffDays = getDateDifferenceInDays(requestedAt, tillDate)
+                if (diffDays > 10) {
+                    const totalMembershipDays = calculateMembershipDays(last.fromDate, last.tillDate)
+                    const perDayFee = (last.submittedAmount ?? 0) / totalMembershipDays;
+                    const totalAmountLeft = Math.round(diffDays * perDayFee);
+                    if (confirm(`Do you want to add future adjustment amount ₹${totalAmountLeft} for this student?`)) {
+                        adjustmentAmount = totalAmountLeft;
+                    }
+                }
+            }
+        }
         var reason = ""
         if (!status) {
             alert("Please select status");
@@ -1299,6 +1317,7 @@ showUpdateStatus(currentStatus) {
 
         const payload = {
             enrollmentStatus: status,
+            adjustmentAmount: adjustmentAmount,
             studentId: this.studentId,
             requestedBy: Session.getUserId(),
             remarks: reason,
