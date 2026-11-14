@@ -43,7 +43,6 @@ window.Api = {
             // =================================================
             // UNAUTHORIZED
             // =================================================
-
             if (response.status === 401) {
 
                 localStorage.removeItem("jwtToken");

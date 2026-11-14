@@ -1,32 +1,43 @@
+
 window.Session = {
 
-    currentUser: null,
+    // =========================================================
+    // CURRENT USER
+    // =========================================================
+
+    currentUser: JSON.parse(
+        localStorage.getItem("currentUser") || "null"
+    ),
 
 
     // =========================================================
     // LOAD CURRENT USER
+    // No API call required
     // =========================================================
 
     async loadCurrentUser() {
-        if (this.currentUser) {
-            return this.currentUser;
-        }
-        try {
+        // Check JWT availability
+        const token = localStorage.getItem("jwtToken");
 
-            this.currentUser =
-                await Api.get(Endpoints.auth.currentUser);
-            return this.currentUser;
-
-        } catch (error) {
-            console.error(
-                "Unable to load current user.",
-                error
-            );
-
-            this.currentUser = null;
-
+        if (!token) {
+            this.clear();
             return null;
         }
+
+        // Restore user from localStorage if needed
+        if (!this.currentUser) {
+            try {
+                this.currentUser = JSON.parse(
+                    localStorage.getItem("currentUser") || "null"
+                );
+            } catch (error) {
+                console.error("Invalid stored user data.", error);
+                this.clear();
+                return null;
+            }
+        }
+
+        return this.currentUser;
     },
 
 
@@ -38,21 +49,17 @@ window.Session = {
         return this.currentUser;
     },
 
-
     getUserId() {
         return this.currentUser?.id;
     },
-
 
     getUserName() {
         return this.currentUser?.fullName;
     },
 
-
     getRole() {
         return this.currentUser?.role;
     },
-
 
     getSuperAdmin() {
         return this.currentUser?.superAdmin;
@@ -67,16 +74,13 @@ window.Session = {
         return this.currentUser?.role === "ADMIN";
     },
 
-
     isStudent() {
         return this.currentUser?.role === "STUDENT";
     },
 
-
     isManager() {
         return this.currentUser?.role === "MANAGER";
     },
-
 
     hasRole(role) {
         return this.currentUser?.role === role;
@@ -141,7 +145,6 @@ window.Session = {
             loaded: false
         };
 
-
         try {
 
             // Tell backend to logout
@@ -151,10 +154,7 @@ window.Session = {
 
         } catch (error) {
 
-            console.error(
-                "Logout failed.",
-                error
-            );
+            console.error("Logout failed.", error);
 
         } finally {
 

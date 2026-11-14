@@ -86,7 +86,6 @@ window.FeeForm = {
     },
 
   populate(data) {
-        debugger;
         if (data.availableBalance > 0) {
             if(confirm(`This student has available balance of ₹${data.availableBalance}, Do you want to adjust this in fees?`)) {
                 this.availableBalance = data.availableBalance;
@@ -333,7 +332,6 @@ window.FeeForm = {
         const pending = Number(document.getElementById("pendingAmount")?.value || 0);
         const submittedAmount = document.getElementById("submittedAmount");
         const membershipDays = calculateMembershipDays(fromDate, tillDate);
-debugger;
         if (FeeForm.currentBatchId !== batchId) {
             document.getElementById("discount").value = FeeForm.availableBalance ?? 0;
         } else {

@@ -284,7 +284,6 @@ async viewEdit(requestId) {
         const from = new Date(pendingRow.fromDate);
         const till = new Date(pendingRow.tillDate);
         const diffInDays = Math.floor((till - from) / (1000 * 60 * 60 * 24));
-debugger;
         const warnings = [];
         if (pendingRow.requestType === "ENROLLMENT") {
             const lastFeeTillDate = new Date(pendingRow.lastFeeTillDate);

@@ -42,18 +42,57 @@ async function login(event) {
     loginButton.disabled = true;
     loginButton.textContent = "Logging in...";
 
-    const payload = {
-        userId: Number(studentId),
-        password: password
-    }
-
     try {
-        const response = await Api.post(Endpoints.auth.studentLogin, payload);
-        // Store JWT returned by backend
-        if (!response?.token) {
-            throw new Error("Login successful but authentication token was not received.");
+        const response = await fetch(Endpoints.auth.studentLogin, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                userId: Number(studentId),
+                password: password
+            })
+        });
+
+
+        // -----------------------------------------------------
+        // INVALID LOGIN
+        // -----------------------------------------------------
+        if (response.status === 401) {
+            const data = await response.json();
+            error.innerText = data.message || "Invalid login.";
+            return;
         }
-        localStorage.setItem("jwtToken", response.token);
+
+        // -----------------------------------------------------
+        // OTHER SERVER ERROR
+        // -----------------------------------------------------
+        if (!response.ok) {
+            error.innerText = "Login failed. Please try again.";
+            return;
+        }
+
+        // -----------------------------------------------------
+        // SUCCESS
+        // -----------------------------------------------------
+        const data = await response.json();
+        const token = data.token;
+        const user = data.user;
+
+        // -----------------------------------------------------
+        // STORE JWT
+        // -----------------------------------------------------
+        if (token) {
+            localStorage.setItem("jwtToken", token);
+        }
+
+        // -----------------------------------------------------
+        // STORE USER
+        // -----------------------------------------------------
+        if (user) {
+            localStorage.setItem("currentUser", JSON.stringify(user));
+        }
         await loadConfiguration();
         window.location.href = `/student-details.html?id=${studentId}`;
     } catch (e) {

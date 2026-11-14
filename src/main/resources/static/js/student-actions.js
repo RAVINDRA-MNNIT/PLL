@@ -1276,7 +1276,6 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveEnrollmentStatus() {
-        debugger;
         var adjustmentAmount = 0
         const status = document.getElementById("newEnrollmentStatus")?.value;
         if (Session.isStudent() === false && status.toUpperCase() === "DISCONTINUED") {
