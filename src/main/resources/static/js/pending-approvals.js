@@ -290,7 +290,7 @@ async viewEdit(requestId) {
             const requestedAt = new Date(pendingRow.requestedAt);
             if (lastFeeTillDate > requestedAt) {
                 const diffDays = getDateDifferenceInDays(requestedAt, lastFeeTillDate)
-                if (diffDays > 10) {
+                if (diffDays > getConfigurations().MINIMUM_DAYS_FOR_DATE_ADJUSTMENT) {
                     const totalMembershipDays = calculateMembershipDays(pendingRow.lastFeeFromDate, pendingRow.lastFeeTillDate)
                     const perDayFee = (pendingRow.lastFeeSubmittedAmount ?? 0) / totalMembershipDays;
                     const totalAmountLeft = Math.round(diffDays * perDayFee);

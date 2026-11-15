@@ -91,6 +91,7 @@ const Configurations = {
         document.getElementById("daysForDiscontinue").value = config.DAYS_FOR_DISCONTINUE ?? "";
         document.getElementById("daysBeforeNextFeeSubmit").value = config.DAYS_BEFORE_NEXT_FEE_SUBMIT ?? "";
         document.getElementById("pageLimit").value = config.PAGE_LIMIT ?? "";
+        document.getElementById("minimumDaysForDateAdjustment").value = config.MINIMUM_DAYS_FOR_DATE_ADJUSTMENT ?? "";
         document.querySelector(`input[name="pageSorting"][value="${config.PAGE_SORTING}"]`).checked = true;
         document.getElementById("updateFullDetail").checked = config.UPDATE_FULL_DETAIL;
         document.getElementById("onlineAdmission").checked = config.ONLINE_ADMISSION_ENABLED;
@@ -274,6 +275,7 @@ const Configurations = {
         const daysForDiscontinue = document.getElementById("daysForDiscontinue").value;
         const daysBeforeNextFeeSubmit = document.getElementById("daysBeforeNextFeeSubmit").value;
         const pageLimit = document.getElementById("pageLimit").value;
+        const minimumDaysForDateAdjustment = document.getElementById("minimumDaysForDateAdjustment").value;
         const pageSorting = document.querySelector('input[name="pageSorting"]:checked')?.value;
 
         if (!libraryName) {
@@ -294,6 +296,9 @@ const Configurations = {
         if (!pageLimit) {
             return alert("Page limit is required.");
         }
+        if (!minimumDaysForDateAdjustment) {
+            return alert("Minimum days criteria for date adjustment.")
+        }
         if (!pageSorting) {
             return alert("Please select page sorting.");
         }
@@ -304,6 +309,7 @@ const Configurations = {
             DAYS_FOR_DISCONTINUE: Number(daysForDiscontinue),
             DAYS_BEFORE_NEXT_FEE_SUBMIT: Number(daysBeforeNextFeeSubmit),
             PAGE_LIMIT: Number(pageLimit),
+            MINIMUM_DAYS_FOR_DATE_ADJUSTMENT: Number(minimumDaysForDateAdjustment),
             PAGE_SORTING: pageSorting,
             UPDATE_FULL_DETAIL: document.getElementById("updateFullDetail").checked
         };

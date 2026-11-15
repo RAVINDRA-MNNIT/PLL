@@ -1284,7 +1284,7 @@ showUpdateStatus(currentStatus) {
             const requestedAt = new Date();
             if (tillDate > requestedAt) {
                 const diffDays = getDateDifferenceInDays(requestedAt, tillDate)
-                if (diffDays > 10) {
+                if (diffDays > this.getConfigurations().MINIMUM_DAYS_FOR_DATE_ADJUSTMENT) {
                     const totalMembershipDays = calculateMembershipDays(last.fromDate, last.tillDate)
                     const perDayFee = (last.submittedAmount ?? 0) / totalMembershipDays;
                     const totalAmountLeft = Math.round(diffDays * perDayFee);

@@ -23,6 +23,9 @@ public class ConfigurationDTO {
     @JsonProperty("PAGE_LIMIT")
     private Integer pageLimit;
 
+    @JsonProperty("MINIMUM_DAYS_FOR_DATE_ADJUSTMENT")
+    private Integer minimumDaysForDateAdjustment;
+
     @JsonProperty("PAGE_SORTING")
     private String pageSorting;
 

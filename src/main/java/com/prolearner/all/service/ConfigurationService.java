@@ -25,6 +25,7 @@ public class ConfigurationService {
         update("DAYS_FOR_DISCONTINUE", String.valueOf(configuration.getDaysForDiscontinue()));
         update("DAYS_BEFORE_NEXT_FEE_SUBMIT", String.valueOf(configuration.getDaysBeforeNextFeeSubmit()));
         update("PAGE_LIMIT", String.valueOf(configuration.getPageLimit()));
+        update("MINIMUM_DAYS_FOR_DATE_ADJUSTMENT", String.valueOf(configuration.getMinimumDaysForDateAdjustment()));
         update("PAGE_SORTING", configuration.getPageSorting());
         update("UPDATE_FULL_DETAIL", String.valueOf(configuration.getUpdateFullDetail()));
     }
