@@ -177,7 +177,7 @@ public class IdCardActivityService {
     public List<PrintLaterResponse> getPrintLaterIds() {
 
         return activityRepository
-                .findByPrintLaterTrueOrderByUpdatedAtDesc()
+                .findByPrintLaterTrueOrderByStudentIdAsc()
                 .stream()
                 .map(activity -> new PrintLaterResponse(
                         activity.getStudent().getStudentId(),
@@ -225,7 +225,7 @@ public class IdCardActivityService {
     public List<IdCardActivityResponse> getAllActivities() {
 
         return activityRepository
-                .findAllByOrderByUpdatedAtDesc()
+                .findAllByOrderByStudentIdAsc()
                 .stream()
                 .map(activity -> new IdCardActivityResponse(
                         activity.getStudent().getStudentId(),

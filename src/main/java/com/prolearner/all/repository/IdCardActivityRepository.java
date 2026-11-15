@@ -16,12 +16,12 @@ public interface IdCardActivityRepository
     // =========================================================
     // GET ALL PRINT LATER RECORDS
     // =========================================================
-    List<IdCardActivity> findByPrintLaterTrueOrderByUpdatedAtDesc();
+    List<IdCardActivity> findByPrintLaterTrueOrderByStudentIdAsc();
 
     // =========================================================
     // GET ALL ACTIVITY RECORDS
     // =========================================================
-    List<IdCardActivity> findAllByOrderByUpdatedAtDesc();
+    List<IdCardActivity> findAllByOrderByStudentIdAsc();
 
     // =========================================================
     // FIND ACTIVITIES USING BUSINESS-FACING STUDENT IDs

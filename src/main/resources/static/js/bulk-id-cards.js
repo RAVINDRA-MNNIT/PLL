@@ -738,28 +738,33 @@ const BulkIdCards = {
             const status = getStatus(activity);
 
             return `
-                            <tr
-                                data-student-id="${studentId}"
-                                data-status="${status}">
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        class="recent-activity-checkbox"
-                                        value="${studentId}"
-                                        aria-label="Select Student ID ${studentId}">
-                                </td>
-                                <td>${studentId}</td>
-                                <td>
-                                    <span class="id-card-status status-${status.toLowerCase()}">
-                                        ${escapeHtml(status)}
-                                    </span>
-                                </td>
-                                <td>${activity.printLater ? "Yes" : "No"}</td>
-                                <td>${escapeHtml(formatDate(activity.printedAt))}</td>
-                                <td>${escapeHtml(formatDate(activity.issuedAt))}</td>
-                                <td>${escapeHtml(formatDate(activity.updatedAt))}</td>
-                            </tr>
-                        `;
+                    <tr
+                        data-student-id="${studentId}"
+                        data-status="${status}"
+                        class="recent-activity-row">
+                
+                        <td>
+                            <input
+                                type="checkbox"
+                                class="recent-activity-checkbox"
+                                value="${studentId}"
+                                aria-label="Select Student ID ${studentId}">
+                        </td>
+                
+                        <td>${studentId}</td>
+                
+                        <td>
+                            <span class="id-card-status status-${status.toLowerCase()}">
+                                ${escapeHtml(status)}
+                            </span>
+                        </td>
+                
+                        <td>${activity.printLater ? "Yes" : "No"}</td>
+                        <td>${escapeHtml(formatDate(activity.printedAt))}</td>
+                        <td>${escapeHtml(formatDate(activity.issuedAt))}</td>
+                        <td>${escapeHtml(formatDate(activity.updatedAt))}</td>
+                    </tr>
+                `;
         }).join("")}
                 </tbody>
             </table>
@@ -785,6 +790,20 @@ const BulkIdCards = {
                     this.updateRecentActivitySelection();
                 });
             });
+
+        container.querySelector("tbody")?.addEventListener("click", (event) => {
+            const row = event.target.closest(".recent-activity-row");
+            if (!row) return;
+            if (event.target.closest(".recent-activity-checkbox")) {
+                return;
+            }
+            const checkbox = row.querySelector(".recent-activity-checkbox");
+            if (!checkbox) return;
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event("change", {
+                bubbles: true
+            }));
+        });
         this.updateRecentActivitySelection();
     },
 
@@ -1055,53 +1074,144 @@ const BulkIdCards = {
     // =========================================================
     // RENDER PRINT LATER LIST
     // =========================================================
+
     renderSavedStudentIds() {
+
         const container = document.getElementById("savedStudentIdsList");
+
         if (!container) return;
+
         if (!this.savedStudentIds.length) {
+
             container.innerHTML = `
-                <div class="empty-saved-state">
-                    No Student IDs saved for later printing.
-                </div>
-            `;
+            <div class="empty-saved-state">
+                No Student IDs saved for later printing.
+            </div>
+        `;
+
             this.updateSavedPrintActions();
             return;
         }
 
         container.innerHTML = this.savedStudentIds.map(studentId => `
-            <div class="saved-student-id-item" data-student-id="${studentId}">
-                <div class="saved-student-id-left">
-                    <input
-                        type="checkbox"
-                        class="saved-student-id-checkbox"
-                        value="${studentId}"
-                        aria-label="Select Student ID ${studentId}"
-                    >
-                    <span class="saved-student-id-number">
-                        Student ID: ${studentId}
-                    </span>
-                </div>
+        <div class="saved-student-id-item" data-student-id="${studentId}">
 
-                <div class="saved-student-id-actions">
-                    <button
-                        type="button"
-                        class="print-single-button"
-                        data-student-id="${studentId}"
-                    >Print</button>
+            <div class="saved-student-id-left">
 
-                    <button
-                        type="button"
-                        class="remove-single-button"
-                        data-student-id="${studentId}"
-                    >Remove</button>
-                </div>
+                <input
+                    type="checkbox"
+                    class="saved-student-id-checkbox"
+                    value="${studentId}"
+                    aria-label="Select Student ID ${studentId}"
+                >
+
+                <span class="saved-student-id-number">
+                    Student ID: ${studentId}
+                </span>
+
             </div>
-        `).join("");
-        container.querySelectorAll(".print-single-button").forEach(button => {button.onclick = () => this.printSavedIds([Number(button.dataset.studentId)]);});
-        container.querySelectorAll(".remove-single-button").forEach(button => {button.onclick = () => this.removeSavedStudentId(Number(button.dataset.studentId));});
-        container.querySelectorAll(".saved-student-id-checkbox").forEach(checkbox => {checkbox.onchange = () => this.updateSavedPrintActions();});
+
+            <div class="saved-student-id-actions">
+
+                <button
+                    type="button"
+                    class="print-single-button"
+                    data-student-id="${studentId}"
+                >Print</button>
+
+                <button
+                    type="button"
+                    class="remove-single-button"
+                    data-student-id="${studentId}"
+                >Remove</button>
+
+            </div>
+
+        </div>
+    `).join("");
+
+
+        // =========================================================
+        // PRINT SINGLE STUDENT ID
+        // =========================================================
+
+        container.querySelectorAll(".print-single-button").forEach(button => {
+
+            button.onclick = () => {
+                this.printSavedIds([
+                    Number(button.dataset.studentId)
+                ]);
+            };
+
+        });
+
+
+        // =========================================================
+        // REMOVE SINGLE STUDENT ID
+        // =========================================================
+
+        container.querySelectorAll(".remove-single-button").forEach(button => {
+
+            button.onclick = () => {
+                this.removeSavedStudentId(
+                    Number(button.dataset.studentId)
+                );
+            };
+
+        });
+
+
+        // =========================================================
+        // CHECKBOX CHANGE
+        // =========================================================
+
+        container.querySelectorAll(".saved-student-id-checkbox").forEach(checkbox => {
+
+            checkbox.onchange = () => {
+                this.updateSavedPrintActions();
+            };
+
+        });
+
+
+        // =========================================================
+        // CLICK ITEM TO SELECT / DESELECT
+        // =========================================================
+
+        container.onclick = (event) => {
+
+            const item = event.target.closest(".saved-student-id-item");
+
+            if (!item || !container.contains(item)) return;
+
+            // Don't interfere with Print or Remove buttons
+            if (event.target.closest("button")) {
+                return;
+            }
+
+            // Checkbox handles its own click
+            if (event.target.closest(".saved-student-id-checkbox")) {
+                return;
+            }
+
+            const checkbox = item.querySelector(
+                ".saved-student-id-checkbox"
+            );
+
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+
+            checkbox.dispatchEvent(new Event("change", {
+                bubbles: true
+            }));
+
+        };
+
+
         this.updateSavedPrintActions();
     },
+
 
     // =========================================================
     // UPDATE SAVED PRINT ACTIONS
