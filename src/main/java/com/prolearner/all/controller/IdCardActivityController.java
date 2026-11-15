@@ -25,8 +25,12 @@ public class IdCardActivityController {
 
     @PostMapping("/bulk-id-cards")
     public ResponseEntity<List<BulkIdCardResponse>> getBulkIdCards(
-            @RequestBody List<Long> studentIds) {
-        return ResponseEntity.ok(activityService.getBulkIdCards(studentIds));
+            @RequestBody List<Long> studentIds,
+            @RequestParam(defaultValue = "true") boolean addInActivity) {
+
+        return ResponseEntity.ok(
+                activityService.getBulkIdCards(studentIds, addInActivity)
+        );
     }
 
     @PostMapping("/print-later")
@@ -42,29 +46,36 @@ public class IdCardActivityController {
         return ResponseEntity.ok(records);
     }
 
-    // =========================================================
-    // REMOVE ONE SAVED ID
-    // DELETE /api/id-card-activities/print-later/{studentId}
-    // =========================================================
-    @DeleteMapping("/print-later/{studentId}")
+// =========================================================
+// REMOVE ONE SAVED ID
+// PATCH /api/id-card-activities/print-later/{studentId}
+// =========================================================
+
+    @PatchMapping("/print-later/{studentId}")
     public ResponseEntity<Map<String, String>> removeSavedStudentId(
             @PathVariable Long studentId) {
+
         activityService.removeSavedStudentId(studentId);
-        return ResponseEntity.ok(Map.of("message", "Student ID removed from Print Later successfully."));
+
+        return ResponseEntity.ok(
+                Map.of("message", "Student ID removed from Print Later successfully.")
+        );
     }
 
-    // =========================================================
-    // CLEAR ALL SAVED IDS
-    // DELETE /api/id-card-activities/print-later
-    // =========================================================
-    @DeleteMapping("/print-later")
+
+// =========================================================
+// CLEAR ALL SAVED IDS
+// PATCH /api/id-card-activities/print-later
+// =========================================================
+
+    @PatchMapping("/print-later")
     public ResponseEntity<Map<String, Object>> clearAllSavedStudentIds() {
+
         int clearedCount = activityService.clearAllSavedStudentIds();
+
         return ResponseEntity.ok(Map.of(
-                "message",
-                "Saved Student IDs cleared successfully.",
-                "clearedCount",
-                clearedCount
+                "message", "Saved Student IDs cleared successfully.",
+                "clearedCount", clearedCount
         ));
     }
 

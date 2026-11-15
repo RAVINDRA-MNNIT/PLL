@@ -986,7 +986,15 @@ const BulkIdCards = {
         this.showLoading();
         this.clearError();
         try {
-            const students = await Api.post(Endpoints.students.bulkIdCards(), studentIds);
+            debugger;
+            var addInActivity = true;
+            if (this.getPrintMode() === "RECENT" ) {
+                addInActivity = false;
+            }
+            const students = await Api.post(
+                `${Endpoints.students.bulkIdCards()}?addInActivity=${addInActivity}`,
+                studentIds
+            );
             if (!Array.isArray(students) || students.length === 0) {
                 this.selectedStudentIds = [];
                 this.studentsCache = [];
@@ -1245,7 +1253,7 @@ const BulkIdCards = {
             return;
         }
         try {
-            await Api.delete(Endpoints.students.removePrintLater(studentId));
+            await Api.patch(Endpoints.students.removePrintLater(studentId));
             this.savedStudentIds = this.savedStudentIds.filter(id => id !== studentId);
             this.renderSavedStudentIds();
         } catch (error) {
@@ -1271,7 +1279,7 @@ const BulkIdCards = {
                 clearButton.disabled = true;
                 clearButton.textContent = "Clearing...";
             }
-            await Api.delete(Endpoints.students.printLater());
+            await Api.patch(Endpoints.students.printLater());
             this.savedStudentIds = [];
             this.renderSavedStudentIds();
             alert("All saved Student IDs have been cleared.");

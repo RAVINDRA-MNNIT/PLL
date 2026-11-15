@@ -31,25 +31,29 @@ public interface IdCardActivityRepository
     );
 
     // =========================================================
-    // DELETE ONE PRINT LATER RECORD
+    // REMOVE ONE STUDENT FROM PRINT LATER
+    // Set printLater = false; preserve the activity record
     // =========================================================
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-        DELETE FROM IdCardActivity a
-        WHERE a.student.studentId = :studentId
-          AND a.printLater = true
-        """)
+    UPDATE IdCardActivity a
+       SET a.printLater = false
+     WHERE a.student.studentId = :studentId
+       AND a.printLater = true
+    """)
     int removeSavedStudentId(
             @Param("studentId") Long studentId
     );
 
     // =========================================================
-    // DELETE ALL PRINT LATER RECORDS
+    // CLEAR ALL PRINT LATER RECORDS
+    // Set printLater = false; preserve all activity records
     // =========================================================
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
-        DELETE FROM IdCardActivity a
-        WHERE a.printLater = true
-        """)
+    UPDATE IdCardActivity a
+       SET a.printLater = false
+     WHERE a.printLater = true
+    """)
     int clearSavedStudentIds();
 }

@@ -37,7 +37,7 @@ public class IdCardActivityService {
     // =========================================================
     @Transactional
     public List<BulkIdCardResponse> getBulkIdCards(
-            List<Long> studentIds) {
+            List<Long> studentIds, boolean addInActivity) {
 
         if (studentIds == null || studentIds.isEmpty()) {
             return List.of();
@@ -55,30 +55,32 @@ public class IdCardActivityService {
             return List.of();
         }
 
-        // Find existing shared activities using business Student IDs
-        List<IdCardActivity> existingActivities =
-                activityRepository.findAllByStudent_StudentIdIn(
-                        uniqueStudentIds
-                );
+        if (addInActivity) {
+            // Find existing shared activities using business Student IDs
+            List<IdCardActivity> existingActivities =
+                    activityRepository.findAllByStudent_StudentIdIn(
+                            uniqueStudentIds
+                    );
 
-        Set<Long> existingStudentIds = existingActivities.stream()
-                .map(activity -> activity.getStudent().getStudentId())
-                .collect(Collectors.toSet());
+            Set<Long> existingStudentIds = existingActivities.stream()
+                    .map(activity -> activity.getStudent().getStudentId())
+                    .collect(Collectors.toSet());
 
-        // Create activity records only for students without one
-        List<IdCardActivity> newActivities = students.stream()
-                .filter(student ->
-                        !existingStudentIds.contains(student.getStudentId()))
-                .map(student -> {
-                    IdCardActivity activity = new IdCardActivity();
-                    activity.setStudent(student);
-                    activity.setPrintLater(false);
-                    return activity;
-                })
-                .toList();
+            // Create activity records only for students without one
+            List<IdCardActivity> newActivities = students.stream()
+                    .filter(student ->
+                            !existingStudentIds.contains(student.getStudentId()))
+                    .map(student -> {
+                        IdCardActivity activity = new IdCardActivity();
+                        activity.setStudent(student);
+                        activity.setPrintLater(false);
+                        return activity;
+                    })
+                    .toList();
 
-        if (!newActivities.isEmpty()) {
-            activityRepository.saveAll(newActivities);
+            if (!newActivities.isEmpty()) {
+                activityRepository.saveAll(newActivities);
+            }
         }
 
         return students.stream()
