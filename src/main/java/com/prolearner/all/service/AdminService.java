@@ -62,9 +62,9 @@ public class AdminService {
     // 🔹 Approve Request
     // ====================================================
 
-    public void approve(Long id, Long adminId, Long adjustmentAmount) {
+    public void approve(Long id, Long adminId, Long adjustmentAmount, Long pendingAmount, String remark) {
         ApprovalRequest r = pendingQueryService.get(id);
-        adminCommandService.approve(r, adminId, adjustmentAmount);
+        adminCommandService.approve(r, adminId, adjustmentAmount, pendingAmount, remark);
     }
 
     // =========================================================

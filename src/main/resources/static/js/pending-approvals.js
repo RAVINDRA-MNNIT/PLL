@@ -276,8 +276,10 @@ async viewEdit(requestId) {
 },
 
     async approveRequest(id) {
+        var remark = "";
         const pendingRow = this.pendingRowsData.find(row => row.requestId === id);
         var adjustmentAmount = 0;
+        var pendingAmount = 0;
         if (!pendingRow) {
             console.error("Pending row not found");
         }
@@ -301,6 +303,28 @@ async viewEdit(requestId) {
                     if (confirm(message)) {
                         adjustmentAmount = totalAmountLeft;
                     }
+                }
+            } else {
+                const diffDays = getDateDifferenceInDays(lastFeeTillDate, requestedAt)
+                const batch = findBatch(pendingRow.lastFeeBatchId);
+                const baseAmount = Number(batch.baseAmount ?? 0);
+                const allowedDiscount = pendingRow.allowedDiscount ?? 0;
+                const totalPendingFee = Math.round((calculateTotalFee(baseAmount, diffDays) + (pendingRow.lastFeePendingAmount ?? 0)) - allowedDiscount);
+                var totalPendingFeeMessage = `Do you want to add Pending amount of ₹${totalPendingFee} for ${diffDays} days for this student?`
+                if (confirm(totalPendingFeeMessage)) {
+                    pendingAmount = totalPendingFee;
+                    const remarkLog = [
+                        "Pending Fee Adjustment:",
+                        `Last Fee Till Date: ${lastFeeTillDate}`,
+                        `Update Requested At: ${requestedAt}`,
+                        `Difference Days: ${diffDays}`,
+                        `Batch Base Amount: ₹${baseAmount}`,
+                        `Previous Pending Amount: ₹${pendingRow.lastFeePendingAmount}`,
+                        `Allowed Discount: ₹${pendingRow.allowedDiscount}`,
+                        `Total Pending Fee Added: ₹${totalPendingFee}`
+                    ].join("\n");
+
+                    remark = [remark, remarkLog].filter(Boolean).join("\n\n");
                 }
             }
         }
@@ -344,7 +368,7 @@ async viewEdit(requestId) {
         if (!confirm("Approve this request?")) return;
         try {
             await Api.post(
-                Endpoints.admin.approveRequest(id, adjustmentAmount)
+                Endpoints.admin.approveRequest(id, adjustmentAmount, pendingAmount, remark)
             );
 
             await this.refresh();

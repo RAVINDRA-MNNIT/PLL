@@ -1276,10 +1276,12 @@ showUpdateStatus(currentStatus) {
     },
 
     async saveEnrollmentStatus() {
-        var adjustmentAmount = 0
+        var adjustmentAmount = 0;
+        var pendingAmount = 0;
+        var remark = "";
+        const last = this.student?.lastFee;
         const status = document.getElementById("newEnrollmentStatus")?.value;
         if (Session.isStudent() === false && status.toUpperCase() === "DISCONTINUED") {
-            const last = this.student?.lastFee;
             const tillDate = new Date(last.tillDate);
             const requestedAt = new Date();
             if (tillDate > requestedAt) {
@@ -1292,17 +1294,40 @@ showUpdateStatus(currentStatus) {
                         adjustmentAmount = totalAmountLeft;
                     }
                 }
+            } else {
+                if (Session.isAdmin()) {
+                    await getUpdatedBatch();
+                    const diffDays = getDateDifferenceInDays(tillDate, requestedAt)
+                    const batch = findBatch(last.batchId);
+                    const baseAmount = Number(batch.baseAmount ?? 0);
+                    const allowedDiscount = this.student.allowedDiscount ?? 0;
+                    const totalPendingFee = Math.round((calculateTotalFee(baseAmount, diffDays) + (last.pendingAmount ?? 0)) - allowedDiscount);
+                    var totalPendingFeeMessage = `Do you want to add Pending amount of ₹${totalPendingFee} for ${diffDays} days for this student?`
+                    if (confirm(totalPendingFeeMessage)) {
+                        pendingAmount = totalPendingFee;
+                        const remarkLog = [
+                            "Pending Fee Adjustment:",
+                            `Last Fee Till Date: ${tillDate}`,
+                            `Update Requested At: ${requestedAt}`,
+                            `Difference Days: ${diffDays}`,
+                            `Batch Base Amount: ₹${baseAmount}`,
+                            `Previous Pending Amount: ₹${last.pendingAmount}`,
+                            `Allowed Discount: ₹${allowedDiscount}`,
+                            `Total Pending Fee Added: ₹${totalPendingFee}`
+                        ].join("\n");
+                        remark = [remark, remarkLog].filter(Boolean).join("\n\n");
+                    }
+                }
             }
         }
-        var reason = ""
         if (!status) {
             alert("Please select status");
             return;
         }
         let message = `Are you to update status as ${status}?`;
         if (status.toUpperCase() === "TERMINATED") {
-            reason = prompt("Please enter reason for termination");
-            if (reason.length === 0) {
+            remark = prompt("Please enter reason for termination");
+            if (remark.length === 0) {
                 alert("Reason is required for termination")
             }
             if (!Session.isAdmin()) {
@@ -1317,9 +1342,10 @@ showUpdateStatus(currentStatus) {
         const payload = {
             enrollmentStatus: status,
             adjustmentAmount: adjustmentAmount,
+            pendingAmount: pendingAmount,
             studentId: this.studentId,
             requestedBy: Session.getUserId(),
-            remarks: reason,
+            remarks: remark,
         };
 
         try {

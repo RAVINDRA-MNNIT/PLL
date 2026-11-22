@@ -105,15 +105,16 @@ public class AdminController {
     // ====================================================
     // 🔹 Approve Request
     // ====================================================
-
     @PostMapping("/pending/approve")
     public void approve(
             @RequestParam Long requestId,
             @RequestParam Long adjustmentAmount,
+            @RequestParam Long pendingAmount,
+            @RequestParam(required = false) String remark,
             Authentication authentication
     ) {
         Long adminId = getLoggedInUserId(authentication);
-        adminService.approve(requestId, adminId, adjustmentAmount);
+        adminService.approve(requestId, adminId, adjustmentAmount, pendingAmount, remark);
     }
 
     // ====================================================

@@ -127,10 +127,13 @@ window.Endpoints = {
         updateStudentDiscount: `/api/admin/updatestudent/DISCOUNT`,
 
         rejectRequest: `/api/admin/pending/reject`,
-        approveRequest(requestId, adjustmentAmount) {
+        approveRequest(requestId, adjustmentAmount, pendingAmount, remark) {
             const params = new URLSearchParams();
             params.append("requestId", requestId);
             params.append("adjustmentAmount", adjustmentAmount);
+            params.append("pendingAmount", pendingAmount);
+            params.append("remark", remark ?? "");
+
             return `/api/admin/pending/approve?${params.toString()}`;
         },
         saveExpense: `/api/admin/expense/save`,

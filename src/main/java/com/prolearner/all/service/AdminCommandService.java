@@ -7,6 +7,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.prolearner.all.entity.*;
 import com.prolearner.all.enums.*;
@@ -141,7 +143,7 @@ public class AdminCommandService {
     // 🔹 Approve Request
     // ====================================================
 
-    public void approve(ApprovalRequest r, Long adminId, Long adjustmentAmount) {
+    public void approve(ApprovalRequest r, Long adminId, Long adjustmentAmount, Long pendingAmount, String remark) {
         if (r.getStatus() != PendingRequestStatus.PENDING) {
             throw new IllegalStateException("Only pending request can be approved");
         }
@@ -294,7 +296,8 @@ public class AdminCommandService {
                 updateDetail(student, r.getFullName(), r.getMobileNumber(), r.getGuardianNumber());
             } else if (RequestType.ENROLLMENT.equals(r.getRequestType())) {
                 student.setAvailableBalance(BigDecimal.valueOf(adjustmentAmount));
-                updateEnrollment(student, r.getEnrollmentStatus(), r.getRemarks(), r.getRequestedAt().toLocalDate(), r.getRequestedBy());
+                String combinedRemarks = Stream.of(r.getRemarks(), remark).filter(s -> s != null && !s.isBlank()).collect(Collectors.joining("\n\n"));
+                updateEnrollment(student, r.getEnrollmentStatus(), combinedRemarks, r.getRequestedAt().toLocalDate(), r.getRequestedBy(), pendingAmount != null ? BigDecimal.valueOf(pendingAmount) : BigDecimal.ZERO);
             }  else if (RequestType.BATCH.equals(r.getRequestType())) {
                 FeeRecord lastFee = student.getLastFee();
                 Long lastBatchId = lastFee.getBatchId();
@@ -383,7 +386,7 @@ public class AdminCommandService {
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         if (RequestType.ENROLLMENT.name().equals(type)) {
             student.setAvailableBalance(body.getAdjustmentAmount());
-            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(), userId);
+            updateEnrollment(student, body.getEnrollmentStatus(), body.getRemarks(), LocalDate.now(), userId, body.getPendingAmount());
         } else if (RequestType.SEAT.name().equals(type)) {
             updateSeat(studentId, body.getSeatId());
         } else if (RequestType.DETAILS.name().equals(type)) {
@@ -504,6 +507,7 @@ public class AdminCommandService {
                 .enrollmentStatus(EnrollmentStatus.ACTIVE.name())
                 .terminationCount(0)
                 .idCardStatus("NOT_ISSUED")
+                .availableBalance(BigDecimal.ZERO)
                 .createdBy(adminId)
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
@@ -586,12 +590,24 @@ public class AdminCommandService {
     }
 
     // =========================================================
-    // ENROLLMENT UPDATE REQUEST
-    // =========================================================
-    public void updateEnrollment(Students student,
-                                 String status, String remarks, LocalDate statusDate, Long userId) {
+// ENROLLMENT UPDATE REQUEST
+// =========================================================
+    public void updateEnrollment(
+            Students student,
+            String status,
+            String remarks,
+            LocalDate statusDate,
+            Long userId,
+            BigDecimal pendingAmount
+    ) {
         student.setEnrollmentStatus(status);
         FeeRecord lastFee = student.getLastFee();
+        if (lastFee != null && pendingAmount != null) {
+            lastFee.setPendingAmount(pendingAmount);
+        }
+        if (lastFee != null && remarks != null && !remarks.isBlank()) {
+            lastFee.setRemarks(remarks);
+        }
         if (EnrollmentStatus.DISCONTINUED.name().equals(status) || EnrollmentStatus.TERMINATED.name().equals(status)) {
             Long seatId = lastFee.getSeatId();
             seatService.removeReservedSeat(seatId);
@@ -630,7 +646,6 @@ public class AdminCommandService {
         }
         studentRepo.save(student);
     }
-
     public void deleteTerminateWarning(Long studentId) {
         List<StudentWarning> warnings = studentWarningRepo.findByStudentIdAndWarningLevel(studentId, "TERMINATE");
         if (!warnings.isEmpty()) {
