@@ -5,6 +5,8 @@ const BulkIdCards = {
     selectedStudentIds: [],
     savedStudentIds: [],
     studentsCache: [],
+    recentActivitiesCache: [],
+    selectedRecentActivityIds: [],
     initialized: false,
 
     // =========================================================
@@ -62,13 +64,34 @@ const BulkIdCards = {
         const printSavedButton = document.getElementById("printSavedCardsButton");
         const selectAllLaterButton = document.getElementById("selectAllLaterButton");
         const clearSelectionLaterButton = document.getElementById("clearSelectionLaterButton");
-        const markPrintedButton = document.getElementById("markSelectedPrintedButton");
-        const markIssuedButton = document.getElementById("markSelectedIssuedButton");
         const deleteActivitiesButton = document.getElementById("deleteSelectedActivitiesButton");
         const refreshActivitiesButton = document.getElementById("refreshRecentActivitiesButton");
         const generateSelectedButton = document.getElementById("generateSelectedIdCardsButton");
         const checkStatusButton = document.getElementById("checkStudentStatusButton");
         const printBackButton = document.getElementById("printBackIdCardsButton");
+
+        const statusFilter = document.getElementById("recentActivityStatusFilter");
+        const printLaterFilter = document.getElementById("recentActivityPrintLaterFilter");
+        const bulkStatusSelect = document.getElementById("bulkActivityStatusSelect");
+        const updateStatusButton = document.getElementById("updateSelectedActivityStatusButton");
+debugger;
+        if (statusFilter) {
+            statusFilter.onchange = () => this.renderFilteredRecentActivities();
+        }
+
+        if (printLaterFilter) {
+            printLaterFilter.onchange = () => this.renderFilteredRecentActivities();
+        }
+
+        if (bulkStatusSelect) {
+            bulkStatusSelect.addEventListener("change", () => {
+                this.updateRecentActivitySelection();
+            });
+        }
+
+        if (updateStatusButton) {
+            updateStatusButton.onclick = () => this.updateSelectedActivitiesStatus();
+        }
 
         if (printBackButton) {
             printBackButton.onclick = () => this.printBackCards();
@@ -80,14 +103,6 @@ const BulkIdCards = {
 
         if (generateSelectedButton) {
             generateSelectedButton.onclick = () => this.generateSelectedIdCards();
-        }
-
-        if (markPrintedButton) {
-            markPrintedButton.onclick = () => this.markSelectedActivitiesPrinted();
-        }
-
-        if (markIssuedButton) {
-            markIssuedButton.onclick = () => this.markSelectedActivitiesIssued();
         }
 
         if (deleteActivitiesButton) {
@@ -485,6 +500,13 @@ const BulkIdCards = {
                 <div class="library-name">
                     PRO LEARNER'S DIGITAL LIBRARY
                 </div>
+            
+                <div class="library-contact">
+                    276/2, CHAKIYA, PRAYAGRAJ
+                    <br>
+                    8840932610, 6387471168
+                </div>
+            
                 <div class="instructions-title">
                     GENERAL INSTRUCTIONS
                 </div>
@@ -522,89 +544,94 @@ const BulkIdCards = {
         `);
         }
 
+
         const printCss = `
-        @page {
-            size: A4 portrait;
-            margin: 5mm 0 0 0;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 210mm;
-            background: #fff;
-            font-family: Arial, sans-serif;
-        }
-
-        .back-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 53.98mm);
-            grid-auto-rows: 85.60mm;
-            gap: 3mm;
-            justify-content: center;
-            align-content: start;
-        }
-
-        .back-card {
-            display: flex;
-            flex-direction: column;
-            width: 53.98mm;
-            height: 85.60mm;
-            overflow: hidden;
-            border: .25mm solid #cbd5e1;
-            background: white;
-            color: #172033;
-            break-inside: avoid;
-        }
-
-        .back-header {
-            padding: 5mm 2mm 3mm;
-            color: white;
-            background: #173f7a;
-            text-align: center;
-        }
-
-        .library-name {
-            font-size: 9pt;
-            font-weight: 900;
-            color: black;
-        }
-
-        .card-title {
-            margin-top: 2mm;
-            padding-top: 2mm;
-            border-top: .2mm solid white;
-            font-size: 6.5pt;
-            font-weight: 800;
-        }
-
-        .instructions-title {
-            margin-top: 2mm;
-            font-size: 7pt;
-            font-weight: 800;
-        }
-
-        .instructions-list {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            justify-content: space-evenly;
-            gap: 0.3mm;
-            margin: 0;
-            padding: 3mm 3mm 3mm 7mm;
-            font-size: 6.5pt;
-            font-weight: 700;
-            line-height: 1.0;
-        }
-
-        .instructions-list li {
-            padding-left: .5mm;
-        }
-    `;
+            @page {
+                size: A4 portrait;
+                margin: 5mm 0 0 0;
+            }
+        
+            * {
+                box-sizing: border-box;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        
+            html, body {
+                margin: 0;
+                padding: 0;
+                width: 210mm;
+                background: #fff;
+                font-family: Arial, sans-serif;
+            }
+        
+            .back-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 53.98mm);
+                grid-auto-rows: 85.60mm;
+                gap: 3mm;
+                justify-content: center;
+                align-content: start;
+            }
+        
+            .back-card {
+                display: flex;
+                flex-direction: column;
+                width: 53.98mm;
+                height: 85.60mm;
+                overflow: hidden;
+                border: .25mm solid #cbd5e1;
+                background: white;
+                color: #172033;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        
+            .back-header {
+                padding: 5mm 2mm 3mm;
+                color: white;
+                background: #173f7a;
+                text-align: center;
+            }
+        
+            .back-header .library-name {
+                font-size: 9pt;
+                font-weight: 900;
+                color: white;
+            }
+        
+            .back-header .library-contact {
+                font-size: 7pt;
+                font-weight: 700;
+                color: white;
+                line-height: 1.2;
+                margin-top: 2mm;
+            }
+        
+            .instructions-title {
+                margin-top: 2mm;
+                font-size: 7pt;
+                font-weight: 800;
+                color: white;
+            }
+        
+            .instructions-list {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                justify-content: space-evenly;
+                gap: 0.3mm;
+                margin: 0;
+                padding: 3mm 3mm 3mm 7mm;
+                font-size: 6.5pt;
+                font-weight: 700;
+                line-height: 1.0;
+            }
+        
+            .instructions-list li {
+                padding-left: .5mm;
+            }
+        `;
 
         printWindow.document.write(`
         <!DOCTYPE html>
@@ -680,45 +707,108 @@ const BulkIdCards = {
     // =========================================================
     // RENDER RECENT ID CARD ACTIVITIES
     // =========================================================
+
+    getRecentActivityStatus(activity) {
+        const status = String(
+            activity.idCardStatus || activity.status || ""
+        ).toUpperCase();
+
+        const validStatuses = [
+            "NOT_ISSUED",
+            "PHOTO_COLLECTED_PRINTED",
+            "PHOTO_COLLECTED_NOT_PRINTED",
+            "PHOTO_PENDING_PRINTED",
+            "PHOTO_PENDING_NOT_PRINTED",
+            "READY",
+            "ISSUED"
+        ];
+
+        return validStatuses.includes(status) ? status : "NOT_ISSUED";
+    },
+
+    getRecentActivityStatusLabel(status) {
+        const labels = {
+            NOT_ISSUED: "Not Issued",
+            PHOTO_COLLECTED_PRINTED: "Photo Collected and Printed",
+            PHOTO_COLLECTED_NOT_PRINTED: "Photo Collected and Not Printed",
+            PHOTO_PENDING_PRINTED: "Photo Pending and Printed",
+            PHOTO_PENDING_NOT_PRINTED: "Photo Pending and Not Printed",
+            READY: "Ready",
+            ISSUED: "Issued"
+        };
+
+        return labels[status] || status;
+    },
+
+    renderFilteredRecentActivities() {
+        const statusFilter = document.getElementById("recentActivityStatusFilter")?.value || "ALL";
+        const printLaterFilter = document.getElementById("recentActivityPrintLaterFilter")?.value || "ALL";
+
+        const activities = this.recentActivitiesCache.filter(activity => {
+            const status = this.getRecentActivityStatus(activity);
+
+            const matchesStatus =
+                statusFilter === "ALL" || status === statusFilter;
+
+            const matchesPrintLater =
+                printLaterFilter === "ALL" ||
+                String(activity.printLater === true) === printLaterFilter;
+
+            return matchesStatus && matchesPrintLater;
+        });
+
+        this.renderRecentActivitiesTable(activities);
+    },
+
     renderRecentActivities(activities) {
+        this.recentActivitiesCache = Array.isArray(activities) ? activities : [];
+
+        // Remove selections for records no longer present in the API response
+        const availableIds = new Set(
+            this.recentActivitiesCache.map(a => Number(a.studentId))
+        );
+
+        this.selectedRecentActivityIds =
+            this.selectedRecentActivityIds.filter(id => availableIds.has(id));
+
+        this.renderFilteredRecentActivities();
+    },
+
+    renderRecentActivitiesTable(activities) {
         const container = document.getElementById("recentActivitiesList");
         if (!container) return;
-        this.recentActivitiesCache = Array.isArray(activities) ? activities : [];
-        if (!this.recentActivitiesCache.length) {
+
+        if (!activities.length) {
             container.innerHTML = `
-                <div class="empty-state">No ID card activities found.</div>
-            `;
+            <div class="empty-state">
+                No ID card activities found for the selected filters.
+            </div>
+        `;
+
             this.updateRecentActivitySelection();
             return;
         }
-        const escapeHtml = value =>
-            String(value ?? "").replace(/[&<>"']/g, char => ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            })[char]);
+
         const formatDate = value => {
             if (!value) return "—";
+
             const date = new Date(value);
-            return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
+
+            return Number.isNaN(date.getTime())
+                ? "—"
+                : date.toLocaleString("en-IN");
         };
-        const getStatus = activity => {
-            const status = activity.idCardStatus || activity.status;
-            if (["NOT_ISSUED", "PRINTED", "ISSUED"].includes(status)) {
-                return status;
-            }
-            if (activity.issuedAt) return "ISSUED";
-            if (activity.printedAt) return "PRINTED";
-            return "NOT_ISSUED";
-        };
+
         container.innerHTML = `
         <div class="recent-activities-table-wrapper">
             <table class="recent-activities-table">
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAllRecentActivities" aria-label="Select all activities"></th>
+                        <th>
+                            <input type="checkbox"
+                                   id="selectAllRecentActivities"
+                                   aria-label="Select all activities">
+                        </th>
                         <th>Student ID</th>
                         <th>Card Status</th>
                         <th>Print Later</th>
@@ -728,43 +818,45 @@ const BulkIdCards = {
                     </tr>
                 </thead>
                 <tbody>
-                    ${this.recentActivitiesCache.map(activity => {
+                    ${activities.map(activity => {
             const studentId = Number(activity.studentId);
 
             if (!Number.isInteger(studentId) || studentId <= 0) {
                 return "";
             }
 
-            const status = getStatus(activity);
+            const status = this.getRecentActivityStatus(activity);
+            const selected = this.selectedRecentActivityIds.includes(studentId);
 
             return `
-                    <tr
-                        data-student-id="${studentId}"
-                        data-status="${status}"
-                        class="recent-activity-row">
-                
-                        <td>
-                            <input
-                                type="checkbox"
-                                class="recent-activity-checkbox"
-                                value="${studentId}"
-                                aria-label="Select Student ID ${studentId}">
-                        </td>
-                
-                        <td>${studentId}</td>
-                
-                        <td>
-                            <span class="id-card-status status-${status.toLowerCase()}">
-                                ${escapeHtml(status)}
-                            </span>
-                        </td>
-                
-                        <td>${activity.printLater ? "Yes" : "No"}</td>
-                        <td>${escapeHtml(formatDate(activity.printedAt))}</td>
-                        <td>${escapeHtml(formatDate(activity.issuedAt))}</td>
-                        <td>${escapeHtml(formatDate(activity.updatedAt))}</td>
-                    </tr>
-                `;
+                            <tr
+                                data-student-id="${studentId}"
+                                data-status="${status}"
+                                class="recent-activity-row">
+
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        class="recent-activity-checkbox"
+                                        value="${studentId}"
+                                        ${selected ? "checked" : ""}
+                                        aria-label="Select Student ID ${studentId}">
+                                </td>
+
+                                <td>${studentId}</td>
+
+                                <td>
+                                    <span class="id-card-status status-${status.toLowerCase()}">
+                                        ${this.escapeHtml(this.getRecentActivityStatusLabel(status))}
+                                    </span>
+                                </td>
+
+                                <td>${activity.printLater === true ? "Yes" : "No"}</td>
+                                <td>${this.escapeHtml(formatDate(activity.printedAt))}</td>
+                                <td>${this.escapeHtml(formatDate(activity.issuedAt))}</td>
+                                <td>${this.escapeHtml(formatDate(activity.updatedAt))}</td>
+                            </tr>
+                        `;
         }).join("")}
                 </tbody>
             </table>
@@ -772,102 +864,148 @@ const BulkIdCards = {
     `;
 
         const selectAll = document.getElementById("selectAllRecentActivities");
+
         selectAll?.addEventListener("change", () => {
-            container.querySelectorAll(".recent-activity-checkbox")
-                .forEach(checkbox => {
-                    checkbox.checked = selectAll.checked;
-                });
-            this.updateRecentActivitySelection();
-        });
-        container.querySelectorAll(".recent-activity-checkbox")
-            .forEach(checkbox => {
-                checkbox.addEventListener("change", () => {
-                    const checkboxes = [
-                        ...container.querySelectorAll(".recent-activity-checkbox")
-                    ];
-                    selectAll.checked = checkboxes.length > 0 && checkboxes.every(item => item.checked);
-                    selectAll.indeterminate = checkboxes.some(item => item.checked) && !selectAll.checked;
-                    this.updateRecentActivitySelection();
-                });
+            const checkboxes = [
+                ...container.querySelectorAll(".recent-activity-checkbox")
+            ];
+
+            checkboxes.forEach(checkbox => {
+                const studentId = Number(checkbox.value);
+
+                checkbox.checked = selectAll.checked;
+
+                if (selectAll.checked) {
+                    if (!this.selectedRecentActivityIds.includes(studentId)) {
+                        this.selectedRecentActivityIds.push(studentId);
+                    }
+                } else {
+                    this.selectedRecentActivityIds =
+                        this.selectedRecentActivityIds.filter(id => id !== studentId);
+                }
             });
 
-        container.querySelector("tbody")?.addEventListener("click", (event) => {
+            this.updateRecentActivitySelection();
+        });
+
+        container.querySelectorAll(".recent-activity-checkbox").forEach(checkbox => {
+            checkbox.addEventListener("change", () => {
+                const studentId = Number(checkbox.value);
+
+                if (checkbox.checked) {
+                    if (!this.selectedRecentActivityIds.includes(studentId)) {
+                        this.selectedRecentActivityIds.push(studentId);
+                    }
+                } else {
+                    this.selectedRecentActivityIds =
+                        this.selectedRecentActivityIds.filter(id => id !== studentId);
+                }
+
+                this.updateRecentActivitySelection();
+            });
+        });
+
+        container.querySelector("tbody")?.addEventListener("click", event => {
             const row = event.target.closest(".recent-activity-row");
-            if (!row) return;
-            if (event.target.closest(".recent-activity-checkbox")) {
+
+            if (!row || event.target.closest(".recent-activity-checkbox")) {
                 return;
             }
+
             const checkbox = row.querySelector(".recent-activity-checkbox");
-            if (!checkbox) return;
-            checkbox.checked = !checkbox.checked;
-            checkbox.dispatchEvent(new Event("change", {
-                bubbles: true
-            }));
+
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+
+                checkbox.dispatchEvent(new Event("change", {
+                    bubbles: true
+                }));
+            }
         });
+
         this.updateRecentActivitySelection();
     },
+
 
     // =========================================================
     // UPDATE RECENT ACTIVITY SELECTION AND BUTTON STATES
     // =========================================================
+
     updateRecentActivitySelection() {
         const container = document.getElementById("recentActivitiesList");
         if (!container) return;
 
-        const selectedCheckboxes = [
-            ...container.querySelectorAll(".recent-activity-checkbox:checked")
+        // Synchronize selected IDs with currently rendered checkboxes
+        const visibleCheckboxes = [
+            ...container.querySelectorAll(".recent-activity-checkbox")
         ];
-        const selectedCount = selectedCheckboxes.length;
+
+        visibleCheckboxes.forEach(checkbox => {
+            const studentId = Number(checkbox.value);
+
+            if (checkbox.checked) {
+                if (!this.selectedRecentActivityIds.includes(studentId)) {
+                    this.selectedRecentActivityIds.push(studentId);
+                }
+            } else {
+                this.selectedRecentActivityIds =
+                    this.selectedRecentActivityIds.filter(id => id !== studentId);
+            }
+        });
+
+        const selectedCount = this.selectedRecentActivityIds.length;
+
         const countElement = document.getElementById("selectedRecentActivitiesCount");
-        const markPrintedButton = document.getElementById("markSelectedPrintedButton");
-        const markIssuedButton = document.getElementById("markSelectedIssuedButton");
         const deleteButton = document.getElementById("deleteSelectedActivitiesButton");
-        document.getElementById("generateSelectedIdCardsButton").disabled = selectedCount === 0;
+        const generateButton = document.getElementById("generateSelectedIdCardsButton");
+
+        const bulkStatusSelect = document.getElementById("bulkActivityStatusSelect");
+        const updateStatusButton = document.getElementById("updateSelectedActivityStatusButton");
+
+        const selectedRows = this.recentActivitiesCache.filter(activity =>
+            this.selectedRecentActivityIds.includes(Number(activity.studentId))
+        );
+
+        if (generateButton) {
+            generateButton.disabled = selectedCount === 0;
+        }
+
         if (countElement) {
             countElement.textContent = `${selectedCount} selected`;
         }
 
-        const selectedRows = selectedCheckboxes.map(checkbox => checkbox.closest("tr")).filter(Boolean);
-        const canMarkPrinted = selectedRows.some(row => row.dataset.status === "NOT_ISSUED");
-        const canMarkIssued = selectedRows.some(row => row.dataset.status === "PRINTED");
-        if (markPrintedButton) {
-            markPrintedButton.disabled = !canMarkPrinted;
-        }
-        if (markIssuedButton) {
-            markIssuedButton.disabled = !canMarkIssued;
-        }
         if (deleteButton) {
             deleteButton.disabled = selectedCount === 0;
         }
+
+        // Update Status button
+        if (updateStatusButton) {
+            updateStatusButton.disabled = !(
+                selectedCount > 0 &&
+                bulkStatusSelect &&
+                bulkStatusSelect.value !== ""
+            );
+        }
+
+        const selectAll = document.getElementById("selectAllRecentActivities");
+
+        if (selectAll) {
+            selectAll.checked =
+                visibleCheckboxes.length > 0 &&
+                visibleCheckboxes.every(checkbox => checkbox.checked);
+
+            selectAll.indeterminate =
+                visibleCheckboxes.some(checkbox => checkbox.checked) &&
+                !selectAll.checked;
+        }
     },
+
 
     // =========================================================
     // GET SELECTED STUDENT IDS
     // =========================================================
     getSelectedRecentStudentIds() {
-        return [...document.querySelectorAll("#recentActivitiesList .recent-activity-checkbox:checked")].map(checkbox => Number(checkbox.value));
-    },
-
-    // =========================================================
-    // MARK SELECTED AS PRINTED
-    // =========================================================
-    async markSelectedActivitiesPrinted() {
-        await this.performBulkActivityAction({
-            action: "printed",
-            endpoint: "/api/id-card-activities/mark-printed/bulk",
-            confirmation: "Mark selected student ID cards as printed?"
-        });
-    },
-
-    // =========================================================
-    // MARK SELECTED AS ISSUED
-    // =========================================================
-    async markSelectedActivitiesIssued() {
-        await this.performBulkActivityAction({
-            action: "issued",
-            endpoint: "/api/id-card-activities/mark-issued/bulk",
-            confirmation: "Mark selected student ID cards as issued?"
-        });
+        return [...this.selectedRecentActivityIds];
     },
 
     // =========================================================
@@ -881,46 +1019,58 @@ const BulkIdCards = {
         });
     },
 
-    // =========================================================
-    // EXECUTE BULK ACTIVITY ACTION
-    // =========================================================
+// =========================================================
+// EXECUTE BULK ACTIVITY ACTION
+// =========================================================
+// =========================================================
+// EXECUTE BULK ACTIVITY ACTION
+// =========================================================
     async performBulkActivityAction({ action, endpoint, confirmation }) {
         const studentIds = this.getSelectedRecentStudentIds();
+
         if (!studentIds.length) {
             this.showError("Please select at least one Student ID.");
             return;
         }
+
         if (!confirm(`${confirmation}\nSelected records: ${studentIds.length}`)) {
             return;
         }
+
         const buttonIds = {
-            printed: "markSelectedPrintedButton",
-            issued: "markSelectedIssuedButton",
             delete: "deleteSelectedActivitiesButton"
         };
+
         const button = document.getElementById(buttonIds[action]);
+
         try {
             if (button) {
                 button.disabled = true;
                 button.textContent = "Processing...";
             }
+
             await Api.post(endpoint, { studentIds });
+
+            this.selectedRecentActivityIds = [];
+
             await this.loadRecentActivities();
+
             alert("Selected activity records updated successfully.");
+
         } catch (error) {
             console.error(`Bulk ${action} operation failed:`, error);
             this.showError(error?.message || "Unable to process the selected records.");
+
         } finally {
             if (button) {
-                button.textContent = {
-                    printed: "Mark Printed",
-                    issued: "Mark Issued",
-                    delete: "Delete"
-                }[action];
+                button.disabled = false;
+                button.textContent = "Delete";
             }
+
             this.updateRecentActivitySelection();
         }
     },
+
 
     // =========================================================
     // GET STUDENT IDS FROM RANGE
@@ -1232,6 +1382,69 @@ const BulkIdCards = {
         actionSection.style.display = selected.length ? "flex" : "none";
         printButton.textContent = `Print Selected ID Cards (${selected.length})`;
         printButton.disabled = selected.length === 0;
+    },
+
+    async updateSelectedActivitiesStatus() {
+        debugger;
+        const studentIds = this.getSelectedRecentStudentIds();
+
+        const statusSelect = document.getElementById("bulkActivityStatusSelect");
+        const updateButton = document.getElementById("updateSelectedActivityStatusButton");
+
+        const status = statusSelect?.value;
+
+        if (!studentIds.length) {
+            this.showError("Please select at least one Student ID.");
+            return;
+        }
+
+        if (!status) {
+            this.showError("Please select a new status.");
+            return;
+        }
+
+        const statusLabel = this.getRecentActivityStatusLabel(status);
+
+        if (!confirm(
+            `Update the status of selected ID card activities to "${statusLabel}"?\nSelected records: ${studentIds.length}`
+        )) {
+            return;
+        }
+
+        try {
+            if (updateButton) {
+                updateButton.disabled = true;
+                updateButton.textContent = "Updating...";
+            }
+
+            await Api.post(
+                "/api/id-card-activities/status/bulk",
+                {
+                    studentIds,
+                    status
+                }
+            );
+
+            this.selectedRecentActivityIds = [];
+
+            await this.loadRecentActivities();
+
+            if (statusSelect) {
+                statusSelect.value = "";
+            }
+
+            alert("Selected ID card activity statuses updated successfully.");
+
+        } catch (error) {
+            console.error("Bulk status update failed:", error);
+            this.showError(error?.message || "Unable to update selected statuses.");
+        } finally {
+            if (updateButton) {
+                updateButton.textContent = "Update Selected Status";
+            }
+
+            this.updateRecentActivitySelection();
+        }
     },
 
     // =========================================================

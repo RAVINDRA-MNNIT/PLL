@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class IdCardActivityResponse {
 
     private Long studentId;
+    private String idCardStatus;
     private Boolean printLater;
     private LocalDateTime printedAt;
     private LocalDateTime issuedAt;
@@ -13,12 +14,15 @@ public class IdCardActivityResponse {
 
     public IdCardActivityResponse(
             Long studentId,
+            String idCardStatus,
             Boolean printLater,
             LocalDateTime printedAt,
             LocalDateTime issuedAt,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
+
         this.studentId = studentId;
+        this.idCardStatus = idCardStatus;
         this.printLater = printLater;
         this.printedAt = printedAt;
         this.issuedAt = issuedAt;
@@ -28,6 +32,10 @@ public class IdCardActivityResponse {
 
     public Long getStudentId() {
         return studentId;
+    }
+
+    public String getIdCardStatus() {
+        return idCardStatus;
     }
 
     public Boolean getPrintLater() {

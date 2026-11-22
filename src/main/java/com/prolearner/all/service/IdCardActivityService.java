@@ -231,6 +231,7 @@ public class IdCardActivityService {
                 .stream()
                 .map(activity -> new IdCardActivityResponse(
                         activity.getStudent().getStudentId(),
+                        activity.getStudent().getIdCardStatus(),
                         activity.getPrintLater(),
                         activity.getPrintedAt(),
                         activity.getIssuedAt(),
@@ -241,11 +242,28 @@ public class IdCardActivityService {
     }
 
     // =========================================================
-    // MARK SELECTED CARDS AS PRINTED
-    // =========================================================
+// UPDATE ID CARD STATUS — BULK
+// =========================================================
     @Transactional
-    public Map<String, Object> markPrintedBulk(
-            List<Long> studentIds) {
+    public Map<String, Object> updateBulkStatus(
+            List<Long> studentIds,
+            String status) {
+
+        Set<String> validStatuses = Set.of(
+                "NOT_ISSUED",
+                "PHOTO_COLLECTED_PRINTED",
+                "PHOTO_COLLECTED_NOT_PRINTED",
+                "PHOTO_PENDING_PRINTED",
+                "PHOTO_PENDING_NOT_PRINTED",
+                "READY",
+                "ISSUED"
+        );
+
+        status = status == null ? "" : status.trim().toUpperCase();
+
+        if (!validStatuses.contains(status)) {
+            throw new IllegalArgumentException("Invalid ID card status: " + status);
+        }
 
         List<IdCardActivity> activities =
                 getRequestedActivities(studentIds);
@@ -262,16 +280,39 @@ public class IdCardActivityService {
             Students student = activity.getStudent();
             Long businessStudentId = student.getStudentId();
 
-            if (activity.getIssuedAt() != null) {
+            // Do not revert an already issued card.
+            if (activity.getIssuedAt() != null && !"ISSUED".equals(status)) {
                 skippedIds.add(businessStudentId);
                 continue;
             }
 
-            activity.setPrintedAt(activityNow);
             activity.setUpdatedAt(activityNow);
+            student.setIdCardStatus(status);
 
-            student.setIdCardStatus("PRINTED");
-            student.setCardPrintedAt(studentNow);
+            // Update printed timestamp
+            if (status.equals("PHOTO_COLLECTED_PRINTED")
+                    || status.equals("PHOTO_PENDING_PRINTED")
+                    || status.equals("READY")
+                    || status.equals("ISSUED")) {
+
+                if (activity.getPrintedAt() == null) {
+                    activity.setPrintedAt(activityNow);
+                }
+
+                student.setCardPrintedAt(studentNow);
+            }
+
+            // Update issued timestamp
+            if ("ISSUED".equals(status)) {
+
+                if (activity.getPrintedAt() == null) {
+                    activity.setPrintedAt(activityNow);
+                    student.setCardPrintedAt(studentNow);
+                }
+
+                activity.setIssuedAt(activityNow);
+                student.setCardIssuedAt(studentNow);
+            }
 
             updatedStudents.add(student);
             updatedIds.add(businessStudentId);
@@ -281,56 +322,8 @@ public class IdCardActivityService {
         studentRepository.saveAll(updatedStudents);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Bulk print status processing completed.");
-        result.put("updatedCount", updatedIds.size());
-        result.put("updatedStudentIds", updatedIds);
-        result.put("skippedStudentIds", skippedIds);
-
-        return result;
-    }
-
-    // =========================================================
-    // MARK SELECTED CARDS AS ISSUED
-    // =========================================================
-    @Transactional
-    public Map<String, Object> markIssuedBulk(
-            List<Long> studentIds) {
-
-        List<IdCardActivity> activities =
-                getRequestedActivities(studentIds);
-
-        LocalDateTime activityNow = LocalDateTime.now();
-        OffsetDateTime studentNow = OffsetDateTime.now();
-
-        List<Long> updatedIds = new ArrayList<>();
-        List<Long> skippedIds = new ArrayList<>();
-        List<Students> updatedStudents = new ArrayList<>();
-
-        for (IdCardActivity activity : activities) {
-
-            Students student = activity.getStudent();
-            Long businessStudentId = student.getStudentId();
-
-            if (activity.getPrintedAt() == null) {
-                skippedIds.add(businessStudentId);
-                continue;
-            }
-
-            activity.setIssuedAt(activityNow);
-            activity.setUpdatedAt(activityNow);
-
-            student.setIdCardStatus("ISSUED");
-            student.setCardIssuedAt(studentNow);
-
-            updatedStudents.add(student);
-            updatedIds.add(businessStudentId);
-        }
-
-        activityRepository.saveAll(activities);
-        studentRepository.saveAll(updatedStudents);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("message", "Bulk issue status processing completed.");
+        result.put("message", "Bulk ID card status update completed.");
+        result.put("status", status);
         result.put("updatedCount", updatedIds.size());
         result.put("updatedStudentIds", updatedIds);
         result.put("skippedStudentIds", skippedIds);

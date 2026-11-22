@@ -574,3 +574,107 @@
         font-size: 12px;
     }
 }
+
+
+.recent-activity-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.recent-activity-toolbar .filter-select {
+    min-width: 145px;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 13px;
+}
+
+.bulk-status-update {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bulk-status-update-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .recent-activity-toolbar {
+        align-items: stretch;
+    }
+
+    .recent-activity-toolbar > *,
+    .bulk-status-update {
+        flex: 1 1 45%;
+    }
+
+    .bulk-status-update-fields {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.recent-activity-toolbar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.id-card-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* Not Issued */
+.status-not_issued {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Photo Collected */
+.status-photo_collected_printed {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.status-photo_collected_not_printed {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* Photo Pending */
+.status-photo_pending_printed {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-photo_pending_not_printed {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+/* Ready */
+.status-ready {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+/* Issued */
+.status-issued {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+

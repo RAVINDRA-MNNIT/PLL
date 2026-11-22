@@ -122,13 +122,68 @@
                 <h2 id="recentActivitiesHeading">Recent ID Card Activities</h2>
                 <p>Review and manage student ID card activities.</p>
             </div>
+
             <div class="recent-activity-toolbar">
-                <button type="button" id="generateSelectedIdCardsButton" class="primary-button" disabled>Generate ID Card</button>
-                <button type="button" id="markSelectedPrintedButton" class="primary-button" disabled>Mark Printed</button>
-                <button type="button" id="markSelectedIssuedButton" class="secondary-button" disabled>Mark Issued</button>
-                <button type="button" id="deleteSelectedActivitiesButton" class="danger-button" disabled>Delete</button>
-                <button type="button" id="refreshRecentActivitiesButton" class="secondary-button">Refresh</button>
+
+                <!-- Status Filter -->
+                <select id="recentActivityStatusFilter" class="filter-select">
+                    <option value="ALL">All Statuses</option>
+                    <option value="NOT_ISSUED">Not Issued</option>
+                    <option value="PHOTO_COLLECTED_PRINTED">Photo Collected and Printed</option>
+                    <option value="PHOTO_COLLECTED_NOT_PRINTED">Photo Collected and Not Printed</option>
+                    <option value="PHOTO_PENDING_PRINTED">Photo Pending and Printed</option>
+                    <option value="PHOTO_PENDING_NOT_PRINTED">Photo Pending and Not Printed</option>
+                    <option value="READY">Ready</option>
+                    <option value="ISSUED">Issued</option>
+                </select>
+
+                <!-- Print Later Filter -->
+                <select id="recentActivityPrintLaterFilter" class="filter-select">
+                    <option value="ALL">All Print Later</option>
+                    <option value="true">Print Later: Yes</option>
+                    <option value="false">Print Later: No</option>
+                </select>
+
+                <button type="button" id="generateSelectedIdCardsButton"
+                        class="primary-button" disabled>
+                    Generate ID Card
+                </button>
+
+                <!-- Bulk Status Update -->
+                <div class="bulk-status-update">
+                    <div class="bulk-status-update-fields">
+                        <select id="bulkActivityStatusSelect" class="filter-select">
+                            <option value="">Select New Status</option>
+                            <option value="NOT_ISSUED">Not Issued</option>
+                            <option value="PHOTO_COLLECTED_PRINTED">Photo Collected and Printed</option>
+                            <option value="PHOTO_COLLECTED_NOT_PRINTED">Photo Collected and Not Printed</option>
+                            <option value="PHOTO_PENDING_PRINTED">Photo Pending and Printed</option>
+                            <option value="PHOTO_PENDING_NOT_PRINTED">Photo Pending and Not Printed</option>
+                            <option value="READY">Ready</option>
+                            <option value="ISSUED">Issued</option>
+                        </select>
+
+                        <button type="button"
+                                id="updateSelectedActivityStatusButton"
+                                class="primary-button"
+                                disabled>
+                            Update Selected Status
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" id="deleteSelectedActivitiesButton"
+                        class="danger-button" disabled>
+                    Delete
+                </button>
+
+                <button type="button" id="refreshRecentActivitiesButton"
+                        class="secondary-button">
+                    Refresh
+                </button>
+
             </div>
+
         </div>
         <div id="recentActivitiesList">
             <div class="empty-state">Select Recent Activities to load records.</div>

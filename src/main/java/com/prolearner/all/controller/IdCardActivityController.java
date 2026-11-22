@@ -90,24 +90,20 @@ public class IdCardActivityController {
     }
 
     // =========================================================
-    // MARK PRINTED — BULK
-    // POST /api/id-card-activities/mark-printed/bulk
+    // UPDATE STATUS — BULK
+    // POST /api/id-card-activities/status/bulk
     // =========================================================
-    @PostMapping("/mark-printed/bulk")
-    public ResponseEntity<Map<String, Object>> markPrintedBulk(
-            @Valid @RequestBody BulkPrintLaterRequest request) {
-        return ResponseEntity.ok(activityService.markPrintedBulk(request.getStudentIds()));
-    }
+        @PostMapping("/status/bulk")
+        public ResponseEntity<Map<String, Object>> updateBulkStatus(
+                @Valid @RequestBody BulkIdCardStatusRequest request) {
 
-    // =========================================================
-    // MARK ISSUED — BULK
-    // POST /api/id-card-activities/mark-issued/bulk
-    // =========================================================
-    @PostMapping("/mark-issued/bulk")
-    public ResponseEntity<Map<String, Object>> markIssuedBulk(
-            @Valid @RequestBody BulkPrintLaterRequest request) {
-        return ResponseEntity.ok(activityService.markIssuedBulk(request.getStudentIds()));
-    }
+            return ResponseEntity.ok(
+                    activityService.updateBulkStatus(
+                            request.getStudentIds(),
+                            request.getStatus()
+                    )
+            );
+        }
 
     // =========================================================
     // DELETE ACTIVITIES — BULK
