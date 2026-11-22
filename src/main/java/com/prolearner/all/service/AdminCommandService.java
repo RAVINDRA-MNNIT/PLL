@@ -166,6 +166,7 @@ public class AdminCommandService {
                     .enrollmentStatus(EnrollmentStatus.ACTIVE.name())
                     .terminationCount(0)
                     .idCardStatus("NOT_ISSUED")
+                    .availableBalance(BigDecimal.ZERO)
                     .createdBy(adminId)
                     .createdAt(OffsetDateTime.now())
                     .updatedAt(OffsetDateTime.now())
