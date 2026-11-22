@@ -377,13 +377,7 @@ debugger;
                 throw new Error("No response received from server.");
             }
             const status = String(response.idCardStatus || "NOT_ISSUED").toUpperCase();
-
-            const statusLabels = {
-                NOT_ISSUED: "Not Issued",
-                PRINTED: "Printed",
-                ISSUED: "Issued"
-            };
-            const statusLabel = statusLabels[status] || status;
+            const statusLabel = this.getRecentActivityStatusLabel(status);
             const statusClass = {
                 NOT_ISSUED: "not-issued",
                 PRINTED: "printed",
@@ -789,14 +783,21 @@ debugger;
             return;
         }
 
-        const formatDate = value => {
-            if (!value) return "—";
-
-            const date = new Date(value);
-
-            return Number.isNaN(date.getTime())
-                ? "—"
-                : date.toLocaleString("en-IN");
+        const formatDate = (dateValue) => {
+            if (!dateValue) {
+                return "Not available";
+            }
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) {
+                return "Not available";
+            }
+            return date.toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
         };
 
         container.innerHTML = `
