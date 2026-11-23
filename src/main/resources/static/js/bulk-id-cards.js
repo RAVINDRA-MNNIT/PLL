@@ -74,13 +74,18 @@ const BulkIdCards = {
         const printLaterFilter = document.getElementById("recentActivityPrintLaterFilter");
         const bulkStatusSelect = document.getElementById("bulkActivityStatusSelect");
         const updateStatusButton = document.getElementById("updateSelectedActivityStatusButton");
-debugger;
         if (statusFilter) {
-            statusFilter.onchange = () => this.renderFilteredRecentActivities();
+            statusFilter.onchange = () => {
+                this.selectedRecentActivityIds = [];
+                this.renderFilteredRecentActivities();
+            };
         }
 
         if (printLaterFilter) {
-            printLaterFilter.onchange = () => this.renderFilteredRecentActivities();
+            printLaterFilter.onchange = () => {
+                this.selectedRecentActivityIds = [];
+                this.renderFilteredRecentActivities();
+            };
         }
 
         if (bulkStatusSelect) {
@@ -407,7 +412,7 @@ debugger;
             // =====================================================
             // RENDER STUDENT STATUS
             // =====================================================
-            const fullName = response.fullName || "Not available";
+            const fullName = (response.fullName || "Not available").toUpperCase();
             const studentInitial = fullName === "Not available" ? "S" : fullName.charAt(0).toUpperCase();
             resultContainer.innerHTML = `
             <div class="student-status-result-card">
@@ -737,17 +742,10 @@ debugger;
     renderFilteredRecentActivities() {
         const statusFilter = document.getElementById("recentActivityStatusFilter")?.value || "ALL";
         const printLaterFilter = document.getElementById("recentActivityPrintLaterFilter")?.value || "ALL";
-
         const activities = this.recentActivitiesCache.filter(activity => {
             const status = this.getRecentActivityStatus(activity);
-
-            const matchesStatus =
-                statusFilter === "ALL" || status === statusFilter;
-
-            const matchesPrintLater =
-                printLaterFilter === "ALL" ||
-                String(activity.printLater === true) === printLaterFilter;
-
+            const matchesStatus = statusFilter === "ALL" || (statusFilter === "TO_BE_PRINTED" && (status === "NOT_ISSUED" || status.endsWith("_NOT_PRINTED"))) || status === statusFilter;
+            const matchesPrintLater = printLaterFilter === "ALL" || String(activity.printLater === true) === printLaterFilter;
             return matchesStatus && matchesPrintLater;
         });
 
@@ -1589,7 +1587,7 @@ debugger;
                             </div>
 
                             <div class="student-name">
-                                ${this.escapeHtml(student.fullName ?? "-")}
+                                ${this.escapeHtml((student.fullName ?? "-").toUpperCase())}
                             </div>
 
                             <div class="student-field">
