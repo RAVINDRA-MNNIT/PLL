@@ -841,9 +841,16 @@ const BulkIdCards = {
                                         ${selected ? "checked" : ""}
                                         aria-label="Select Student ID ${studentId}">
                                 </td>
-
-                                <td>${studentId}</td>
-
+                                <td>
+                                    <a
+                                        href="/student-details.html?id=${studentId}"
+                                        target="_blank"
+                                        onclick="event.stopPropagation()">
+                                        <strong>
+                                            ${escapeHtml(studentId)}
+                                        </strong>
+                                    </a>
+                                </td>
                                 <td>
                                     <span class="id-card-status status-${status.toLowerCase()}">
                                         ${this.escapeHtml(this.getRecentActivityStatusLabel(status))}
@@ -1263,7 +1270,15 @@ const BulkIdCards = {
                 >
 
                 <span class="saved-student-id-number">
-                    Student ID: ${studentId}
+                    Student ID:
+                    <a
+                        href="/student-details.html?id=${studentId}"
+                        target="_blank"
+                        onclick="event.stopPropagation()">
+                        <strong>
+                            ${escapeHtml(studentId)}
+                        </strong>
+                    </a>
                 </span>
 
             </div>
