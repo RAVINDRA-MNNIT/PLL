@@ -87,40 +87,46 @@
     text-transform: uppercase;
 }
 
-/* Active */
+/* Active - Green */
 .badge.active {
     color: #166534;
     background: #dcfce7;
     border-color: #86efac;
 }
 
-/* Expired */
+/* Expired - Red */
 .badge.expired {
     color: #991b1b;
     background: #fee2e2;
     border-color: #fca5a5;
 }
 
-/* Discontinued */
-.badge.discontinued {
-    color: #92400e;
-    background: #fef3c7;
-    border-color: #fcd34d;
+/* Outdated - Amber */
+.badge.outdated {
+    color: #854d0e;
+    background: #fef9c3;
+    border-color: #fde047;
 }
 
-/* Terminated */
+/* Discontinued - Orange */
+.badge.discontinued {
+    color: #9a3412;
+    background: #ffedd5;
+    border-color: #fdba74;
+}
+
+/* Terminated - Grey */
 .badge.terminated {
-    color: #6b7280;
+    color: #4b5563;
     background: #f3f4f6;
     border-color: #d1d5db;
     text-decoration: line-through;
     text-decoration-thickness: 2px;
-    text-decoration-color: #6b7280;
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 /* Default */
-.badge:not(.active):not(.expired):not(.discontinued):not(.terminated) {
+.badge:not(.active):not(.expired):not(.discontinued):not(.terminated):not(.outdated)  {
     color: #475569;
     background: #f1f5f9;
     border-color: #cbd5e1;

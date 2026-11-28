@@ -14,8 +14,8 @@ public class ConfigurationDTO {
     @JsonProperty("DAYS_FOR_EXPIRE")
     private Integer daysForExpire;
 
-    @JsonProperty("DAYS_FOR_DISCONTINUE")
-    private Integer daysForDiscontinue;
+    @JsonProperty("DAYS_FOR_OUTDATED")
+    private Integer daysForOutdated;
 
     @JsonProperty("DAYS_BEFORE_NEXT_FEE_SUBMIT")
     private Integer daysBeforeNextFeeSubmit;

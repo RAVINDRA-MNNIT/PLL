@@ -451,6 +451,7 @@ renderStatus(status) {
         approved: "status-approved",
         cancelled: "status-cancelled",
         expired: "status-expired",
+        outdated: "status-outdated",
         discontinued: "status-discontinued",
         terminated: "status-terminated"
     };

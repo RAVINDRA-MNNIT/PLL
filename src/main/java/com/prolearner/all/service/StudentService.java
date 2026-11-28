@@ -67,8 +67,8 @@ public class StudentService {
             boolean discount,
             Pageable pageable) {
 
-        LocalDate discontinuedDate =
-                LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        LocalDate outdatedDate =
+                LocalDate.now().minusDays(configurationService.getDaysForOutdated());
 
         Page<StudentListItem> page = studentRepo.findStudents(
                 searchBy,
@@ -77,7 +77,7 @@ public class StudentService {
                 enrollmentStatus,
                 pendingFees,
                 discount,
-                discontinuedDate,
+                outdatedDate,
                 pageable
         );
 
@@ -306,8 +306,8 @@ public class StudentService {
                     diffDays < 0
                             && enrollmentStatus == EnrollmentStatus.ACTIVE;
 
-            boolean isDiscontinued =
-                    diffDays < -configurationService.getDaysForDiscontinue()
+            boolean isOutdated =
+                    diffDays < -configurationService.getDaysForOutdated()
                             && enrollmentStatus == EnrollmentStatus.ACTIVE;
 
             if (enrollmentStatus == EnrollmentStatus.TERMINATED
@@ -316,9 +316,9 @@ public class StudentService {
 
                 // Keep existing status
 
-            } else if (isDiscontinued) {
+            } else if (isOutdated) {
 
-                enrollmentStatus = EnrollmentStatus.DISCONTINUED;
+                enrollmentStatus = EnrollmentStatus.OUTDATED;
 
             } else if (isExpired) {
 
@@ -389,12 +389,12 @@ public class StudentService {
 
     public OverallStrengthResponse getOverallStrength() {
 
-        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        LocalDate outdatedDate = LocalDate.now().minusDays(configurationService.getDaysForOutdated());
 
         List<StrengthProjection> strengths =
                 studentRepo.getBatchWiseStrength(
                         List.of("ACTIVE", "EXPIRED"),
-                        discontinuedDate
+                        outdatedDate
                 );
 
         List<OveraallStrengthItem> room1 = new ArrayList<>();
@@ -444,10 +444,10 @@ public class StudentService {
 
     public FullDayStrengthResponse getStrength(List<String> rooms) {
 
-        LocalDate discontinuedDate =
-                LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        LocalDate outdatedDate =
+                LocalDate.now().minusDays(configurationService.getDaysForOutdated());
 
-        List<FullDayStrength> seats = seatRepo.getStrengthByRooms(rooms, discontinuedDate)
+        List<FullDayStrength> seats = seatRepo.getStrengthByRooms(rooms, outdatedDate)
                 .stream()
                 .map(s -> new FullDayStrength(
                         s.getSeatNumber(),
@@ -473,8 +473,8 @@ public class StudentService {
     }
 
     public ShiftStrengthResponse getRoomStrength(String room) {
-        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
-        List<Room2StrengthProjection> rows = studentRepo.getStrengthByRooms(List.of(room), List.of("ACTIVE", "EXPIRED"), discontinuedDate);
+        LocalDate outdatedDate = LocalDate.now().minusDays(configurationService.getDaysForOutdated());
+        List<Room2StrengthProjection> rows = studentRepo.getStrengthByRooms(List.of(room), List.of("ACTIVE", "EXPIRED"), outdatedDate);
         long fullDayCount = getStrength(List.of(room)).occupied();
 
         List<StrengthCount> firstShift = new ArrayList<>();
@@ -680,9 +680,9 @@ public class StudentService {
     }
 
     public StudentVerificationResponse verifyStudent(Long studentId) {
-        LocalDate discontinuedDate = LocalDate.now().minusDays(configurationService.getDaysForDiscontinue());
+        LocalDate outdatedDate = LocalDate.now().minusDays(configurationService.getDaysForOutdated());
         StudentVerificationResponse response =
-                studentRepo.verifyStudent(studentId, discontinuedDate)
+                studentRepo.verifyStudent(studentId, outdatedDate)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Student not found: " + studentId

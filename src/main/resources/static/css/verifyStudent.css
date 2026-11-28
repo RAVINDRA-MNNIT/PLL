@@ -228,37 +228,37 @@
 }
 
 
-/* ✅ ACTIVE */
-
+/* Active - Green */
 .student-result-status.active {
-    background: #d1f2e1;
-    color: #1e7e34;
+    background: #dcfce7;
+    color: #166534;
 }
 
-
-/* ⚠️ EXPIRED */
-
+/* Expired - Red */
 .student-result-status.expired {
-    background: #f5c6cb;
-    color: #721c24;
+    background: #fee2e2;
+    color: #991b1b;
 }
 
+/* Outdated - Amber */
+.student-result-status.outdated {
+    background: #fef9c3;
+    color: #854d0e;
+}
 
-/* ❌ DISCONTINUED */
-
+/* Discontinued - Orange */
 .student-result-status.discontinued {
-    background: #f8d7da;
-    color: #721c24;
+    background: #ffedd5;
+    color: #9a3412;
 }
 
-
-/* ❌ TERMINATED */
-
+/* Terminated - Grey */
 .student-result-status.terminated {
-    background: #f8d7da;
-    color: #721c24;
+    background: #f3f4f6;
+    color: #4b5563;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
 }
-
 
 /* =========================
    ISSUES SECTION
@@ -343,42 +343,54 @@
 
 
 /* =========================
-   ACTIVE ISSUE
+   ACTIVE ISSUE - GREEN
    ========================= */
 
 .issue-item.active {
-    background: #d1f2e1;
-    color: #1e7e34;
+    background: #dcfce7;
+    color: #166534;
 }
 
 
 /* =========================
-   EXPIRED ISSUE
+   EXPIRED ISSUE - RED
    ========================= */
 
 .issue-item.expired {
-    background: #f5c6cb;
-    color: #721c24;
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 
 /* =========================
-   DISCONTINUED ISSUE
+   OUTDATED ISSUE - AMBER
+   ========================= */
+
+.issue-item.outdated {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+
+/* =========================
+   DISCONTINUED ISSUE - ORANGE
    ========================= */
 
 .issue-item.discontinued {
-    background: #f8d7da;
-    color: #721c24;
+    background: #ffedd5;
+    color: #9a3412;
 }
 
 
 /* =========================
-   TERMINATED ISSUE
+   TERMINATED ISSUE - GREY
    ========================= */
 
 .issue-item.terminated {
-    background: #f8d7da;
-    color: #721c24;
+    background: #f3f4f6;
+    color: #4b5563;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
 }
 
 

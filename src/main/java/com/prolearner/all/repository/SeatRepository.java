@@ -41,10 +41,10 @@ SELECT
 
     CASE
         WHEN st.id IS NULL THEN NULL
-        WHEN st.enrollment_status IN ('TERMINATED','DISCONTINUED','EXPIRED')
+        WHEN st.enrollment_status IN ('TERMINATED','DISCONTINUED','EXPIRED', 'OUTDATED')
             THEN st.enrollment_status
-        WHEN fr.till_date < :discontinuedDate
-            THEN 'DISCONTINUED'
+        WHEN fr.till_date < :outdatedDate
+            THEN 'OUTDATED'
         WHEN fr.till_date < CURRENT_DATE
             THEN 'EXPIRED'
         ELSE 'ACTIVE'
@@ -65,6 +65,6 @@ ORDER BY se.id
 """, nativeQuery = true)
     List<FullDayStrengthProjection> getStrengthByRooms(
             @Param("rooms") List<String> rooms,
-            @Param("discontinuedDate") LocalDate discontinuedDate
+            @Param("outdatedDate") LocalDate outdatedDate
     );
 }

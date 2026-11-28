@@ -224,6 +224,11 @@ window.FeeForm = {
             statusElement.style.color = "#B91C1C";
             break;
 
+        case "OUTDATED":
+            statusElement.style.background = "#FEF3C7";
+            statusElement.style.color = "#B45309";
+            break;
+
         case "DISCONTINUED":
             statusElement.style.background = "#FEF3C7";
             statusElement.style.color = "#B45309";

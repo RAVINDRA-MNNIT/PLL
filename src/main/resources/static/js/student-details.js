@@ -220,6 +220,7 @@ initialize() {
         const map = {
             ACTIVE: "active",
             EXPIRED: "expired",
+            OUTDATED: "outdated",
             DISCONTINUED: "discontinued",
             TERMINATED: "terminated"
         };

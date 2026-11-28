@@ -157,10 +157,12 @@ function createStudentRow(student) {
     const badgeClassMap = {
         ACTIVE: "active",
         EXPIRED: "expired",
+        OUTDATED: "outdated",
         DISCONTINUED: "discontinued",
         TERMINATED: "terminated"
     };
     const DAYS_BEFORE_NEXT_FEE_SUBMIT = getConfigurations().DAYS_BEFORE_NEXT_FEE_SUBMIT ?? 3
+    debugger;
     const badgeClass =
         badgeClassMap[student.enrollmentStatus?.toUpperCase()] || "";
     let isTerminated = true;

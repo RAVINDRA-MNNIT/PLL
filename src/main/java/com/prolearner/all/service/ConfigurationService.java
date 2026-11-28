@@ -22,7 +22,7 @@ public class ConfigurationService {
         update("LIBRARY_NAME", configuration.getLibraryName());
         update("FINE_PER_DAY", String.valueOf(configuration.getFinePerDay()));
         update("DAYS_FOR_EXPIRE", String.valueOf(configuration.getDaysForExpire()));
-        update("DAYS_FOR_DISCONTINUE", String.valueOf(configuration.getDaysForDiscontinue()));
+        update("DAYS_FOR_OUTDATED", String.valueOf(configuration.getDaysForOutdated()));
         update("DAYS_BEFORE_NEXT_FEE_SUBMIT", String.valueOf(configuration.getDaysBeforeNextFeeSubmit()));
         update("PAGE_LIMIT", String.valueOf(configuration.getPageLimit()));
         update("MINIMUM_DAYS_FOR_DATE_ADJUSTMENT", String.valueOf(configuration.getMinimumDaysForDateAdjustment()));
@@ -83,9 +83,9 @@ public class ConfigurationService {
         configurationRepo.save(configuration);
     }
 
-    public int getDaysForDiscontinue() {
+    public int getDaysForOutdated() {
         return Integer.parseInt(
-                configurationRepo.findByProperty("DAYS_FOR_DISCONTINUE")
+                configurationRepo.findByProperty("DAYS_FOR_OUTDATED")
                         .orElseThrow(() -> new RuntimeException("Configuration not found"))
                         .getValue()
         );

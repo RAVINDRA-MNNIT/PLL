@@ -453,14 +453,15 @@ function getDateDifferenceInDays(fromDate, toDate) {
     return Math.floor((to - from) / (1000 * 60 * 60 * 24));
 }
 
-function getUpdatedEnrollment(fromDate, toDate, enrollmentStatus) {
+function getUpdatedEnrollment(fromDate, toDate, enrollmentStatus, daysForOutdated) {
+    debugger;
     const diffDays = getDateDifferenceInDays(fromDate, toDate)
     const isExpired = (diffDays < 0 && (enrollmentStatus === "ACTIVE"));
-    const isDiscontinued = (diffDays < -10 && (enrollmentStatus === "ACTIVE"));
-    if (enrollmentStatus == "TERMINATED" || enrollmentStatus == "DISCONTINUED" || enrollmentStatus == "EXPIRED") {
+    const isOutdated = (diffDays < -(daysForOutdated) && (enrollmentStatus === "ACTIVE"));
+    if (enrollmentStatus === "TERMINATED" || enrollmentStatus === "DISCONTINUED" || enrollmentStatus === "EXPIRED" || enrollmentStatus === "OUTDATED") {
         return enrollmentStatus
-    } else if (isDiscontinued) {
-        return "DISCONTINUED"
+    } else if (isOutdated) {
+        return "OUTDATED"
     }else if (isExpired) {
         return "EXPIRED"
     } else {
@@ -696,6 +697,7 @@ function renderStatus(status) {
         approved: "status-approved",
         cancelled: "status-cancelled",
         expired: "status-expired",
+        outdated: "status-outdated",
         discontinued: "status-discontinued",
         terminated: "status-terminated"
     };

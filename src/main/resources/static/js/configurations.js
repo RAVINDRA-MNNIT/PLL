@@ -88,7 +88,7 @@ const Configurations = {
         document.getElementById("finePerDay").value = config.FINE_PER_DAY ?? "";
         document.getElementById("libraryName").value = config.LIBRARY_NAME ?? "";
         document.getElementById("daysForExpire").value = config.DAYS_FOR_EXPIRE ?? "";
-        document.getElementById("daysForDiscontinue").value = config.DAYS_FOR_DISCONTINUE ?? "";
+        document.getElementById("daysForOutdated").value = config.DAYS_FOR_OUTDATED ?? "";
         document.getElementById("daysBeforeNextFeeSubmit").value = config.DAYS_BEFORE_NEXT_FEE_SUBMIT ?? "";
         document.getElementById("pageLimit").value = config.PAGE_LIMIT ?? "";
         document.getElementById("minimumDaysForDateAdjustment").value = config.MINIMUM_DAYS_FOR_DATE_ADJUSTMENT ?? "";
@@ -272,7 +272,7 @@ const Configurations = {
         const libraryName = document.getElementById("libraryName").value.trim();
         const finePerDay = document.getElementById("finePerDay").value;
         const daysForExpire = document.getElementById("daysForExpire").value;
-        const daysForDiscontinue = document.getElementById("daysForDiscontinue").value;
+        const daysForOutdated = document.getElementById("daysForOutdated").value;
         const daysBeforeNextFeeSubmit = document.getElementById("daysBeforeNextFeeSubmit").value;
         const pageLimit = document.getElementById("pageLimit").value;
         const minimumDaysForDateAdjustment = document.getElementById("minimumDaysForDateAdjustment").value;
@@ -287,8 +287,8 @@ const Configurations = {
         if (!daysForExpire) {
             return alert("Days for expire is required.");
         }
-        if (!daysForDiscontinue) {
-            return alert("Days for discontinue is required.");
+        if (!daysForOutdated) {
+            return alert("Days for outdated is required.");
         }
         if (!daysBeforeNextFeeSubmit) {
             return alert("Days before next fee submit is required.");
@@ -306,7 +306,7 @@ const Configurations = {
             LIBRARY_NAME: libraryName,
             FINE_PER_DAY: Number(finePerDay),
             DAYS_FOR_EXPIRE: Number(daysForExpire),
-            DAYS_FOR_DISCONTINUE: Number(daysForDiscontinue),
+            DAYS_FOR_OUTDATED: Number(daysForOutdated),
             DAYS_BEFORE_NEXT_FEE_SUBMIT: Number(daysBeforeNextFeeSubmit),
             PAGE_LIMIT: Number(pageLimit),
             MINIMUM_DAYS_FOR_DATE_ADJUSTMENT: Number(minimumDaysForDateAdjustment),

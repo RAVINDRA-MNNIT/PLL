@@ -4,5 +4,6 @@ public enum EnrollmentStatus {
     ACTIVE,
     EXPIRED,
     TERMINATED,
-    DISCONTINUED
+    OUTDATED,
+    DISCONTINUED,
 }

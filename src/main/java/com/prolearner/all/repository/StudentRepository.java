@@ -48,10 +48,10 @@ SELECT new com.prolearner.all.dto.StudentListItem(
     fr.fromDate,
     fr.tillDate,
     CASE
-        WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED')
+        WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED', 'OUTDATED')
             THEN s.enrollmentStatus
-        WHEN fr.tillDate < :discontinuedDate
-            THEN 'DISCONTINUED'
+        WHEN fr.tillDate < :outdatedDate
+            THEN 'OUTDATED'
         WHEN fr.tillDate < CURRENT_DATE
             THEN 'EXPIRED'
         ELSE 'ACTIVE'
@@ -105,10 +105,10 @@ AND (
     OR :enrollmentStatus = 'all'
     OR (
         CASE
-            WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED')
+            WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED', 'OUTDATED')
                 THEN s.enrollmentStatus
-            WHEN fr.tillDate < :discontinuedDate
-                THEN 'DISCONTINUED'
+            WHEN fr.tillDate < :outdatedDate
+                THEN 'OUTDATED'
             WHEN fr.tillDate < CURRENT_DATE
                 THEN 'EXPIRED'
             ELSE 'ACTIVE'
@@ -132,7 +132,7 @@ ORDER BY s.studentId DESC
             @Param("enrollmentStatus") String enrollmentStatus,
             @Param("pendingFees") boolean pendingFees,
             @Param("discount") boolean discount,
-            @Param("discontinuedDate") LocalDate discontinuedDate,
+            @Param("outdatedDate") LocalDate outdatedDate,
             Pageable pageable
     );
 
@@ -151,10 +151,10 @@ WHERE (
     :statuses IS NULL
     OR (
         CASE
-            WHEN s.enrollment_status IN ('TERMINATED','DISCONTINUED','EXPIRED')
+            WHEN s.enrollment_status IN ('TERMINATED','DISCONTINUED','EXPIRED', 'OUTDATED')
                 THEN s.enrollment_status
-            WHEN fr.till_date < :discontinuedDate
-                THEN 'DISCONTINUED'
+            WHEN fr.till_date < :outdatedDate
+                THEN 'OUTDATED'
             WHEN fr.till_date < CURRENT_DATE
                 THEN 'EXPIRED'
             ELSE 'ACTIVE'
@@ -171,7 +171,7 @@ ORDER BY
 """, nativeQuery = true)
     List<StrengthProjection> getBatchWiseStrength(
             @Param("statuses") List<String> statuses,
-            @Param("discontinuedDate") LocalDate discontinuedDate
+            @Param("outdatedDate") LocalDate outdatedDate
     );
 
 
@@ -204,12 +204,13 @@ ORDER BY
                     WHEN s.enrollment_status IN (
                         'TERMINATED',
                         'DISCONTINUED',
-                        'EXPIRED'
+                        'EXPIRED',
+                        'OUTDATED'
                     )
                         THEN s.enrollment_status
 
-                    WHEN fr.till_date < :discontinuedDate
-                        THEN 'DISCONTINUED'
+                    WHEN fr.till_date < :outdatedDate
+                        THEN 'OUTDATED'
 
                     WHEN fr.till_date < CURRENT_DATE
                         THEN 'EXPIRED'
@@ -231,7 +232,7 @@ ORDER BY
     List<Room2StrengthProjection> getStrengthByRooms(
             @Param("rooms") List<String> rooms,
             @Param("statuses") List<String> statuses,
-            @Param("discontinuedDate") LocalDate discontinuedDate
+            @Param("outdatedDate") LocalDate outdatedDate
     );
 
 
@@ -257,10 +258,10 @@ ORDER BY
         fr.fromDate,
         fr.tillDate,
     CASE
-        WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED')
+        WHEN s.enrollmentStatus IN ('TERMINATED','DISCONTINUED','EXPIRED', 'OUTDATED')
             THEN s.enrollmentStatus
-        WHEN fr.tillDate < :discontinuedDate
-            THEN 'DISCONTINUED'
+        WHEN fr.tillDate < :outdatedDate
+            THEN 'OUTDATED'
         WHEN fr.tillDate < CURRENT_DATE
             THEN 'EXPIRED'
         ELSE 'ACTIVE'
@@ -274,7 +275,7 @@ ORDER BY
 """)
     Optional<StudentVerificationResponse> verifyStudent(
             @Param("studentId") Long studentId,
-            @Param("discontinuedDate") LocalDate discontinuedDate
+            @Param("outdatedDate") LocalDate outdatedDate
     );
 
 

@@ -50,7 +50,7 @@ public class LookupService {
         dto.setLibraryName(configs.get("LIBRARY_NAME"));
         dto.setFinePerDay(Integer.parseInt(configs.get("FINE_PER_DAY")));
         dto.setDaysForExpire(Integer.parseInt(configs.get("DAYS_FOR_EXPIRE")));
-        dto.setDaysForDiscontinue(Integer.parseInt(configs.get("DAYS_FOR_DISCONTINUE")));
+        dto.setDaysForOutdated(Integer.parseInt(configs.get("DAYS_FOR_OUTDATED")));
         dto.setPageLimit(Integer.parseInt(configs.get("PAGE_LIMIT")));
         dto.setMinimumDaysForDateAdjustment(Integer.parseInt(configs.get("MINIMUM_DAYS_FOR_DATE_ADJUSTMENT")));
         dto.setPageSorting(configs.get("PAGE_SORTING"));

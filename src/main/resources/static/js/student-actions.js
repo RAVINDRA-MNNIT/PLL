@@ -1112,7 +1112,7 @@ showUpdateStatus(currentStatus) {
     isSeatApplicable() {
         const last = this.student?.lastFee;
         if (!last?.batchName) return false;
-        if (getUpdatedEnrollment(Date(), last.tillDate, this.student?.enrollmentStatus) != "ACTIVE") return false;
+        if (getUpdatedEnrollment(Date(), last.tillDate, this.student?.enrollmentStatus, this.getConfigurations().DAYS_FOR_OUTDATED) != "ACTIVE") return false;
         const name = last.batchName.toUpperCase();
         return name.includes("FULL DAY") || name.includes("24 HOURS");
     },
@@ -1331,7 +1331,7 @@ showUpdateStatus(currentStatus) {
                 alert("Reason is required for termination")
             }
             if (!Session.isAdmin()) {
-                message = `Are you to update status as ${status}?\n\n After termination this students can become active only admin`;
+                message = `Are you sure to update status as ${status}?\n\n After termination this students can become active only by admin`;
             }
         }
 
