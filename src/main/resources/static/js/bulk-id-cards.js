@@ -115,7 +115,38 @@ const BulkIdCards = {
         }
 
         if (refreshActivitiesButton) {
-            refreshActivitiesButton.onclick = () => this.loadRecentActivities();
+            refreshActivitiesButton.onclick = () => {
+                // Reset Recent Activity selection
+                this.selectedRecentActivityIds = [];
+
+                // Uncheck all visible checkboxes
+                document.querySelectorAll(
+                    "#recentActivitiesList .recent-activity-checkbox, #selectAllRecentActivities"
+                ).forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.indeterminate = false;
+                });
+
+                // Clear previously generated student cards
+                this.selectedStudentIds = [];
+                this.studentsCache = [];
+
+                const printArea = document.getElementById("idCardsPrintArea");
+
+                if (printArea) {
+                    printArea.innerHTML = "";
+                    printArea.style.display = "none";
+                }
+
+                // Hide Print and other card actions
+                this.updateModeActions("RECENT");
+
+                // Reset selection count and button states
+                this.updateRecentActivitySelection();
+
+                // Reload activities
+                this.loadRecentActivities();
+            };
         }
 
         if (generateButton) {
@@ -182,6 +213,28 @@ const BulkIdCards = {
         const isRange = mode === "RANGE";
         const isLater = mode === "LATER";
 
+        // Reset all selections whenever the tab changes
+        this.selectedRecentActivityIds = [];
+        this.selectedStudentIds = [];
+        this.studentsCache = [];
+
+        document.querySelectorAll(
+            "#recentActivitiesList .recent-activity-checkbox, " +
+            "#selectAllRecentActivities, " +
+            "#savedStudentIdsList .saved-student-id-checkbox"
+        ).forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.indeterminate = false;
+        });
+
+        // Clear generated cards and preview
+        this.clearCards();
+
+        if (printArea) {
+            printArea.innerHTML = "";
+            printArea.style.display = isRecent || isStatus ? "none" : "";
+        }
+
         // Student ID input
         if (idsSection) {
             idsSection.style.display = isRecent || isStatus || isRange ? "none" : "block";
@@ -215,17 +268,9 @@ const BulkIdCards = {
             previewSection.style.display = isStatus ? "none" : "";
         }
 
-        // Hide the card area in Recent Activities mode initially
-        if (printArea) {
-            if (isRecent || isStatus) {
-                printArea.innerHTML = "";
-                printArea.style.display = "none";
-            } else {
-                printArea.style.display = "";
-            }
-        }
-
-        // Apply the correct button visibility for every mode
+        // Update buttons and selection counts
+        this.updateRecentActivitySelection();
+        this.updateSavedPrintActions();
         this.updateModeActions(mode);
 
         // Load recent activities when selected
