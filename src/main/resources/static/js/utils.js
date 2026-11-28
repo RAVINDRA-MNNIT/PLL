@@ -710,3 +710,25 @@ function renderStatus(status) {
         </span>
     `;
 }
+
+function getWarningLevelClass(warningLevel) {
+    debugger;
+    const level = warningLevel?.toUpperCase().trim();
+
+    const classes = {
+        "FIRST WARNING": "warning-first",
+        "SECOND WARNING": "warning-second",
+        "FINAL WARNING": "warning-final",
+        "TERMINATE": "warning-terminate"
+    };
+
+    return classes[level] || "warning-default";
+}
+
+/* =========================================================
+   FORMAT TEXT
+   ========================================================= */
+function formatText(value) {
+    if (!value) {return "-";}
+    return String(value).replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
+}

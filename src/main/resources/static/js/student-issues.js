@@ -226,9 +226,9 @@ const StudentIssues = {
 
         rows.innerHTML = data.map(complaint => {
 
-            const category = this.formatText(complaint.category);
+            const category = formatText(complaint.category);
 
-            const status = this.formatText(
+            const status = formatText(
                 complaint.status || "OPEN"
             );
 
@@ -521,8 +521,8 @@ const StudentIssues = {
 
         rows.innerHTML =
             data.map(warning => {
-                const warningLevel = this.formatText(warning.warningLevel);
-                const category = this.formatText(warning.category);
+                const warningLevel = formatText(warning.warningLevel);
+                const category = formatText(warning.category);
                 const issuedAt = warning.issuedAt ? new Date(warning.issuedAt).toLocaleString() : "-";
                 const actionHtml =
                     isAdmin
@@ -544,8 +544,9 @@ const StudentIssues = {
                         <td>
                             ${this.escape((warning.fullName ?? "-").toUpperCase())}
                         </td>
-                        <td>
-                            <span class="warning-level-badge"> ${this.escape(warningLevel)}
+                         <td>
+                            <span class="warning-level-badge ${getWarningLevelClass(warningLevel)}">
+                                ${this.escape(warningLevel)}
                             </span>
                         </td>
                         <td>
@@ -966,33 +967,6 @@ const StudentIssues = {
         }
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /* =========================================================
-       FORMAT TEXT
-       ========================================================= */
-    formatText(value) {
-        if (!value) {return "-";}
-        return String(value).replaceAll("_", " ").replace(/\b\w/g, c => c.toUpperCase());
-    },
-
     /* =========================================================
        ESCAPE HTML
        ========================================================= */
@@ -1037,5 +1011,5 @@ const StudentIssues = {
                 </td>
             </tr>
         `;
-    }
+    },
 };

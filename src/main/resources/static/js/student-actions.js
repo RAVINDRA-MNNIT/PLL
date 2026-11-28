@@ -474,11 +474,9 @@ showUpdateStatus(currentStatus) {
         if (Session.isStudent()) {
             options += `<option value="DISCONTINUED">Discontinued</option>`;
         } else {
-            // Normal status changes
-            if (currentStatus === "DISCONTINUED") {
-                options += `<option value="ACTIVE">Active</option>`;
+            if (currentStatus !== "DISCONTINUED") {
+                options += `<option value="DISCONTINUED">Discontinued</option>`;
             }
-            options += `<option value="DISCONTINUED">Discontinued</option>`;
             if (currentStatus !== "TERMINATED") {
                 options += `<option value="TERMINATED">Terminated</option>`;
             }
@@ -1777,7 +1775,7 @@ showUpdateStatus(currentStatus) {
             console.error("Warning not found:", warningId);
             return;
         }
-        const warningLevel = formatWarningLevel(warning.warningLevel);
+        const warningLevel = formatText(warning.warningLevel);
         const confirmed = confirm(`Are you sure you want to delete this ${warningLevel}?\n\n` + `This action cannot be undone.`);
         if (!confirmed) {
             return;
@@ -1959,6 +1957,7 @@ showUpdateStatus(currentStatus) {
         } else {
             content = warnings.map((warning, index) => {
                 const issuedAt = warning.issuedAt ? renderRequestedAt(warning.issuedAt) : "-";
+                const warningLevel = formatText(warning.warningLevel);
                 const cancelledAt = warning.cancelledAt ? renderRequestedAt(warning.cancelledAt) : null;
                 const isLatestWarning = index === 0;
                 return `
@@ -1968,8 +1967,8 @@ showUpdateStatus(currentStatus) {
                             <span class="student-warning-number">
                                 Warning #${warnings.length - index}
                             </span>
-                            <span class="student-warning-level">
-                                ${formatWarningLevel(warning.warningLevel)}
+                            <span class="student-warning-level ${getWarningLevelClass(warningLevel)}">
+                                ${escape(warningLevel)}
                             </span>
                         </div>
                         <div class="student-warning-header-right">

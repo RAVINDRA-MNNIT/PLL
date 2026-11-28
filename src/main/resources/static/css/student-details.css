@@ -551,32 +551,59 @@
 }
 
 
+/* Common Warning Badge */
+.warning-level-badge,
 .student-warning-level {
-    display: inline-flex !important;
-
-    align-items: center !important;
-
-    width: auto !important;
-
-    margin: 0 !important;
-
-    padding: 3px 7px !important;
-
-    border-radius: 5px !important;
-
-    background: #fef3c7 !important;
-
-    color: #92400e !important;
-
-    font-size: 11px !important;
-
-    line-height: 1.2 !important;
-
-    font-weight: 600 !important;
-
-    white-space: nowrap !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    line-height: 1.4;
 }
 
+/* First Warning - Blue */
+.warning-first {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+/* Second Warning - Orange */
+.warning-second {
+    color: #c2410c;
+    background-color: #ffedd5;
+    border-color: #fdba74;
+}
+
+/* Final Warning - Red */
+.warning-final {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* Terminate - Dark Red */
+.warning-terminate {
+    color: #ffffff;
+    background-color: #991b1b;
+    border-color: #7f1d1d;
+}
+
+/* Default */
+.warning-default {
+    color: #475569;
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
 
 /* =========================================================
    WARNING DATE
